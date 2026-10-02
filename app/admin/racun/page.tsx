@@ -1,4 +1,5 @@
 import { KeyRound, Mail, ShieldCheck, User } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 import { AdminPage } from "@/components/admin/shell/AdminPage";
 import { zahtevajPrijavo } from "@/lib/auth/straza";
@@ -47,6 +48,20 @@ export default async function Racun() {
       eyebrow="Račun"
       title="Moj dostop"
       description="Kdo sem v tej administraciji in katere naprave imajo odprto sejo."
+      actions={
+        /* Ta stran samo POKAŽE. Vse, kar se da spremeniti — geslo,
+           dvofaktorska prijava, odjava naprav, izbris računa — je na
+           »Varnosti«; dve strani, ki obe nekaj spreminjata, pomenita, da
+           človek nikoli ne ve, na kateri je tisto, kar išče. */
+        <Button
+          as="a"
+          href="/admin/varnost"
+          variant="secondary"
+          leftIcon={<ShieldCheck className="h-4 w-4" aria-hidden />}
+        >
+          Geslo in varnost
+        </Button>
+      }
     >
       <section className="grid gap-(--s2) lg:grid-cols-2">
         <div className="border-chrome-line bg-surface rounded-2xl border p-(--s3)">

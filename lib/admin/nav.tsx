@@ -13,6 +13,7 @@ import {
   Receipt,
   Tags,
   Settings,
+  ShieldCheck,
   User,
 } from "lucide-react";
 import type { ComponentType } from "react";
@@ -100,6 +101,7 @@ function buildSections(): NavSection[] {
       label: "Nastavitve",
       items: [
         { href: "/admin/racun", label: "Račun", icon: User, osebni: true },
+        { href: "/admin/varnost", label: "Varnost", icon: ShieldCheck, osebni: true },
         { href: "/admin/nastavitve", label: "Sistem", icon: Settings },
       ],
     },

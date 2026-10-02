@@ -35,6 +35,17 @@ model Uporabnik {
   /// Zadnja uspešna prijava — da se vidi, ali je račun še v rabi.
   zadnjaPrijava DateTime?
 
+  // --- Dvofaktorska prijava (TOTP) ------------------------------------
+  /// Base32 skrivnost generatorja, ŠIFRIRANA z AES-256-GCM
+  /// (`lib/auth/sifriranje.ts`). Kdor dobi izvoz baze, z njo ne more
+  /// ustvariti kode — ključ je v okolju in ne v bazi.
+  totpSkrivnost String?
+  /// Kdaj je bil vklop zaključen. Null pomeni, da 2FA ne velja — skrivnost
+  /// sama po sebi ne zadošča, ker nastane že ob prikazu kode QR.
+  totpPotrjenAt DateTime?
+
+  totpRezervne TotpRezervnaKoda[]
+
   seje        Seja[]
   zetoniGesla ZetonGesla[]
   nalozeno    MediaAsset[]
@@ -42,6 +53,24 @@ model Uporabnik {
   updatedAt   DateTime     @updatedAt
 
   @@map("uporabniki")
+}
+
+/// Rezervne kode za primer izgubljenega telefona.
+///
+/// Hranjene kot SHA-256 odtis in nikoli v čisti obliki: pokažejo se ENKRAT,
+/// ob izdaji. Koda, ki jo je mogoče prebrati iz baze, ni rezervna pot, ampak
+/// druga vrata.
+model TotpRezervnaKoda {
+  id          String    @id @default(cuid())
+  uporabnikId String
+  odtis       String    @unique
+  uporabljena DateTime?
+  createdAt   DateTime  @default(now())
+
+  uporabnik Uporabnik @relation(fields: [uporabnikId], references: [id], onDelete: Cascade)
+
+  @@index([uporabnikId])
+  @@map("totp_rezervne_kode")
 }
 
 /// Seja v bazi in ne v podpisanem piškotku: tako se da odjaviti napravo, ki

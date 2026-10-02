@@ -68,6 +68,18 @@ export async function zacniSejo(uporabnikId: string, zapomni = true): Promise<vo
   });
 }
 
+/**
+ * Odtis ŽETONA TRENUTNE SEJE — da se ve, katera naprava je ta.
+ *
+ * Seznam naprav in »odjavi vse druge« brez tega nista mogoča: v bazi so
+ * sami odtisi, in brez odtisa te seje bi se človek odjavil tudi sam, prav
+ * takrat ko odjavlja tujo napravo.
+ */
+export async function odtisTrenutneSeje(): Promise<string | null> {
+  const zeton = (await cookies()).get(IME_PISKOTKA)?.value;
+  return zeton ? hash(zeton) : null;
+}
+
 /** Kdo je prijavljen — ali `null`. Ne preusmerja; to je stvar straže. */
 export async function trenutniUporabnik(): Promise<PrijavljenUporabnik | null> {
   const zeton = (await cookies()).get(IME_PISKOTKA)?.value;

@@ -8,6 +8,7 @@ import GesloPonastavitev from "@/emails/GesloPonastavitev";
 import { novoGesloShema, zahtevaGeslaShema } from "@/lib/prijava/validation";
 import { napaka, runAction, uspeh, type ActionResult } from "@/lib/actions/helpers";
 import { zasifriraj } from "@/lib/auth/geslo";
+import { naslovIp, steviPoskus } from "@/lib/auth/omejitev";
 import { posljiPredlogo } from "@/lib/posta/send";
 import { prisma } from "@/lib/prisma";
 import { STRAN } from "@/lib/podatki";
@@ -42,6 +43,21 @@ export async function zahtevajPonastavitev(
     const vhod = zahtevaGeslaShema.safeParse({ email: podatki.get("email") });
     if (!vhod.success) {
       return napaka("Preveri vnos.", { email: [vhod.error.issues[0]!.message] });
+    }
+
+    // Obrazec pošlje PRAVO POŠTO na tuj naslov, zato je brez omejitve orodje
+    // za nadlegovanje: nekdo lahko s klikanjem napolni predal komurkoli,
+    // katerega naslov ugane. Meja je po naslovu IP, ker e-naslov sme biti
+    // tudi napačen in ta pot ne sme izdati, kateri obstajajo.
+    const omejitev = await steviPoskus(
+      `ponastavitev:${(await naslovIp()) ?? "neznan"}`,
+      5,
+      60,
+    );
+    if (!omejitev.dovoljeno) {
+      // Odgovor ostane ISTI kot ob uspehu: tudi meja ne sme izdati, ali
+      // naslov obstaja.
+      return uspeh(ISTI_ODGOVOR);
     }
 
     const uporabnik = await prisma.uporabnik.findUnique({
