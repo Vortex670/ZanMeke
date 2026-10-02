@@ -1,5 +1,3 @@
-import "server-only";
-
 import argon2 from "argon2";
 
 // ============================================================================
@@ -11,6 +9,11 @@ import argon2 from "argon2";
 //
 // `preveri` vrne false tudi ob poškodovanem zapisu: napaka pri razčlenjevanju
 // zapisa ne sme nikoli pomeniti uspešne prijave.
+//
+// Brez `server-only` nalašč: ta modul uporablja tudi skripta za ustvarjanje
+// računa, ki teče zunaj Nexta. Varovalo sodi tja, kjer so skrivnosti — na
+// povezavo z bazo in na piškotke — ne na šifriranje, ki je čista funkcija.
+// V brskalnik tako ali tako ne more, ker je argon2 vezan na Node.
 // ============================================================================
 
 const NASTAVITVE = {

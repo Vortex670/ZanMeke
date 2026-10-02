@@ -79,7 +79,7 @@ export default function Dela() {
   return (
     <>
       <section className="bg-obrat text-na-obratu">
-        <div className="px-s2 pt-s5 pb-s4 mx-auto max-w-5xl">
+        <div className="px-s2 uvod-y mx-auto max-w-5xl">
           <p className="type-label text-poudarek">Dela</p>
           <h1 className="type-h1 mt-s2 max-w-[20ch]">Dve strani, ki danes delata.</h1>
           <p className="type-lead text-na-obratu/65 mt-s3 mera">

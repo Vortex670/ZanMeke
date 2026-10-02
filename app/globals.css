@@ -74,7 +74,19 @@
 
   /* Odsek po višini — isto merilo na vsaki strani. */
   --section-y: clamp(3.4rem, 2rem + 3.6vw, 6.472rem);
+
+  /* Višina glave. Glava LEŽI na temnem uvodu in ne zavzame prostora, zato
+     mora vsak uvod rezervirati prostor zanjo — sicer se naslov dotakne
+     menija. Ena vrednost na enem mestu: ko se glava spremeni, se odmiki
+     popravijo sami. Na telefonu je glava višja, ker ima meni v drugi vrsti. */
+  --glava-h: 7.5rem;
   --mera: 62ch;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --glava-h: 4.5rem;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -256,4 +268,12 @@ body {
   opacity: 0.5;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='z'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23z)' opacity='0.22'/%3E%3C/svg%3E");
   mix-blend-mode: overlay;
+}
+
+@layer components {
+  /* Temen uvod strani — rezervira prostor za glavo, ki leži na njem. */
+  .uvod-y {
+    padding-top: calc(var(--glava-h) + var(--section-y) * 0.6);
+    padding-bottom: var(--section-y);
+  }
 }

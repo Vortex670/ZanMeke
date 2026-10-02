@@ -76,7 +76,7 @@ export default function Domov() {
     <>
       {/* ── 1 · Hero — nadaljuje temno glavo ───────────────────────────── */}
       <section className="bg-obrat text-na-obratu globina">
-        <div className="px-s2 pt-s5 pb-s5 mx-auto flex min-h-[66svh] max-w-5xl flex-col justify-center">
+        <div className="px-s2 uvod-y mx-auto flex min-h-[66svh] max-w-5xl flex-col justify-center">
           <p className="type-label text-poudarek">
             {STRAN.kraj} · {STRAN.obmocje}
           </p>
