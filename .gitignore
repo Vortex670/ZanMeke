@@ -4,4 +4,8 @@ node_modules
 .vercel
 next-env.d.ts
 *.tsbuildinfo
+# Prismin odjemalec nastane ob gradnji (`prisma generate` v `build`), zato ga
+# v repozitoriju NI. Brez vrstice v `build` so git-sprožene postavitve padale
+# z »module not found: ./src/generated/prisma/client«, lokalne pa ne — ker
+# je mapa na disku že obstajala.
 src/generated
