@@ -5,14 +5,17 @@ import { prisma } from "@/lib/prisma";
 import { getStripe, jeStripePripravljen, STRIPE_WEBHOOK_SECRET } from "@/lib/stripe/client";
 
 // ============================================================================
-// POST /api/stripe — Stripe pove, da je bilo plačano
+// POST /api/stripe/webhook — Stripe pove, da je bilo plačano
 // ----------------------------------------------------------------------------
 // EDINO MESTO, kjer račun postane plačan. Povratni naslov po plačilu tega ne
 // sme narediti: kdor ga odpre na roko, bi si račun označil za plačanega sam.
 //
-// Nastavitev po objavi strani:
-//   Stripe → Developers → Webhooks → Add endpoint
-//   URL:     https://zanmeke.com/api/stripe
+// POT SE UJEMA S TISTO, KI JE ŽE VPISANA PRI STRIPU. Končna točka v živem
+// načinu obstaja od maja 2026 in kaže na `/api/stripe/webhook`; pot je zato
+// prestavljena sem, namesto da bi spreminjal nastavitev plačil, ki že dela.
+//
+// Stripe → Developers → Webhooks:
+//   URL:     https://zanmeke.com/api/stripe/webhook
 //   Dogodki: checkout.session.completed,
 //            checkout.session.async_payment_succeeded,
 //            checkout.session.expired

@@ -137,7 +137,7 @@ export const POSTA_PREDLOGE: readonly PostaPredloga[] = [
     kategorija: "racuni",
     prejemnik: "stranka",
     sprozilec: "Ko Stripe potrdi plačilo ali ko sam označiš nakazilo.",
-    izvor: "app/api/stripe/route.ts",
+    izvor: "app/api/stripe/webhook/route.ts",
     stanje: "pripravljena",
     zadeva: "Plačilo prejeto — {znesek}",
     spremenljivke: [
