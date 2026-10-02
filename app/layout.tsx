@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Archivo, Public_Sans } from "next/font/google";
+import { Archivo, Newsreader, Public_Sans } from "next/font/google";
 import { Toaster } from "sonner";
 
 import { Glava } from "@/components/layout/Glava";
@@ -20,10 +20,21 @@ import "./globals.css";
 // v JSON-LD. Tri mesta, ena resnica.
 // ============================================================================
 
-const naslov = Archivo({
+// Serif za naslove, groteskna za oznake in številke, Public Sans za branje.
+// Tri pisave zato, ker vsaka opravlja svoje: serif da naslovu obraz, grotesk
+// drži oznake in številke pokonci, telo pa mora biti berljivo in nič več.
+const naslov = Newsreader({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--pisava-naslov",
+  display: "swap",
+});
+
+const oznaka = Archivo({
   subsets: ["latin", "latin-ext"],
   weight: ["500", "600", "700"],
-  variable: "--pisava-naslov",
+  variable: "--pisava-oznaka",
   display: "swap",
 });
 
@@ -86,7 +97,10 @@ function JsonLd() {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="sl" className={`${naslov.variable} ${besedilo.variable}`}>
+    <html
+      lang="sl"
+      className={`${naslov.variable} ${oznaka.variable} ${besedilo.variable}`}
+    >
       <body className="bg-papir text-crnilo flex min-h-svh flex-col">
         <JsonLd />
         <Glava />

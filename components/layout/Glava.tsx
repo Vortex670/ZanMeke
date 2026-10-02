@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 import { STRAN } from "@/lib/podatki";
@@ -5,15 +6,17 @@ import { STRAN } from "@/lib/podatki";
 // ============================================================================
 // Glava strani
 // ----------------------------------------------------------------------------
-// Temna in enaka na vsaki strani. Dvoje jo dela: besedna znamka z zapisom,
-// kaj človek dela, in ENA pilula z dejanjem — telefon. Vse drugo je meni.
+// Glava LEŽI NA HEROJU in nima svoje podlage. Pas čez vrh bi stran razrezal na
+// dvoje in prvi zaslon bi izgubil višino; tako pa se znamka, meni in dejanje
+// berejo kot del iste slike. Vsaka stran se zato začne s temnim odsekom —
+// to je pravilo postavitve, ne naključje.
 //
-// Meni je oštevilčen. To ni okras: številke povedo, da je poti malo in da so
-// urejene po vrsti, v kateri jih kupec potrebuje — ponudba, dela, kontakt.
+// Dejanje je ENO in ima puščico v krogu: oko gre k njej tudi takrat, kadar
+// človek besedila ne bere. Telefonska številka je v njej, ker je klic edino
+// dejanje, ki na tej strani kaj prinese.
 //
-// Glava je temna tudi zunaj domače strani, zato ni treba loviti odmika ob
-// drsenju: prehod iz temne glave v temen hero je zvezen, drugod pa je glava
-// pas, ki stran drži skupaj.
+// NA TELEFONU JE MENI V DRUGI VRSTI in ne pod gumbom s tremi črtami. Poti so
+// tri; hamburger bi jih skril za dotik, ki ga marsikdo ne naredi.
 // ============================================================================
 
 const MENI = [
@@ -24,11 +27,13 @@ const MENI = [
 
 export function Glava() {
   return (
-    <header className="bg-obrat text-na-obratu sticky top-0 z-50">
-      <div className="gap-s3 px-s2 mx-auto flex h-14 max-w-5xl items-center">
-        <Link href="/" className="leading-none">
-          <span className="type-label block tracking-[0.2em]">ŽAN MEKE</span>
-          <span className="type-micro text-na-obratu/55 mt-0.5 block tracking-[0.1em]">
+    <header className="text-na-obratu absolute inset-x-0 top-0 z-50">
+      <div className="px-s2 gap-s3 mx-auto flex max-w-5xl items-center py-4">
+        <Link href="/" className="min-w-0 leading-none">
+          <span className="type-label block tracking-[0.22em] whitespace-nowrap">
+            ŽAN MEKE
+          </span>
+          <span className="type-micro text-na-obratu/50 mt-1 block whitespace-nowrap">
             SPLETNE STRANI · FOTOGRAFIJA
           </span>
         </Link>
@@ -38,7 +43,7 @@ export function Glava() {
             <Link
               key={m.href}
               href={m.href}
-              className="type-label text-na-obratu/70 hover:text-na-obratu transition-colors"
+              className="type-label text-na-obratu/75 hover:text-na-obratu transition-colors"
             >
               <span className="text-na-obratu/35 stevilke mr-1.5">
                 {String(i + 1).padStart(2, "0")}
@@ -50,11 +55,36 @@ export function Glava() {
 
         <a
           href={`tel:${STRAN.telefonKlic}`}
-          className="type-label bg-poudarek text-na-obratu px-s2 ml-auto rounded-full py-2 sm:ml-0"
+          className="type-label bg-poudarek text-na-obratu group ml-auto inline-flex items-center gap-2.5 rounded-full py-1.5 pr-4 pl-1.5 whitespace-nowrap transition-opacity hover:opacity-90 sm:ml-0"
         >
+          <span className="bg-na-obratu/15 inline-flex size-7 items-center justify-center rounded-full">
+            <ArrowRight
+              className="size-3.5 transition-transform group-hover:translate-x-0.5"
+              strokeWidth={2.2}
+              aria-hidden
+            />
+          </span>
           <span className="stevilke">{STRAN.telefon}</span>
         </a>
       </div>
+
+      {/* Telefon: poti v drugi vrsti, da so dosegljive brez dodatnega dotika. */}
+      <nav className="border-na-obratu/10 border-y sm:hidden">
+        <div className="px-s2 divide-na-obratu/10 mx-auto grid max-w-5xl grid-cols-3 divide-x">
+          {MENI.map((m, i) => (
+            <Link
+              key={m.href}
+              href={m.href}
+              className="type-label text-na-obratu/75 active:text-na-obratu py-2.5 text-center"
+            >
+              <span className="text-na-obratu/35 stevilke mr-1">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              {m.label}
+            </Link>
+          ))}
+        </div>
+      </nav>
     </header>
   );
 }

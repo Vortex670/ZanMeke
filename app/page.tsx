@@ -1,3 +1,4 @@
+import { ArrowRight, Clock, MapPin, Monitor, Phone } from "lucide-react";
 import Link from "next/link";
 
 import { KarticaDela } from "@/components/public/dela/KarticaDela";
@@ -30,9 +31,21 @@ import { CENE, DELA, KORAKI, OPIS, STRAN, TEZAVE } from "@/lib/podatki";
 export const revalidate = 3600;
 
 const DEJSTVA = [
-  { oznaka: "Odziv", vrednost: "Isti dan", pod: "pokličem nazaj" },
-  { oznaka: "Kje", vrednost: STRAN.kraj, pod: `po vsem ${STRAN.obmocje}u` },
   {
+    ikona: Clock,
+    oznaka: "Odziv",
+    vrednost: "Isti dan",
+    pod: "pokličem nazaj",
+    zivo: true,
+  },
+  {
+    ikona: MapPin,
+    oznaka: "Kje",
+    vrednost: STRAN.kraj,
+    pod: `po vsem ${STRAN.obmocje}u`,
+  },
+  {
+    ikona: Monitor,
     oznaka: "V živo",
     vrednost: `${DELA.filter((d) => d.stanje === "živo").length} strani`,
     pod: "gostinstvo in turizem",
@@ -62,8 +75,8 @@ export default function Domov() {
   return (
     <>
       {/* ── 1 · Hero — nadaljuje temno glavo ───────────────────────────── */}
-      <section className="bg-obrat text-na-obratu">
-        <div className="px-s2 pt-s5 pb-s4 mx-auto max-w-5xl">
+      <section className="bg-obrat text-na-obratu globina">
+        <div className="px-s2 pt-s5 pb-s5 mx-auto flex min-h-[66svh] max-w-5xl flex-col justify-center">
           <p className="type-label text-poudarek">
             {STRAN.kraj} · {STRAN.obmocje}
           </p>
@@ -75,15 +88,23 @@ export default function Domov() {
           <div className="mt-s4 gap-s1 flex flex-wrap items-center">
             <Link
               href="/ponudba"
-              className="type-label bg-poudarek text-na-obratu px-s3 rounded-full py-3"
+              className="type-label bg-poudarek text-na-obratu group inline-flex items-center gap-2.5 rounded-full py-2 pr-5 pl-2 transition-opacity hover:opacity-90"
             >
+              <span className="bg-na-obratu/15 inline-flex size-8 items-center justify-center rounded-full">
+                <ArrowRight
+                  className="size-4 transition-transform group-hover:translate-x-0.5"
+                  strokeWidth={2}
+                  aria-hidden
+                />
+              </span>
               Poglej ponudbo
             </Link>
             <a
               href={`tel:${STRAN.telefonKlic}`}
-              className="type-label border-na-obratu/25 text-na-obratu hover:bg-na-obratu/10 px-s3 rounded-full border py-3 transition-colors"
+              className="type-label border-na-obratu/25 text-na-obratu hover:bg-na-obratu/10 inline-flex items-center gap-2 rounded-full border py-3 pr-5 pl-4 transition-colors"
             >
-              Pokliči <span className="stevilke">{STRAN.telefon}</span>
+              <Phone className="size-4" strokeWidth={2} aria-hidden />
+              <span className="stevilke">{STRAN.telefon}</span>
             </a>
           </div>
         </div>
@@ -93,8 +114,19 @@ export default function Domov() {
           <dl className="divide-na-obratu/10 px-s2 mx-auto grid max-w-5xl sm:grid-cols-3 sm:divide-x">
             {DEJSTVA.map((d) => (
               <div key={d.oznaka} className="py-s3 sm:px-s3 sm:first:pl-0 sm:last:pr-0">
-                <dt className="type-label text-na-obratu/40">{d.oznaka}</dt>
-                <dd className="type-h3 mt-s1">{d.vrednost}</dd>
+                <dt className="type-label text-na-obratu/40 flex items-center gap-2">
+                  <d.ikona className="size-3.5" strokeWidth={2} aria-hidden />
+                  {d.oznaka}
+                </dt>
+                <dd className="type-h3 mt-s1 flex items-center gap-2">
+                  {d.zivo ? (
+                    <span
+                      aria-hidden
+                      className="bg-poudarek inline-block size-2 rounded-full"
+                    />
+                  ) : null}
+                  {d.vrednost}
+                </dd>
                 <dd className="type-micro text-na-obratu/50">{d.pod}</dd>
               </div>
             ))}

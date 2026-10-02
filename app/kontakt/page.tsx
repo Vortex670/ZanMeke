@@ -32,7 +32,7 @@ export default function Kontakt() {
   return (
     <>
       <section className="bg-obrat text-na-obratu">
-        <div className="px-s2 pt-s4 pb-s4 mx-auto max-w-5xl">
+        <div className="px-s2 pt-s5 pb-s4 mx-auto max-w-5xl">
           <p className="type-label text-poudarek">Kontakt</p>
           <h1 className="type-h1 mt-s2">Pokličite.</h1>
           <a
