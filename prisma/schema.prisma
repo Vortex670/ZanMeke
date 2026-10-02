@@ -35,8 +35,9 @@ model Uporabnik {
   /// Zadnja uspešna prijava — da se vidi, ali je račun še v rabi.
   zadnjaPrijava DateTime?
 
-  seje      Seja[]
-  createdAt DateTime @default(now())
+  seje        Seja[]
+  zetoniGesla ZetonGesla[]
+  createdAt   DateTime     @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("uporabniki")
@@ -104,4 +105,26 @@ model Sporocilo {
 
   @@index([stanje, createdAt])
   @@map("sporocila")
+}
+
+/// Žeton za ponastavitev gesla.
+///
+/// V bazi je SHA-256 žetona in ne žeton: kdor dobi izvoz baze, z njim ne more
+/// prevzeti računa. Žeton velja eno uro in samo enkrat — `porabljen` se
+/// postavi takoj ob uporabi, da dvakrat poslana povezava ne odpre dveh
+/// ponastavitev.
+model ZetonGesla {
+  id          String   @id @default(cuid())
+  uporabnikId String
+
+  zetonHash String    @unique
+  potece    DateTime
+  porabljen DateTime?
+
+  uporabnik Uporabnik @relation(fields: [uporabnikId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+
+  @@index([uporabnikId])
+  @@index([potece])
+  @@map("zetoni_gesla")
 }

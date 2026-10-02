@@ -1,7 +1,8 @@
 "use client";
 
+import { Eye, EyeOff } from "lucide-react";
 import type { ReactNode } from "react";
-import { useId } from "react";
+import { useId, useState } from "react";
 
 import { cn } from "@/lib/utils/cn";
 
@@ -119,6 +120,105 @@ export function Pilula({
         className="sr-only"
       />
       {napis}
+    </label>
+  );
+}
+
+/**
+ * Vnos z ikono v polju.
+ *
+ * Ikona ni okras: pri dveh poljih brez oznak bi bilo treba brati, katero je
+ * katero. Kljuc in ovojnica se prepoznata brez branja.
+ */
+export function VnosZIkono({
+  ikona,
+  className,
+  ...rest
+}: { ikona: ReactNode } & React.ComponentProps<"input">) {
+  return (
+    <div className="relative">
+      <span
+        aria-hidden
+        className="text-bledo pointer-events-none absolute top-1/2 left-3 -translate-y-1/2"
+      >
+        {ikona}
+      </span>
+      <input {...rest} className={cn(OSNOVA, "pl-10", className)} />
+    </div>
+  );
+}
+
+/**
+ * Geslo z gumbom za prikaz.
+ *
+ * Brez njega človek z dolgim geslom tipka na slepo in se zmoti — pri prijavi,
+ * kjer napaka ne pove, KJE se je zmotil. Gumb je `type="button"`, sicer bi ob
+ * pritisku oddal obrazec.
+ */
+export function VnosGeslo({
+  ikona,
+  className,
+  ...rest
+}: { ikona?: ReactNode } & React.ComponentProps<"input">) {
+  const [vidno, nastavi] = useState(false);
+
+  return (
+    <div className="relative">
+      {ikona ? (
+        <span
+          aria-hidden
+          className="text-bledo pointer-events-none absolute top-1/2 left-3 -translate-y-1/2"
+        >
+          {ikona}
+        </span>
+      ) : null}
+      <input
+        {...rest}
+        type={vidno ? "text" : "password"}
+        className={cn(OSNOVA, ikona && "pl-10", "pr-11", className)}
+      />
+      <button
+        type="button"
+        onClick={() => nastavi((v) => !v)}
+        aria-label={vidno ? "Skrij geslo" : "Pokaži geslo"}
+        className="text-bledo hover:text-crnilo absolute top-1/2 right-2 -translate-y-1/2 rounded p-1.5 transition-colors"
+      >
+        {vidno ? (
+          <EyeOff className="size-4" strokeWidth={1.8} aria-hidden />
+        ) : (
+          <Eye className="size-4" strokeWidth={1.8} aria-hidden />
+        )}
+      </button>
+    </div>
+  );
+}
+
+/** Kljukica z besedilom in razlago pod njim. */
+export function Kljukica({
+  ime,
+  napis,
+  razlaga,
+  privzeto,
+}: {
+  ime: string;
+  napis: string;
+  razlaga?: string;
+  privzeto?: boolean;
+}) {
+  return (
+    <label className="group gap-s1 grid cursor-pointer grid-cols-[1.15rem_1fr] items-start">
+      <input
+        type="checkbox"
+        name={ime}
+        defaultChecked={privzeto}
+        className="border-crta text-poudarek accent-poudarek mt-0.5 size-[1.15rem] rounded-[3px]"
+      />
+      <span>
+        <span className="type-body block">{napis}</span>
+        {razlaga ? (
+          <span className="type-micro text-bledo mt-0.5 block">{razlaga}</span>
+        ) : null}
+      </span>
     </label>
   );
 }

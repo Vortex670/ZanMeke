@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Archivo, Newsreader, Public_Sans } from "next/font/google";
 import { Toaster } from "sonner";
 
-import { Glava } from "@/components/layout/Glava";
-import { Noga } from "@/components/layout/Noga";
 import { OPIS, STRAN } from "@/lib/podatki";
 
 import "./globals.css";
@@ -103,9 +101,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body className="bg-papir text-crnilo flex min-h-svh flex-col">
         <JsonLd />
-        <Glava />
-        <main className="flex-1">{children}</main>
-        <Noga />
+        {children}
         {/* Toast pove izid dejanja (oddano, ni šlo) — nikoli napake posameznega
             polja, te stojijo pod poljem, kjer jih je treba popraviti. */}
         <Toaster position="bottom-center" richColors closeButton />

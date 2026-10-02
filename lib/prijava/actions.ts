@@ -58,7 +58,9 @@ export async function prijavi(
     }
 
     await pocistiPotekle();
-    await zacniSejo(uporabnik.id);
+    // Brez kljukice traja seja do zaprtja brskalnika — tako je prav na tuji
+    // napravi. S kljukico trideset dni, kar je prav na svojem telefonu.
+    await zacniSejo(uporabnik.id, podatki.get("zapomni") === "on");
     await prisma.uporabnik.update({
       where: { id: uporabnik.id },
       data: { zadnjaPrijava: new Date() },
@@ -69,7 +71,10 @@ export async function prijavi(
 
   // Preusmeritev MORA biti zunaj `runAction`: Next jo izvede tako, da vrže
   // posebno napako, in lovilec v ovoju bi jo pogoltnil kot okvaro.
-  if (izid.ok) redirect("/admin");
+  if (izid.ok) {
+    const kam = String(podatki.get("next") ?? "/admin");
+    redirect(kam.startsWith("/") && !kam.startsWith("//") ? kam : "/admin");
+  }
   return izid;
 }
 

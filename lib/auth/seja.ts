@@ -32,8 +32,14 @@ export type PrijavljenUporabnik = {
   ime: string;
 };
 
-/** Ustvari sejo in postavi piškotek. Vrne nič — klicatelj preusmeri sam. */
-export async function zacniSejo(uporabnikId: string): Promise<void> {
+/**
+ * Ustvari sejo in postavi piškotek. Vrne nič — klicatelj preusmeri sam.
+ *
+ * `zapomni` odloča o piškotku, ne o seji: zapis v bazi ima rok tako ali tako.
+ * Brez kljukice piškotek nima roka in ga brskalnik zavrže ob zaprtju — kar je
+ * edino pravilno vedenje na tujem računalniku.
+ */
+export async function zacniSejo(uporabnikId: string, zapomni = true): Promise<void> {
   const zeton = randomBytes(32).toString("base64url");
   const potece = new Date(Date.now() + TRAJANJE_DNI * 24 * 3_600_000);
 
@@ -54,7 +60,7 @@ export async function zacniSejo(uporabnikId: string): Promise<void> {
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    expires: potece,
+    ...(zapomni ? { expires: potece } : {}),
   });
 }
 
