@@ -1,6 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import {
+  premakniBlokShema,
+  saveBlokShema,
+  toggleBlokShema,
+} from "@/lib/domov/validation";
 
 import { zahtevajPrijavo } from "@/lib/auth/straza";
 import {
@@ -48,6 +53,9 @@ export async function toggleBlokAction(
 ): Promise<ActionResult> {
   await zahtevajPrijavo();
 
+  const vhod = toggleBlokShema.safeParse({ stran, kljuc });
+  if (!vhod.success) return { ok: false, message: "Tega odseka ni." };
+
   const def = najdiBlok(stran, kljuc);
   if (!def) return { ok: false, message: "Tega odseka ni." };
   if (def.obvezen) {
@@ -73,6 +81,9 @@ export async function premakniBlokAction(
   smer: "gor" | "dol",
 ): Promise<ActionResult> {
   await zahtevajPrijavo();
+
+  const vhod = premakniBlokShema.safeParse({ stran, kljuc, smer });
+  if (!vhod.success) return { ok: false, message: "Tega odseka ni." };
 
   const vrstice = await prisma.vsebinaBlok.findMany({ where: { stran } });
   const poKljucu = new Map(vrstice.map((v) => [v.kljuc, v]));
@@ -114,6 +125,12 @@ export async function saveBlokBesediloAction(
   data: Record<string, string>,
 ): Promise<ActionResult> {
   await zahtevajPrijavo();
+
+  // Shema pokrije obliko, register pa obstoj: ključi odsekov se s časom
+  // spreminjajo in seznam na dveh mestih se razide ob prvem novem odseku.
+  const vhod = saveBlokShema.safeParse({ stran, kljuc, data });
+  if (!vhod.success) return { ok: false, message: "Vsebine ni bilo mogoče shraniti." };
+  data = vhod.data.data;
 
   const def = najdiBlok(stran, kljuc);
   if (!def) return { ok: false, message: "Tega odseka ni." };

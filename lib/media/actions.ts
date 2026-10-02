@@ -5,7 +5,7 @@ import { randomUUID } from "node:crypto";
 import sharp from "sharp";
 
 import { zahtevajPrijavo } from "@/lib/auth/straza";
-import { DOVOLJENE_VRSTE, NAJVEC_BAJTOV, NAJVEC_MB } from "@/lib/media/limits";
+import { mapaShema, slikaShema, urlSlikeShema } from "@/lib/media/validation";
 import { prisma } from "@/lib/prisma";
 import { storage } from "@/lib/storage";
 import type { ActionResult } from "@/lib/actions/helpers";
@@ -27,8 +27,6 @@ import type { ActionResult } from "@/lib/actions/helpers";
 // se ne razkrije, kako je bila datoteka na disku poimenovana.
 // ============================================================================
 
-const DOVOLJENE = new Set<string>(DOVOLJENE_VRSTE);
-
 /** Najdaljša stranica po pomanjšanju. */
 const NAJVECJA_STRANICA = 2000;
 
@@ -44,18 +42,17 @@ export async function uploadImageAction(
 ): Promise<ActionResult<UploadedImage>> {
   const user = await zahtevajPrijavo();
 
-  const file = formData.get("file");
-  const mapa = String(formData.get("folder") ?? "splosno");
-
-  if (!(file instanceof File)) {
-    return { ok: false, message: "Datoteka manjka." };
+  // Shema namesto zaporedja `if`-ov: sporočila so ista, pravilo pa stoji v
+  // `validation.ts` kot pri vseh drugih domenah.
+  const preverjena = slikaShema.safeParse(formData.get("file"));
+  if (!preverjena.success) {
+    return {
+      ok: false,
+      message: preverjena.error.issues[0]?.message ?? "Datoteka manjka.",
+    };
   }
-  if (!DOVOLJENE.has(file.type)) {
-    return { ok: false, message: "Dovoljene so slike JPEG, PNG, WebP ali AVIF." };
-  }
-  if (file.size > NAJVEC_BAJTOV) {
-    return { ok: false, message: `Slika je prevelika — največ ${NAJVEC_MB} MB.` };
-  }
+  const file = preverjena.data;
+  const mapa = mapaShema.parse(formData.get("folder") ?? "splosno");
 
   const vhod = Buffer.from(await file.arrayBuffer());
 
@@ -84,8 +81,7 @@ export async function uploadImageAction(
     };
   }
 
-  const varnaMapa = mapa.replace(/[^a-z0-9-]/gi, "").toLowerCase() || "splosno";
-  const key = `${varnaMapa}/${randomUUID()}.webp`;
+  const key = `${mapa}/${randomUUID()}.webp`;
 
   const rezultat = await storage.upload({
     key,
@@ -104,7 +100,7 @@ export async function uploadImageAction(
 
   const asset = await prisma.mediaAsset.create({
     data: {
-      bucket: varnaMapa,
+      bucket: mapa,
       path: key,
       url: rezultat.publicUrl,
       kind: "IMAGE",
@@ -138,7 +134,10 @@ export async function uploadImageAction(
 export async function deleteImageAction(url: string): Promise<ActionResult> {
   await zahtevajPrijavo();
 
-  const asset = await prisma.mediaAsset.findFirst({ where: { url } });
+  const naslov = urlSlikeShema.safeParse(url);
+  if (!naslov.success) return { ok: false, message: "Naslov slike ni veljaven." };
+
+  const asset = await prisma.mediaAsset.findFirst({ where: { url: naslov.data } });
   if (!asset) return { ok: true, message: "Slika je odstranjena." };
 
   try {
