@@ -1,0 +1,107 @@
+// ============================================================================
+// Shema — kar stran res potrebuje in nič več
+// ----------------------------------------------------------------------------
+// Prejšnja stran je imela 82 tabel in nobenega naročila. Ta ima tri: človeka,
+// ki se prijavi, sejo in sporočilo z obrazca. Vsaka naslednja tabela mora
+// imeti ime opravila, ki ga opravi — ne »bo pa prav prišlo«.
+//
+// Baza je prazna — stara shema je bila odstranjena, preden se je ta začela.
+// Zato navadna `public` in nobenih preveritvenih funkcij za več shem: manj
+// nastavitev, manj stvari, ki se pokvarijo ob poolerju.
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+// Povezovalna niza nista tu, ampak v `prisma.config.ts` — tako zahteva
+// Prisma 7. Migracije in Studio gredo po DIRECT_URL (vrata 5432, brez
+// poolerja), stran pa se poveže po DATABASE_URL (6543, transaction pooler).
+datasource db {
+  provider = "postgresql"
+}
+
+/// Kdor se sme prijaviti v admin. Ena oseba — a tabela, ker geslo in seje
+/// morajo nekje živeti in ker bo nekoč morda računovodkinja imela svoj dostop.
+model Uporabnik {
+  id    String @id @default(cuid())
+  email String @unique
+  ime   String
+
+  /// argon2id. Nikoli v čisti obliki, nikoli v dnevniku.
+  geslo String
+
+  /// Zadnja uspešna prijava — da se vidi, ali je račun še v rabi.
+  zadnjaPrijava DateTime?
+
+  seje      Seja[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("uporabniki")
+}
+
+/// Seja v bazi in ne v podpisanem piškotku: tako se da odjaviti napravo, ki
+/// je ostala prijavljena na blagajni ali na tujem računalniku.
+model Seja {
+  id          String   @id @default(cuid())
+  uporabnikId String
+
+  /// SHA-256 žetona iz piškotka. Kdor dobi izvoz baze, z njim ne more v sejo.
+  zetonHash String   @unique
+  potece    DateTime
+
+  /// Za pregled »kje sem prijavljen«.
+  naprava String?
+  ip      String?
+
+  uporabnik Uporabnik @relation(fields: [uporabnikId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+
+  @@index([uporabnikId])
+  @@index([potece])
+  @@map("seje")
+}
+
+enum StanjeSporocila {
+  NOVO
+  V_TEKU
+  ZAKLJUCENO
+}
+
+enum Zanimanje {
+  SPLETNA_STRAN
+  FOTOGRAFIJE
+  OBOJE
+  DRUGO
+}
+
+/// Povpraševanje z obrazca. Shrani se TUDI, kadar pošta ne gre skozi — e-pošta
+/// zna odpovedati, povpraševanje pa se ne sme izgubiti, ker je to edina stvar,
+/// zaradi katere stran stoji.
+model Sporocilo {
+  id String @id @default(cuid())
+
+  ime      String
+  podjetje String?
+  telefon  String
+  epota    String?
+
+  zanimanje Zanimanje
+  sporocilo String
+
+  stanje  StanjeSporocila @default(NOVO)
+  opomba  String?
+  /// Ali je obvestilo o tem povpraševanju res odšlo po pošti.
+  poslano Boolean         @default(false)
+
+  /// Za primer zlorabe obrazca; brez brskalnikovega prstnega odtisa.
+  ip String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([stanje, createdAt])
+  @@map("sporocila")
+}

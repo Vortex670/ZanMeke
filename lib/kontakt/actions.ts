@@ -5,6 +5,7 @@ import { Resend } from "resend";
 import { napaka, runAction, uspeh, type ActionResult } from "@/lib/actions/helpers";
 import { ZANIMANJE_NAPIS, povprasevanjeSchema } from "@/lib/kontakt/validation";
 import { STRAN } from "@/lib/podatki";
+import { prisma } from "@/lib/prisma";
 
 // ============================================================================
 // lib/kontakt/actions.ts — povpraševanje pride do Žana
@@ -65,6 +66,21 @@ export async function posljiPovprasevanje(
       .filter(Boolean)
       .join("\n");
 
+    // NAJPREJ V BAZO, šele potem pošta. E-pošta zna odpovedati — tiho in brez
+    // sledi; povpraševanje pa je edina stvar, zaradi katere ta stran stoji, in
+    // se ne sme izgubiti zaradi tuje storitve.
+    const zapis = await prisma.sporocilo.create({
+      data: {
+        ime: v.ime,
+        podjetje: v.podjetje || null,
+        telefon: v.telefon,
+        epota: v.epota || null,
+        zanimanje: v.zanimanje,
+        sporocilo: v.sporocilo,
+      },
+      select: { id: true },
+    });
+
     const kljuc = process.env.RESEND_API_KEY;
     if (!kljuc) {
       console.warn("[kontakt] RESEND_API_KEY ni nastavljen; sporočilo samo v dnevnik");
@@ -83,10 +99,16 @@ export async function posljiPovprasevanje(
 
     if (error) {
       console.error("[kontakt] Resend:", error);
+      // Zapis ostane v adminu z oznako, da obvestilo ni odšlo.
       return napaka(
         `Sporočila ni bilo mogoče poslati. Pokličite na ${STRAN.telefon} — odgovorim takoj.`,
       );
     }
+
+    await prisma.sporocilo.update({
+      where: { id: zapis.id },
+      data: { poslano: true },
+    });
 
     return uspeh("Hvala, sporočilo je oddano. Oglasim se isti dan.");
   });
