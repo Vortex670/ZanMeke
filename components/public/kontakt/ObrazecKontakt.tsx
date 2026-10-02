@@ -58,7 +58,7 @@ export function ObrazecKontakt({
           {(l) => <Vnos {...l} name="ime" autoComplete="name" required />}
         </Polje>
 
-        <Polje oznaka="Gostilna ali podjetje" napaka={napakaPolja("podjetje")}>
+        <Polje oznaka="Podjetje ali dejavnost" napaka={napakaPolja("podjetje")}>
           {(l) => <Vnos {...l} name="podjetje" autoComplete="organization" />}
         </Polje>
 
@@ -94,7 +94,7 @@ export function ObrazecKontakt({
       <Polje
         oznaka="Sporočilo"
         obvezno
-        namig="Kaj vas muči? Na primer: »Vsak dan dvajset klicev za malico.«"
+        namig="Kaj vas muči? Na primer: »Vsak dan dvajset klicev z istim vprašanjem.«"
         napaka={napakaPolja("sporocilo")}
       >
         {(l) => <Besedilo {...l} name="sporocilo" required />}

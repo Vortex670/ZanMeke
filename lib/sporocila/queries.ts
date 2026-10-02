@@ -10,12 +10,25 @@ import { prisma } from "@/lib/prisma";
 // ============================================================================
 
 export async function stejSporocila() {
-  const [novo, vTeku, skupaj] = await Promise.all([
+  const [novo, vTeku, zakljuceno, skupaj] = await Promise.all([
     prisma.sporocilo.count({ where: { stanje: "NOVO" } }),
     prisma.sporocilo.count({ where: { stanje: "V_TEKU" } }),
+    prisma.sporocilo.count({ where: { stanje: "ZAKLJUCENO" } }),
     prisma.sporocilo.count(),
   ]);
-  return { novo, vTeku, skupaj };
+  return { novo, vTeku, zakljuceno, skupaj };
+}
+
+/** Povpraševanja po stanju; brez stanja vsa. */
+export async function sporocilaPoStanju(
+  stanje?: "NOVO" | "V_TEKU" | "ZAKLJUCENO",
+  koliko = 200,
+) {
+  return prisma.sporocilo.findMany({
+    where: stanje ? { stanje } : undefined,
+    orderBy: { createdAt: "desc" },
+    take: koliko,
+  });
 }
 
 export async function zadnjaSporocila(koliko = 20) {

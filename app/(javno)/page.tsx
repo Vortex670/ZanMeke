@@ -1,255 +1,294 @@
 import { ArrowRight, Clock, MapPin, Monitor, Phone } from "lucide-react";
-import Link from "next/link";
 
-import { KarticaDela } from "@/components/public/dela/KarticaDela";
-import { CENE, DELA, KORAKI, OPIS, STRAN, TEZAVE } from "@/lib/podatki";
+import { BatchReveal } from "@/components/motion/BatchReveal";
+import { MagnetniGumb } from "@/components/motion/MagnetniGumb";
+import { OdhodHeroja } from "@/components/motion/OdhodHeroja";
+import { Ozadje3D } from "@/components/motion/Ozadje3D";
+import { SteviloNaraste } from "@/components/motion/SteviloNaraste";
+import { MrezaStoritev } from "@/components/public/MrezaStoritev";
+import { Odsek, UvodOdseka } from "@/components/public/Odsek";
+import { Priporocila } from "@/components/public/Priporocila";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { priporocilaLd } from "@/lib/seo/jsonLd";
+import { OkvirBrskalnika } from "@/components/public/OkvirBrskalnika";
+import { Stik } from "@/components/public/Stik";
+import { VrsticaDela } from "@/components/public/dela/VrsticaDela";
+import { GUMB_NA_TEMNEM, GUMB_POLNI_NA_TEMNEM, GumbPovezava } from "@/components/ui/Gumb";
+import { getVidniBloki } from "@/lib/domov/queries";
+import { getObjavljenaPriporocila } from "@/lib/priporocila/queries";
+import { DELA, OPIS, STRAN } from "@/lib/podatki";
 
 // ============================================================================
 // Domača stran
 // ----------------------------------------------------------------------------
-// Šest odsekov, vsak odgovarja na eno vprašanje — po vrsti, kakor si jih
-// kupec zastavlja:
+// ŠTIRJE ODSEKI in nič več. Človek, ki te prvič vidi, ne prebere tridesetih
+// povedi, da bi ugotovil, ali te pokliče. Podrobnosti so na /ponudba.
 //
-//   1 kaj dela ta človek in za koga   → hero
-//   2 je to že kdaj naredil           → dela, vsako z IZIDOM in ne s posnetkom
-//   3 razume mojo težavo              → štiri stvari, ki jih slišiš pri vsaki
-//   4 koliko                          → cene, s priporočeno srednjo stopnjo
-//   5 kaj me čaka                     → štirje koraki in rok
-//   6 kako ga dobim                   → telefon
+//   1 kdo sem in kaj delam     → uvod, obe storitvi v naslovu
+//   2 katero od dvojega rabim  → mreža s ceno in potekom
+//   3 je to že kdaj naredil    → žive strani čez vso širino
+//   4 kako ga dobim            → telefon, velik kot naslov
 //
-// HERO JE TEMEN IN ČEZ CELO ŠIRINO, ker se nadaljuje iz glave: prvi zaslon
-// mora imeti težo, vse ostalo pa je papir. Poudarek porabimo na enem mestu
-// (hero in cena), drugod je stran tiha — sicer poudarek neha biti poudarek.
+// DVOJE delam in oboje je enako pomembno: spletne strani IN fotografijo. Na
+// prvem zaslonu morata biti obe, sicer pride klic samo za eno.
 //
-// Pod herojem je PAS DEJSTEV. Tri reči, ki jih človek preveri, preden kogar
-// koli pokliče: kdaj odgovorim, od kod sem in ali sem to že delal.
+// RITEM PLOSKEV je tisto, kar stran drži skupaj: temno — svetlo — svetlo —
+// temno. Prej je bilo vse temno in dolga stran se je brala kot en sam blok,
+// v katerem oko ni imelo kje vdihniti. Ploskev nastavi `<Odsek>` in z njo
+// pomenske žetone, zato ista kartica deluje na obeh.
 //
-// Česar ni: galerije, bloga in prodaje fotografij. Niso slabi — samo na
-// nobeno od teh šestih vprašanj ne odgovorijo, in stran ima eno nalogo.
+// Ploskve tečejo čez VES ZASLON, besedilo pa ne — vrstica, dolga čez 1900 px,
+// se ne bere. Zato polno ozadje in `vsebnik` okrog besedila.
 // ============================================================================
 
-export const revalidate = 3600;
+// Vsebina je v bazi, zato se stran osveži ob shranjevanju odseka
+// (`revalidatePath` v `lib/domov/actions.ts`) in ne po uri. Urednik, ki
+// shrani besedilo in mora čakati, misli, da shranjevanje ne dela.
+export const dynamic = "force-dynamic";
 
-const DEJSTVA = [
-  {
-    ikona: Clock,
-    oznaka: "Odziv",
-    vrednost: "Isti dan",
-    pod: "pokličem nazaj",
-    zivo: true,
-  },
-  {
-    ikona: MapPin,
-    oznaka: "Kje",
-    vrednost: STRAN.kraj,
-    pod: `po vsem ${STRAN.obmocje}u`,
-  },
-  {
-    ikona: Monitor,
-    oznaka: "V živo",
-    vrednost: `${DELA.filter((d) => d.stanje === "živo").length} strani`,
-    pod: "gostinstvo in turizem",
-  },
-];
-
-/** Naslov odseka — oznaka, naslov in uvod vedno v istem razmerju. */
-function Glava({
-  oznaka,
-  naslov,
-  uvod,
-}: {
-  oznaka: string;
-  naslov: string;
-  uvod?: string;
-}) {
-  return (
-    <div className="mera">
-      <p className="type-label text-poudarek">{oznaka}</p>
-      <h2 className="type-h2 mt-s1">{naslov}</h2>
-      {uvod ? <p className="type-body text-mirno mt-s2">{uvod}</p> : null}
-    </div>
-  );
+/**
+ * Pas dejstev iz urejenega besedila, s privzetim iz kode.
+ *
+ * Vsako polje ima svoj privzetek: urednik, ki popravi samo eno vrstico, ne
+ * sme izgubiti drugih dveh.
+ */
+function dejstva(d: Record<string, string>) {
+  return [
+    {
+      ikona: Clock,
+      oznaka: "Odziv",
+      vrednost: d.odziv || "Isti dan",
+      pod: d.odzivPod || "pokličem nazaj",
+      zivo: true,
+    },
+    {
+      ikona: MapPin,
+      oznaka: "Kje",
+      vrednost: d.kje || STRAN.kraj,
+      pod: d.kjePod || `po vsem ${STRAN.obmocjeV}`,
+    },
+    {
+      ikona: Monitor,
+      oznaka: "V živo",
+      stevilo: DELA.filter((x) => x.stanje === "živo").length,
+      vrednost: `${DELA.filter((x) => x.stanje === "živo").length} strani`,
+      pod: d.zivoPod || "obe vodim sam",
+    },
+  ];
 }
 
-export default function Domov() {
+export default async function Domov() {
+  // Odseki iz baze; kar ni urejeno, ima prazno polje in pade na privzeto
+  // besedilo spodaj. Skriti odseki sem sploh ne pridejo.
+  const [bloki, priporocila] = await Promise.all([
+    getVidniBloki(),
+    getObjavljenaPriporocila().catch(() => []),
+  ]);
+  const vsebina = new Map(bloki.map((b) => [b.def.kljuc, b.data]));
+  const b = (kljuc: string) => vsebina.get(kljuc) ?? {};
+
+  const hero = b("hero");
+  const storitve = b("storitve");
+  const dela = b("dela");
+  const stik = b("stik");
+  const viden = (kljuc: string) => vsebina.has(kljuc);
+
   return (
     <>
-      {/* ── 1 · Hero — nadaljuje temno glavo ───────────────────────────── */}
-      <section className="bg-obrat text-na-obratu globina">
-        <div className="px-s2 uvod-y mx-auto flex min-h-[66svh] max-w-5xl flex-col justify-center">
-          <p className="type-label text-poudarek">
-            {STRAN.kraj} · {STRAN.obmocje}
-          </p>
-          <h1 className="type-h1 mt-s2 max-w-[19ch]">
-            Spletne strani, ki opravijo delo, ki ga zdaj opravlja telefon.
-          </h1>
-          <p className="type-lead text-na-obratu/65 mt-s3 mera">{OPIS}</p>
+      {/* ── 1 · Uvod ────────────────────────────────────────────────────── */}
+      {/* KOLAŽ IN NE DVA STOLPCA. Naslov levo in slika desno je postavitev,
+          ki jo ima vsaka druga predstavitvena stran — in tudi
+          gostilnica-plus.si. Tu naslov teče čez VSO širino, posnetek žive
+          strani pa je potegnjen navzgor čezenj in čez desni rob: dve ravnini,
+          ki se prekrivata, se bereta kot ena slika in ne kot dva predala. */}
+      <Odsek
+        plast="temna"
+        sirina="poln"
+        sij
+        visina={false}
+        as="section"
+        className="uvod-zaslon"
+        vsebnikClassName="flex flex-1 flex-col"
+      >
+        <Ozadje3D />
 
-          <div className="mt-s4 gap-s1 flex flex-wrap items-center">
-            <Link
-              href="/ponudba"
-              className="type-label bg-poudarek text-na-obratu group inline-flex items-center gap-2.5 rounded-full py-2 pr-5 pl-2 transition-opacity hover:opacity-90"
-            >
-              <span className="bg-na-obratu/15 inline-flex size-8 items-center justify-center rounded-full">
-                <ArrowRight
-                  className="size-4 transition-transform group-hover:translate-x-0.5"
-                  strokeWidth={2}
-                  aria-hidden
+        <OdhodHeroja className="flex flex-1 flex-col">
+          <div className="vsebnik-sirok uvod-y relative lg:min-h-[34rem]">
+            <p className="type-poglavje text-poudarek mb-s3">
+              {hero.oznaka || `${STRAN.kraj} · ${STRAN.obmocje}`}
+            </p>
+
+            {/* Naslov se na širokem zaslonu konča, preden se začne posnetek:
+                kolaž pomeni, da se ravnini prekrivata, ne da ena požre drugo.
+                Brez te meje je posnetek pokril »za gostilne in apartmaje«. */}
+            <h1 className="type-hero max-w-[15ch] lg:max-w-[58%]">
+              {hero.naslov || "Spletne strani, ki nekaj naredijo."}
+            </h1>
+
+            {/* Na širokem zaslonu posnetek PLAVA ob besedilu in ne stoji v
+                svojem stolpcu: stolpec bi besedilo potisnil navzdol in poziv
+                bi padel pod pregib. Tako ostane uvod visok en zaslon, slika
+                pa se vseeno prekriva z naslovom. */}
+            <div className="mt-s4 gap-s4 grid items-end lg:block">
+              <div className="relative z-10 lg:max-w-[58%]">
+                <p className="type-lead text-mirno mera">{hero.uvod || OPIS}</p>
+
+                <div className="mt-s3 gap-s1 flex flex-wrap items-center">
+                  <MagnetniGumb>
+                    <GumbPovezava
+                      href="/ponudba"
+                      ikona={<ArrowRight aria-hidden />}
+                      className={GUMB_POLNI_NA_TEMNEM}
+                    >
+                      Poglej ponudbo
+                    </GumbPovezava>
+                  </MagnetniGumb>
+                  <GumbPovezava
+                    href={`tel:${STRAN.telefonKlic}`}
+                    videz="obris"
+                    ikona={<Phone aria-hidden />}
+                    className={GUMB_NA_TEMNEM}
+                  >
+                    <span className="stevilke">{STRAN.telefon}</span>
+                  </GumbPovezava>
+                </div>
+
+                {/* ODVZEM TVEGANJA TAKOJ POD GUMBOM in ne na podstrani.
+                    Človek, ki okleva pred klicem, ne okleva zaradi cene,
+                    ampak zato, ker ne ve, k čemu ga klic zaveže. Ta stavek
+                    odgovori na to, preden vprašanje nastane. */}
+                <p className="type-small font-oznaka text-bledo mt-s2">
+                  Pol ure pri vas, brez obveznosti. Po pogovoru veste ceno in rok.
+                </p>
+              </div>
+
+              {/* DOKAZ V PRVEM ZASLONU in ne okrasna fotografija. Obiskovalec
+                  v prvi sekundi vidi stran, ki danes dela — to pove več kot
+                  vsak pridevnik. Na širokem zaslonu je potegnjen navzgor pod
+                  naslov in čez desni rob; na telefonu stoji spodaj, ker je
+                  tam naslov tisto, kar mora priti prvo. */}
+              <figure className="relative max-lg:order-last lg:absolute lg:top-[22%] lg:right-[-9vw] lg:w-[42vw] lg:rotate-[-1.2deg]">
+                <OkvirBrskalnika
+                  slika={hero.slika || "/dela/gostilnica-plus.png"}
+                  alt="Spletna stran Gostilnica Plus, ki jo je izdelal Žan Meke"
+                  domena="gostilnica-plus.si"
+                  prednostno
+                  className="border-na-obratu/15"
                 />
-              </span>
-              Poglej ponudbo
-            </Link>
-            <a
-              href={`tel:${STRAN.telefonKlic}`}
-              className="type-label border-na-obratu/25 text-na-obratu hover:bg-na-obratu/10 inline-flex items-center gap-2 rounded-full border py-3 pr-5 pl-4 transition-colors"
-            >
-              <Phone className="size-4" strokeWidth={2} aria-hidden />
-              <span className="stevilke">{STRAN.telefon}</span>
-            </a>
+                <figcaption className="type-micro font-oznaka text-bledo mt-s1">
+                  {hero.podnapis ||
+                    "Živa stran v Sevnici — ponudba, naročanje in evidenca dela."}
+                </figcaption>
+              </figure>
+            </div>
           </div>
-        </div>
+        </OdhodHeroja>
 
-        {/* Pas dejstev — tri reči, ki jih človek preveri pred klicem. */}
-        <div className="border-na-obratu/10 border-t">
-          <dl className="divide-na-obratu/10 px-s2 mx-auto grid max-w-5xl sm:grid-cols-3 sm:divide-x">
-            {DEJSTVA.map((d) => (
-              <div key={d.oznaka} className="py-s3 sm:px-s3 sm:first:pl-0 sm:last:pr-0">
-                <dt className="type-label text-na-obratu/40 flex items-center gap-2">
-                  <d.ikona className="size-3.5" strokeWidth={2} aria-hidden />
-                  {d.oznaka}
-                </dt>
-                <dd className="type-h3 mt-s1 flex items-center gap-2">
+        {/* Pas dejstev kot ENA VRSTICA v mono pisavi, ločena s poševnicami.
+            Trije enaki stolpci so bili tabela — in ista tabela stoji pod
+            uvodom gostilnice. Vrstica se bere kot vrstica stanja v orodju:
+            trije podatki, nič okvirjev. */}
+        <div className="border-crta relative border-t">
+          <dl className="vsebnik-sirok type-micro font-oznaka gap-x-s3 flex flex-wrap items-center gap-y-1 py-3">
+            {dejstva(b("dejstva")).map((d, i) => (
+              <div key={d.oznaka} className="flex items-center gap-2">
+                {i > 0 ? (
+                  <span aria-hidden className="text-bledo/40 mr-s2">
+                    /
+                  </span>
+                ) : null}
+                <dt className="text-bledo">{d.oznaka.toLowerCase()}</dt>
+                <dd className="text-crnilo flex items-center gap-1.5">
                   {d.zivo ? (
                     <span
                       aria-hidden
-                      className="bg-poudarek inline-block size-2 rounded-full"
+                      className="bg-poudarek inline-block size-1.5 rounded-full"
                     />
                   ) : null}
-                  {d.vrednost}
+                  {d.stevilo !== undefined ? (
+                    <>
+                      <SteviloNaraste vrednost={d.stevilo} />
+                      <span>strani</span>
+                    </>
+                  ) : (
+                    d.vrednost
+                  )}
                 </dd>
-                <dd className="type-micro text-na-obratu/50">{d.pod}</dd>
+                <dd className="text-bledo/70">{d.pod}</dd>
               </div>
             ))}
           </dl>
         </div>
-      </section>
+      </Odsek>
 
-      <div className="px-s2 mx-auto max-w-5xl">
-        {/* ── 2 · Dela ─────────────────────────────────────────────────── */}
-        <section className="odsek-y">
-          <Glava
-            oznaka="Dela"
-            naslov="Kar že teče."
-            uvod="Strani, ki danes delajo. Pri vsaki piše, kaj lastniku vsak dan prihrani — ne, kako izgleda."
-          />
+      <BatchReveal izbirnik="section">
+        {/* ── 2 · Dvoje, kar delam ─────────────────────────────────────── */}
+        {/* `viden` je iz `getVidniBloki`: skrit odsek v seznam sploh ne pride.
+            Brez tega pogoja bi gumb »skrij« v adminu javil uspeh, stran pa bi
+            ostala enaka — najslabša možna vrsta napake. */}
+        {viden("storitve") ? (
+          <Odsek plast="mehka" sirina="sirok">
+            <UvodOdseka
+              stevilka="01"
+              oznaka={storitve.oznaka || "Kaj delam"}
+              naslov={storitve.naslov || "Dvoje — in oboje isti človek."}
+              uvod={
+                storitve.uvod ||
+                "Za obrt, trgovino, storitev, gostilno ali sobe za oddajo — panoga ni pogoj. Stran postavim sam in fotografije posnamem sam, zato so slike posnete za to postavitev in ne izbrane iz zaloge."
+              }
+            />
+            <div className="mt-s4">
+              <MrezaStoritev />
+            </div>
+          </Odsek>
+        ) : null}
 
-          <div className="mt-s3 gap-s2 grid sm:grid-cols-2">
-            {DELA.map((d) => (
-              <KarticaDela key={d.ime} delo={d} />
-            ))}
-          </div>
-        </section>
+        {/* ── 3 · Dela ─────────────────────────────────────────────────── */}
+        {viden("dela") ? (
+          <Odsek plast="svetla" sirina="sirok" visina={false}>
+            <div className="pt-(--section-y)">
+              <UvodOdseka
+                stevilka="02"
+                oznaka={dela.oznaka || "Dela"}
+                naslov={dela.naslov || "Kar že teče."}
+                uvod={
+                  dela.uvod ||
+                  "Obe sem postavil zase in ju vsak dan vodim — zato vem, kaj se v praksi res zalomi in česa se iz načrta ne vidi. Pri vsaki piše, kaj podjetju vsak dan prihrani."
+                }
+              />
+            </div>
 
-        {/* ── 3 · Kaj rešim ────────────────────────────────────────────── */}
-        <section className="odsek-y">
-          <Glava
-            oznaka="Kaj rešim"
-            naslov="Štiri stvari, ki jih slišim pri vsaki gostilni."
-          />
-
-          <div className="mt-s3 bg-crta-mehka border-crta-mehka grid gap-px border sm:grid-cols-2">
-            {TEZAVE.map((t) => (
-              <div key={t.vprasanje} className="bg-ploskev p-s3">
-                <p className="type-h3">{t.vprasanje}</p>
-                <p className="type-body text-mirno mt-s1">{t.odgovor}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ── 4 · Cene ─────────────────────────────────────────────────── */}
-        <section className="border-crta odsek-y border-t">
-          <Glava
-            oznaka="Cene"
-            naslov="Cena je znana vnaprej."
-            uvod="Povem jo pred delom, ne po njem. Polovica ob začetku, polovica ob zagonu."
-          />
-
-          <table className="mt-s3 w-full border-collapse">
-            <tbody>
-              {CENE.map((p) => (
-                <tr key={p.kaj} className="border-crta-mehka border-b">
-                  <td
-                    className={`type-body py-s2 ${p.priporoceno ? "bg-poudarek-mehko px-s2" : ""}`}
-                  >
-                    {p.kaj}
-                    {p.opomba ? (
-                      <span className="type-label text-poudarek ml-s1">{p.opomba}</span>
-                    ) : null}
-                  </td>
-                  <td
-                    className={`type-body font-naslov stevilke py-s2 text-right font-bold whitespace-nowrap ${
-                      p.priporoceno ? "bg-poudarek-mehko text-poudarek px-s2" : ""
-                    }`}
-                  >
-                    {p.cena}
-                  </td>
-                </tr>
+            {/* Vrstice gredo čez VES zaslon, zato stojijo zunaj vsebnika —
+                `poln` jih izstavi iz njega. Slika se izmenjuje levo/desno,
+                da se dva soseda ne bereta kot tabela. */}
+            <div className="mt-s4">
+              {DELA.map((d, i) => (
+                <VrsticaDela
+                  key={d.ime}
+                  delo={d}
+                  stevilka={String(i + 1).padStart(2, "0")}
+                  obrnjeno={i % 2 === 1}
+                />
               ))}
-            </tbody>
-          </table>
+            </div>
+          </Odsek>
+        ) : null}
 
-          <p className="type-body text-mirno mt-s3 mera">
-            Agencija bi tak sistem zaračunala osem tisoč in delala tri mesece. Pri meni je
-            osnova že narejena — zato je ceneje in zato je v enem tednu.
-          </p>
-        </section>
+        {/* ── Priporočila ──────────────────────────────────────────────── */}
+        {/* Odseka ni, dokler ni priporočil — glej komentar v komponenti. */}
+        <Priporocila seznam={priporocila} />
+        {priporocila.length > 0 ? <JsonLd podatki={priporocilaLd(priporocila)!} /> : null}
 
-        {/* ── 5 · Kako poteka ──────────────────────────────────────────── */}
-        <section className="odsek-y">
-          <Glava oznaka="Kako poteka" naslov="Od pogovora do žive strani v enem tednu." />
-
-          <ol className="mt-s3 gap-s3 grid sm:grid-cols-2">
-            {KORAKI.map((k, i) => (
-              <li
-                key={k.naslov}
-                className="gap-s2 grid grid-cols-[2.5rem_1fr] items-start"
-              >
-                <span className="type-label text-bledo stevilke pt-1">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div>
-                  <h3 className="type-h3">{k.naslov}</h3>
-                  <p className="type-body text-mirno mt-s1">{k.opis}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        {/* ── 6 · Stik ─────────────────────────────────────────────────── */}
-        <section className="odsek-y">
-          <div className="border-crta bg-ploskev p-s4 border">
-            <p className="type-label text-poudarek">Stik</p>
-            <h2 className="type-h2 mt-s1">Pokličite. Odgovorim isti dan.</h2>
-            <a
-              href={`tel:${STRAN.telefonKlic}`}
-              className="type-h1 font-naslov stevilke mt-s2 hover:text-poudarek block transition-colors"
-            >
-              {STRAN.telefon}
-            </a>
-            <p className="type-body text-mirno mt-s2">
-              <a href={`mailto:${STRAN.epota}`} className="hover:text-crnilo underline">
-                {STRAN.epota}
-              </a>{" "}
-              · {STRAN.kraj}, delam po vsem {STRAN.obmocje}u
-            </p>
-            <Link href="/kontakt" className="type-label text-poudarek mt-s3 inline-block">
-              Ali pišite prek obrazca →
-            </Link>
-          </div>
-        </section>
-      </div>
+        {/* ── 4 · Stik ─────────────────────────────────────────────────── */}
+        <Stik
+          naslov={stik.naslov || "Pokličite. Odgovorim isti dan."}
+          uvod={
+            stik.uvod ||
+            "Pol ure pogovora pri vas, brez obveznosti. Po njem veste ceno, rok in kaj morate pripraviti."
+          }
+          druga={{ href: "/kontakt", besedilo: stik.druga || "Ali pišite" }}
+        />
+      </BatchReveal>
     </>
   );
 }

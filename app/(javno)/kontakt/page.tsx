@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
 
+import { BatchReveal } from "@/components/motion/BatchReveal";
+import { ShieldCheck } from "lucide-react";
+
+import { Odsek } from "@/components/public/Odsek";
 import { ObrazecKontakt } from "@/components/public/kontakt/ObrazecKontakt";
-import { STRAN } from "@/lib/podatki";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { getVidniBloki } from "@/lib/domov/queries";
+import { drobtineLd } from "@/lib/seo/jsonLd";
+import { JAMSTVO, STRAN } from "@/lib/podatki";
 
 // ============================================================================
 // /kontakt
@@ -14,11 +21,12 @@ import { STRAN } from "@/lib/podatki";
 // odgovorim, da je pogovor brezplačen in kaj se zgodi potem.
 // ============================================================================
 
-export const revalidate = 3600;
+// Vsebina je v bazi in se osveži ob shranjevanju odseka.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Kontakt",
-  description: `Pokličite ${STRAN.telefon} ali pošljite povpraševanje. Odgovorim isti dan. Žan Meke, ${STRAN.kraj} — delam po vsem ${STRAN.obmocje}u.`,
+  description: `Pokličite ${STRAN.telefon} ali pošljite povpraševanje. Odgovorim isti dan. Žan Meke, ${STRAN.kraj} — delam po vsem ${STRAN.obmocjeV}.`,
   alternates: { canonical: "/kontakt" },
 };
 
@@ -28,33 +36,50 @@ const ZAGOTOVILA = [
   ["Potem dobite ceno", "Napisano, s rokom. Brez »odvisno« in brez presenečenj."],
 ];
 
-export default function Kontakt() {
+export default async function Kontakt() {
+  const vidni = await getVidniBloki("kontakt");
+  const vsebina = new Map(vidni.map((x) => [x.def.kljuc, x.data]));
+  const b = (kljuc: string) => vsebina.get(kljuc) ?? {};
+  const uvod = b("uvod");
+  const obrazec = b("obrazec");
+
   return (
     <>
-      <section className="bg-obrat text-na-obratu">
-        <div className="px-s2 uvod-y mx-auto max-w-5xl">
-          <p className="type-label text-poudarek">Kontakt</p>
-          <h1 className="type-h1 mt-s2">Pokličite.</h1>
+      {/* Telefonska številka je NAJVEČJA stvar na strani in ne naslov. Na
+          strani, ki se imenuje »Kontakt«, je naslov samo napis nad podatkom;
+          podatek je številka, in ta mora biti berljiva z metra. */}
+      <Odsek plast="temna" sirina="sirok" visina={false} as="section" sij>
+        <div className="uvod-y">
+          <p className="type-poglavje text-poudarek">{uvod.oznaka || "Kontakt"}</p>
+          <h1 className="type-h2 mt-s3 text-mirno">{uvod.naslov || "Pokličite."}</h1>
+
           <a
             href={`tel:${STRAN.telefonKlic}`}
-            className="type-h1 font-naslov stevilke text-poudarek mt-s2 block"
+            className="type-display stevilke text-crnilo decoration-poudarek mt-s2 block underline-offset-[0.1em] hover:underline"
           >
             {STRAN.telefon}
           </a>
-          <p className="type-body text-na-obratu/65 mt-s2">
-            <a href={`mailto:${STRAN.epota}`} className="hover:text-na-obratu underline">
+
+          <p className="type-lead text-mirno mt-s3">
+            <a href={`mailto:${STRAN.epota}`} className="hover:text-crnilo underline">
               {STRAN.epota}
             </a>{" "}
-            · {STRAN.kraj}, delam po vsem {STRAN.obmocje}u
+            · {STRAN.kraj}, delam po vsem {STRAN.obmocjeV}
           </p>
         </div>
-      </section>
+      </Odsek>
 
-      <div className="px-s2 mx-auto max-w-5xl">
-        <section className="odsek-y gap-s4 grid lg:grid-cols-[1fr_1.618fr]">
+      {/* ISTA PLAST RAZKRITIJ kot na ostalih straneh. */}
+      <BatchReveal izbirnik="section">
+        <Odsek
+          plast="mehka"
+          sirina="sirok"
+          as="section"
+          vsebnikClassName="gap-s4 grid lg:grid-cols-[1fr_1.618fr]"
+        >
           <div>
-            <h2 className="type-h2">Ali pišite.</h2>
-            <p className="type-body text-mirno mt-s2">
+            <h2 className="type-h1">{obrazec.naslov || "Ali pišite."}</h2>
+            <p className="type-lead text-mirno mt-s2">
               Povejte, kaj vas muči. Odgovorim z oceno, koliko bi to stalo in koliko časa
               vzelo.
             </p>
@@ -67,13 +92,35 @@ export default function Kontakt() {
                 </div>
               ))}
             </dl>
+
+            <div className="border-poudarek bg-poudarek-mehko p-s3 mt-s3 gap-s2 flex rounded-2xl border">
+              <ShieldCheck
+                className="text-poudarek mt-0.5 size-5 shrink-0"
+                strokeWidth={1.6}
+                aria-hidden
+              />
+              <p className="type-small">
+                <span className="type-body block font-medium">{JAMSTVO.naslov}</span>
+                <span className="text-mirno mt-1 block">{JAMSTVO.obljuba}</span>
+              </p>
+            </div>
           </div>
 
-          <div className="border-crta bg-ploskev p-s3 border">
+          <div className="bg-ploskev p-s3 rounded-2xl shadow-(--shadow-card)">
             <ObrazecKontakt />
+            {obrazec.zasebnost ? (
+              <p className="type-micro text-bledo mt-s2">{obrazec.zasebnost}</p>
+            ) : null}
           </div>
-        </section>
-      </div>
+        </Odsek>
+      </BatchReveal>
+
+      <JsonLd
+        podatki={drobtineLd([
+          { ime: "Domov", pot: "/" },
+          { ime: "Kontakt", pot: "/kontakt" },
+        ])}
+      />
     </>
   );
 }

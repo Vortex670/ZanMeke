@@ -38,6 +38,21 @@
   --color-obrat: #0f1513;
   --color-na-obratu: #f5f7f6;
 
+  /* BESEDILO NA POUDARKU — svoj žeton in ne `na-obratu`.
+     V svetli temi je poudarek temno zelen in besedilo na njem skoraj belo;
+     v temni je poudarek svetla meta in isto besedilo da razmerje 1,55 : 1,
+     kar je neberljivo. Žeton se zato obrne skupaj s temo: izmerjeno 7,25 : 1
+     v svetli in 10,08 : 1 v temni. */
+  --color-na-poudarku: #f5f7f6;
+
+  /* POUDAREK NA TEMNI PLOSKVI je svoja barva in se NE obrne s temo.
+     `obrat` (hero, noga) je temen v obeh temah. V svetli temi je poudarek
+     temno zelen — gumb na temnem herojo da razmerje 2,37 : 1 proti ozadju in
+     se skoraj zlije z njim. Zato ima temna ploskev svojo svetlo različico,
+     enako v obeh temah, in svoje temno besedilo. */
+  --color-poudarek-obrat: #5fd3b4;
+  --color-na-poudarku-obrat: #0f1513;
+
   /* ── Pisavi ─────────────────────────────────────────────────────────── */
   --font-naslov: var(--pisava-naslov), ui-serif, Georgia, serif;
   --font-oznaka: var(--pisava-oznaka), ui-sans-serif, system-ui, sans-serif;
@@ -49,7 +64,6 @@
   --spacing-s3: 1.618rem;
   --spacing-s4: 2.618rem;
   --spacing-s5: 4.236rem;
-
 
   /* ── Besednjak admina ───────────────────────────────────────────────
      Administracija je na vseh treh straneh ISTA koda. Da se komponente
@@ -70,16 +84,63 @@
   --color-border-strong: #c9d2cf;
   --color-chrome-line: var(--color-crta);
   --color-accent: var(--color-poudarek);
-  --color-accent-fg: var(--color-na-obratu);
+  --color-accent-fg: var(--color-na-poudarku);
   --color-accent-bg: var(--color-poudarek-mehko);
   --color-foreground: var(--color-crnilo);
 
+  /* ── Žetoni, ki jih kličejo PRENESENE komponente ──────────────────────
+     Vsak razred spodaj je bil v kodi že prej in ni naredil NIČESAR, ker
+     barve za njim ni bilo: Tailwind za nedefiniran žeton ne javi napake,
+     razred preprosto izpade. Posledice so bile vidne, vzrok ne:
+
+       `bg-accent-hover`  glavni gumb administracije se ob miški ni
+                          spremenil (`Button variant="primary"`, `IconButton`)
+       `bg-scrim`         za okni ni bilo zatemnitve — stran pod njimi je
+                          ostala enako svetla kot okno samo (`Dialog`)
+       `text-background`  kljukica v potrditvenem polju in izbrani dan v
+                          koledarju sta bila v barvi besedila na barvi
+                          besedila, torej nevidna
+       `bg-accent-2/-3`   odseka kolobarja brskalnikov in črte v shemi bloka
+       `ring-ring`        obroba ob tabulatorju je vzela trenutno barvo
+                          besedila namesto poudarka
+
+     Mešanje z `--color-text` namesto s črno ali belo je namenoma: besedilo
+     je v svetli temi temno in v temni svetlo, zato ista vrstica v svetli
+     temi potemni in v temni posvetli. Brez tega bi temna tema rabila svoj
+     blok, ki bi ga kdo nekoč pozabil popraviti. */
+  --color-accent-hover: color-mix(in oklab, var(--color-accent) 88%, var(--color-text));
+  --color-accent-2: color-mix(in oklab, var(--color-accent) 55%, var(--color-bg));
+  --color-accent-3: color-mix(in oklab, var(--color-accent) 30%, var(--color-bg));
+  --color-ring: var(--color-accent);
+  --color-background: var(--color-bg);
+
+  /* Zatemnitev za okni je TRDA vrednost in ne žeton teme: `crnilo` se v
+     temni temi zamenja s svetlo barvo in zatemnitev bi postala bela tančica
+     čez temno stran. Temno je temno v obeh temah. */
+  --color-scrim: rgba(8, 12, 11, 0.55);
+
+  /* Vtisnjena pilula izbranega obdobja in lasna črta pod napisom — v
+     `TimeRangeChips` sta bila razreda `shadow-pressed` in
+     `text-shadow-hairline` brez kritja. Imenovana različica mora stati v
+     `@theme`, drugače razreda ni. */
+  --shadow-pressed:
+    inset 0 1px 1px rgba(255, 255, 255, 0.12), 0 1px 2px rgba(15, 21, 19, 0.18);
+  --text-shadow-hairline: 0 1px 0 color-mix(in oklab, var(--color-text) 10%, transparent);
+
+  /* TRI STANJA, vsako s TREMI žetoni: barva (ikona, črta), ozadje (značka)
+     in BESEDILO NA TEM OZADJU. Tretjega prej ni bilo — `text-success-fg` je
+     bil nemapiran razred, ki tiho ne naredi nič, zato je značka obdržala
+     podedovano barvo besedila in je bila na svojem ozadju neberljiva.
+     Izmerjeno po popravku: 8,7 · 7,21 · 8,44 : 1. */
   --color-success: #0f6b4a;
   --color-success-bg: #e2efe9;
+  --color-success-fg: #0b4a33;
   --color-warning: #8a5a12;
   --color-warning-bg: #f6edde;
+  --color-warning-fg: #6b4610;
   --color-danger: #9b2b1d;
   --color-danger-bg: #f7e6e2;
+  --color-danger-fg: #7a2117;
 
   /* ── Trajanja in krivulje ───────────────────────────────────────────── */
   --dur-fast: 200ms;
@@ -100,12 +161,56 @@
   --tracking-eyebrow: 0.28em;
 
   /* Sence admina — ista imena kot na drugih dveh straneh. */
-  --shadow-card: 0 1px 2px rgba(15, 21, 19, 0.04), 0 8px 24px -16px rgba(15, 21, 19, 0.18);
-  --shadow-card-hover: 0 1px 2px rgba(15, 21, 19, 0.05), 0 14px 32px -16px rgba(15, 21, 19, 0.24);
+  --shadow-card:
+    0 1px 2px rgba(15, 21, 19, 0.04), 0 8px 24px -16px rgba(15, 21, 19, 0.18);
+  --shadow-card-hover:
+    0 1px 2px rgba(15, 21, 19, 0.05), 0 14px 32px -16px rgba(15, 21, 19, 0.24);
   --shadow-chrome-inset: inset 0 -1px 0 rgba(15, 21, 19, 0.06);
   --shadow-edge-sidebar: 1px 0 0 rgba(15, 21, 19, 0.06);
   --shadow-edge-footer: 0 -1px 0 rgba(15, 21, 19, 0.06);
   --shadow-glass: 0 1px 2px rgba(15, 21, 19, 0.04);
+  --shadow-drawer: 0 24px 64px -24px rgba(15, 21, 19, 0.45);
+
+  /* ── GOLA IMENA ŽETONOV za prenesene admin komponente ────────────────
+     Komponente administracije so na vseh treh straneh ISTA koda in pišejo
+     `text-(--text-muted)`, `bg-(--accent)`, `max-w-(--container)`. Ta
+     imena so brez predpone `--color-`, ki jo zahteva Tailwindova paleta,
+     zato morata obstajati OBE obliki.
+
+     Brez tega bloka se razred prevede v barvo, ki ne obstaja — in besedilo
+     je nevidno. Napake ne javi nihče: ne prevajalnik ne brskalnik. Prav to
+     se je zgodilo na strani s statistikami, ko so prišle komponente od
+     gostilnice.
+
+     Vrednosti kažejo na `--color-*`, ki se v temni temi zamenjajo same —
+     zato tega bloka ni treba podvajati pod `[data-theme="dark"]`. */
+  --text: var(--color-text);
+  --text-muted: var(--color-muted);
+  --text-subtle: var(--color-subtle);
+  --foreground: var(--color-foreground);
+  --background: var(--color-bg);
+  --surface: var(--color-surface);
+  --border: var(--color-border);
+  --accent: var(--color-accent);
+  /* Druga poudarna barva — pri kolobarju brskalnikov četrti odsek. Lastne
+     vrednosti nima, ker ima ta stran eno barvo; svetlejši odtenek iste je
+     dovolj, da se odseka ločita. */
+  --accent-2: color-mix(in oklab, var(--color-accent) 55%, var(--color-bg));
+  --success: var(--color-success);
+  --warning: var(--color-warning);
+  --danger: var(--color-danger);
+
+  /* Širine okvira — `AdminPageShell` jih kliče kot `max-w-(--container)`.
+     ISTE VREDNOSTI kot na gostilnica-plus.si: 80rem je privzeta širina
+     administracije. Pri 72rem je bila vsebina ožja od iste strani tam in
+     kartice v vrsti so se razporedile drugače — isti razredi, druga slika. */
+  --container: 80rem;
+  --container-narrow: 52rem;
+  --container-wide: 88rem;
+
+  /* Plasti. Glava admina je `--z-sticky`, okna nad njo. */
+  --z-sticky: 40;
+  --z-modal: 60;
 
   /* Velikosti pisav — sedem stopenj, vsaka ima svoj namen. */
   --type-micro: 0.7rem;
@@ -151,6 +256,21 @@
     --color-crta-mehka: #1b2220;
     --color-poudarek: #5fd3b4;
     --color-poudarek-mehko: #10231e;
+    /* Poudarek je tu svetel, zato je besedilo na njem temno. */
+    --color-na-poudarku: #0f1513;
+
+    /* Stanja v temni temi: ozadje temno, besedilo svetlo. Brez tega je bila
+     značka svetla ploskev sredi temne strani. Izmerjeno: 11,11 · 10,34 ·
+     9,47 : 1. */
+    --color-success: #4ade9f;
+    --color-success-bg: #10291f;
+    --color-success-fg: #7ff0bd;
+    --color-warning: #e0b05a;
+    --color-warning-bg: #2a2114;
+    --color-warning-fg: #f0cc8a;
+    --color-danger: #f08a7a;
+    --color-danger-bg: #2b1715;
+    --color-danger-fg: #f7b0a4;
     --color-obrat: #171d1b;
     --color-na-obratu: #e8edeb;
     --color-surface-2: #1f2624;
@@ -169,28 +289,29 @@
   --color-crta-mehka: #1b2220;
   --color-poudarek: #5fd3b4;
   --color-poudarek-mehko: #10231e;
+  --color-na-poudarku: #0f1513;
+
+  /* Stanja v temni temi: ozadje temno, besedilo svetlo. Brez tega je bila
+     značka svetla ploskev sredi temne strani. Izmerjeno: 11,11 · 10,34 ·
+     9,47 : 1. */
+  --color-success: #4ade9f;
+  --color-success-bg: #10291f;
+  --color-success-fg: #7ff0bd;
+  --color-warning: #e0b05a;
+  --color-warning-bg: #2a2114;
+  --color-warning-fg: #f0cc8a;
+  --color-danger: #f08a7a;
+  --color-danger-bg: #2b1715;
+  --color-danger-fg: #f7b0a4;
   --color-obrat: #171d1b;
   --color-na-obratu: #e8edeb;
-    --color-surface-2: #1f2624;
-    --color-border-strong: #3a4441;
+  --color-surface-2: #1f2624;
+  --color-border-strong: #3a4441;
 }
 
 /* ----------------------------------------------------------------------------
    Osnova
    -------------------------------------------------------------------------- */
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  background: var(--color-papir);
-  color: var(--color-crnilo);
-  font-family: var(--font-besedilo);
-  font-size: var(--type-body);
-  line-height: var(--leading-body);
-  -webkit-font-smoothing: antialiased;
-}
 
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -204,15 +325,42 @@ body {
   }
 }
 
-:focus-visible {
-  outline: 2px solid var(--color-poudarek);
-  outline-offset: 3px;
-  border-radius: 2px;
-}
+/* FOKUSNI OBROČ JE V PLASTI `base`, in to je bistveno.
+   Neplasteno pravilo v Tailwindu v4 premaga VSE razrede, ne glede na
+   specifičnost — tudi `outline-none`. Polja v `components/ui/Input.tsx`
+   rišejo svoj fokusni okvir in si obris izklopijo; dokler je to pravilo
+   stalo zunaj plasti, jim ga ni uspelo, in vsako polje je imelo ob dotiku
+   DVE obrobi: svojo in to.
+   V plasti `base` ostane za vse, kar svojega fokusa nima (povezave, kljukice,
+   gumbi), razred pa ga lahko povozi tam, kjer je to pravilno. */
+@layer base {
+  /* VIŠINA »auto« SE DA ANIMIRATI. Brez tega se `<details>` odpre v enem
+     kadru — vsebina skoči na mesto. Z `interpolate-size` brskalnik zna
+     preračunati `auto` v število in prehod steče. Kjer tega ni, se vsebina
+     še vedno odpre, samo brez prehoda. */
+  :root {
+    interpolate-size: allow-keywords;
+  }
 
-::selection {
-  background: var(--color-poudarek);
-  color: var(--color-papir);
+  /* Besedilo brez samotnih besed v zadnji vrstici. `balance` je za naslove
+     (nekaj vrstic), `pretty` za odstavke — ta ne prelomi cele poravnave,
+     popravi samo konec. */
+  p,
+  li {
+    text-wrap: pretty;
+  }
+
+  /* Polje za sporočilo raste z besedilom. Prej je to delal poslušalec na
+     vsakem pritisku tipke; zdaj je ena lastnost. */
+  textarea {
+    field-sizing: content;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-poudarek);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
 }
 
 /* ----------------------------------------------------------------------------
@@ -279,6 +427,42 @@ body {
     line-height: 1.5;
   }
 
+  /* ENA ŠIRINA ZA VSE. Glava, vsebina in noga uporabljajo isto klaso, zato
+     se leva in desna poravnava ne moreta razhajati — in rob se ne more
+     izgubiti, kot se je pri oknu, širokem natanko toliko kot vsebnik.
+     Rob raste z zaslonom: na telefonu dovolj, da besedilo ne visi na robu,
+     na namizju toliko, da stran ni prilepljena na steklo. */
+  .vsebnik {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 72rem;
+    padding-inline: var(--s3);
+  }
+
+  @media (min-width: 1024px) {
+    .vsebnik {
+      padding-inline: var(--s4);
+    }
+  }
+
+  /* ŠIRŠI VSEBNIK za mreže kartic.
+     Besedilo ima svojo mejo pri 65 znakih (`.mera`), ploskve tečejo čez vso
+     širino — vmes pa so mreže kartic, ki pri 72rem na širokem zaslonu
+     stojijo stisnjene, čeprav bi prostor bil. Kartica ni odstavek: v njej
+     se ne bere vrstica za vrstico, zato zanjo meja branja ne velja. */
+  .vsebnik-sirok {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 88rem;
+    padding-inline: var(--s3);
+  }
+
+  @media (min-width: 1024px) {
+    .vsebnik-sirok {
+      padding-inline: var(--s4);
+    }
+  }
+
   /* Širina odstavka — oko se ne izgubi med vrsticami. */
   .mera {
     max-width: var(--mera);
@@ -289,9 +473,238 @@ body {
     padding-block: var(--section-y);
   }
 
+  /* Drsnik, ki ga ni videti — za vodoravno vrstico menija na telefonu.
+     Vrstica se podrsa, siva palica pod njo pa bi v glavi izgledala kot
+     napaka. Uporabljata ga tudi stranska vrstica in predal administracije. */
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
   /* Številke se primerjajo po stolpcih: cena pod ceno, ura pod uro. */
   .stevilke {
     font-variant-numeric: tabular-nums;
+  }
+
+  /* --------------------------------------------------------------------
+     PLOSKVE — odsek, ki pove, kakšen je svet znotraj njega
+     --------------------------------------------------------------------
+     Odsek ne nastavi samo svojega ozadja, ampak PREPIŠE pomenske žetone
+     zase. Posledica je, da ista kartica, isti gumb in isti naslov delujejo
+     na svetlem in na temnem brez ene same različice razreda.
+
+     Prej je bilo obratno: vsaka komponenta na temnem pasu je rabila svoj
+     niz razredov (`GUMB_NA_TEMNEM`, `text-na-obratu/65`, `border-na-obratu/10`),
+     in vsak nov odsek je pomenil nov niz. Deset takih nizov je deset mest,
+     kjer se barva lahko razide.
+
+     Tailwind v4 bere barvo kot `var(--color-ime)`, zato je dovolj, da
+     spremenljivko na ploskvi prevežemo — razredi `bg-ploskev`,
+     `text-mirno`, `border-crta` ostanejo isti.
+     -------------------------------------------------------------------- */
+
+  .plast-temna {
+    --color-papir: #0f1513;
+    --color-ploskev: #171d1b;
+    --color-crnilo: #f5f7f6;
+    --color-mirno: color-mix(in oklab, #f5f7f6 62%, transparent);
+    /* 42 % belega na #0f1513 da razmerje 3,8 : 1 — pod mejo 4,5 : 1, ki jo
+       WCAG zahteva za drobno besedilo. Prav v tej barvi stojita vrstica s
+       podatki pod uvodom in drobni pas v nogi, oba pri 11 px. Pri 52 % je
+       razmerje 5,2 : 1. Izračunano, ne ocenjeno: barva je prosojna, zato se
+       pomeša s podlago, in šele zmes je tisto, kar oko vidi. */
+    --color-bledo: color-mix(in oklab, #f5f7f6 52%, transparent);
+    --color-crta: color-mix(in oklab, #f5f7f6 14%, transparent);
+    --color-crta-mehka: color-mix(in oklab, #f5f7f6 8%, transparent);
+    /* Na temnem je poudarek svetla meta, sicer se zelena zlije z ozadjem. */
+    --color-poudarek: var(--color-poudarek-obrat);
+    --color-na-poudarku: var(--color-na-poudarku-obrat);
+    --color-poudarek-mehko: color-mix(
+      in oklab,
+      var(--color-poudarek-obrat) 16%,
+      transparent
+    );
+
+    background-color: var(--color-papir);
+    color: var(--color-crnilo);
+    color-scheme: dark;
+  }
+
+  /* Svetla ploskev samo ponastavi nazaj — rabi jo odsek, vgnezden v temnega. */
+  .plast-svetla {
+    background-color: var(--color-papir);
+    color: var(--color-crnilo);
+  }
+
+  /* Ploskev med obema: papir za pol stopnje globlje, da se dva svetla
+     odseka drug ob drugem ne zlijeta v eno dolgo belo polje. */
+  .plast-mehka {
+    background-color: color-mix(in oklab, var(--color-crnilo) 4%, var(--color-papir));
+    color: var(--color-crnilo);
+  }
+
+  /* --------------------------------------------------------------------
+     DISPLAY — stopnja nad `type-h1`, samo za uvodne besede odseka.
+     Na telefonu se ne sme razbiti: spodnja meja je zato pri 2,6rem.
+     -------------------------------------------------------------------- */
+  .type-display {
+    font-family: var(--font-naslov);
+    font-size: clamp(2.6rem, 1.2rem + 6.4vw, 6.2rem);
+    line-height: 0.98;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  /* --------------------------------------------------------------------
+     HERO — največja pisava na strani, čez vso širino
+     --------------------------------------------------------------------
+     Stopnja nad `type-display` in SAMO za naslov prvega zaslona. Grotesk pri
+     tej velikosti potrebuje negativno sledenje in višino vrstice pod ena,
+     sicer se vrstice razlezejo in napis je videti natipkan, ne postavljen.
+     `text-wrap: balance` je tu NAMENOMA izklopljen: pri treh ali štirih
+     vrsticah brskalnik izenači dolžine in nastane pravokotnik besedila —
+     tu pa hočemo neenake vrstice, ki se končajo tam, kjer se beseda konča.
+     -------------------------------------------------------------------- */
+  .type-hero {
+    font-family: var(--font-naslov);
+    font-size: clamp(2.4rem, 6.2vw, 6.4rem);
+    line-height: 0.92;
+    font-weight: 600;
+    letter-spacing: -0.045em;
+    text-wrap: initial;
+  }
+
+  /* Oznaka odseka kot številka poglavja — »01 / Kaj delam«. */
+  .type-poglavje {
+    font-family: var(--font-oznaka);
+    font-size: var(--type-label);
+    font-weight: 600;
+    letter-spacing: var(--razmik-label);
+    text-transform: uppercase;
+  }
+
+  /* --------------------------------------------------------------------
+     ČRTA NAPREDKA — brez ene vrstice JavaScripta
+     --------------------------------------------------------------------
+     `animation-timeline: scroll()` poveže animacijo z drsnikom namesto s
+     časom. Prej je isto delal GSAP s poslušalcem drsenja in klicem ob vsakem
+     kadru; zdaj to opravi brskalnik na nitki za sestavljanje, torej brez
+     glavne niti in brez kode, ki bi se naložila.
+     Podpirajo ga Chrome 115+, Safari 26+ in Firefox 144+. Kjer ga ni, črte
+     preprosto ni — okras, ki pove, koliko strani je še, ni nič, brez česar
+     stran ne bi delovala.
+     -------------------------------------------------------------------- */
+  .crta-napredka {
+    display: none;
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .crta-napredka {
+      display: block;
+      transform-origin: 0 50%;
+      animation: napredek linear;
+      animation-timeline: scroll(root block);
+    }
+  }
+
+  @keyframes napredek {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  /* --------------------------------------------------------------------
+     KINETIČNA TIPOGRAFIJA — naslov se ob vstopu zgosti
+     --------------------------------------------------------------------
+     Geist je spremenljiva pisava: debelina ni izbira med dvema datotekama,
+     ampak zvezna os. Zato se da animirati — in ko se naslov ob prihodu v
+     okno zgosti s 430 na 620, se bere kot da se postavlja, ne kot da je bil
+     že tam.
+     To je `animation-timeline: view()`: ura animacije ni čas, ampak položaj
+     elementa v oknu. Brez JavaScripta in brez opazovalca.
+     ZUNAJ `@supports` tega ni, zato je privzeto stanje KONČNO stanje —
+     naslov je poln in viden tudi, kadar brskalnik tega ne zna. Animacija
+     sme nekaj dodati, nikoli pa ne sme biti pogoj za to, da se vsebina
+     vidi.
+     -------------------------------------------------------------------- */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .kineticna {
+        animation: zgostitev linear both;
+        animation-timeline: view();
+        animation-range: entry 8% cover 38%;
+      }
+
+      /* --------------------------------------------------------------
+         POMETANJE BESEDILA — barva priteče skozi napis ob drsenju
+         --------------------------------------------------------------
+         Prehod je narisan v ozadju in prirezan na obliko črk
+         (`background-clip: text`). Ker mora biti besedilo za to prozorno,
+         sme to pravilo stati SAMO tu: brez podpore za `view()` bi bil
+         napis nevidne barve na temni ploskvi, torej ga ne bi bilo.
+         -------------------------------------------------------------- */
+      .pometanje {
+        background-image: linear-gradient(
+          100deg,
+          var(--color-crnilo) 45%,
+          color-mix(in oklab, var(--color-crnilo) 26%, transparent) 55%
+        );
+        background-size: 240% 100%;
+        background-position: 100% 0;
+        background-repeat: no-repeat;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: pometi linear both;
+        animation-timeline: view();
+        animation-range: entry 15% cover 60%;
+      }
+    }
+  }
+
+  @keyframes zgostitev {
+    from {
+      font-variation-settings: "wght" 430;
+      letter-spacing: -0.005em;
+    }
+    to {
+      font-variation-settings: "wght" 620;
+      letter-spacing: -0.03em;
+    }
+  }
+
+  @keyframes pometi {
+    to {
+      background-position: 0 0;
+    }
+  }
+
+  /* --------------------------------------------------------------------
+     POLNA ŠIRINA — otrok izstopi iz vsebnika čez cel zaslon.
+     Uporablja se za slike in ploskve, nikoli za besedilo: vrstica, dolga
+     čez 1900 px, se ne bere.
+     -------------------------------------------------------------------- */
+  .poln {
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+  }
+
+  /* ŠIRINA `100vw` NE VŠTEJE NAVPIČNEGA DRSNIKA. Na namizju, kjer drsnik
+     zavzame svojih 15 px, je vsak tak pas za toliko širši od okna in stran
+     dobi vodoravno drsenje — pas dejstev se premakne, desni rob se odreže.
+     `overflow-x: clip` odreže presežek brez drsnika in za razliko od
+     `hidden` ne ustvari drsnega konteksta, zato `position: sticky` naprej
+     dela. */
+  html,
+  body {
+    overflow-x: clip;
   }
 }
 
@@ -316,6 +729,17 @@ body {
   inset: 0;
   z-index: -1;
   pointer-events: none;
+
+  /* SIJ SE IZTEČE V NIČ PROTI DNU.
+     Brez tega je spodnji rob odseka s sijem svetlejši od odseka pod njim,
+     ki sija nima — in na stiku nastane vidna vodoravna črta. Videti je kot
+     napaka v izrisu, čeprav sta obe ploskvi pravilni; razlika je samo v
+     tem, da se ena konča sredi preliva.
+     Maska poskrbi, da je zadnja tretjina odseka natanko barva podlage,
+     torej enaka tistemu, kar sledi — prehod je potem neviden, ne glede na
+     to, kam sta zasidrana preliva. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
 }
 
 .globina::before {
@@ -343,5 +767,54 @@ body {
   .uvod-y {
     padding-top: calc(var(--glava-h) + var(--section-y) * 0.6);
     padding-bottom: var(--section-y);
+  }
+
+  /* UVODNI ZASLON naj zapolni okno, a ne natanko `100svh`: tam pas dejstev
+     pade pod pregib in prvi zaslon izgubi tisto, kar človek preveri pred
+     klicem. 78 % pusti pas ravno viden, kar je povabilo k drsenju.
+     Zgornja meja 920 px, ker na visokem zaslonu sicer naslov plava sredi
+     praznine. */
+  /* UVODNI ZASLON ZAVZAME CEL ZASLON.
+     `svh` in ne `vh`: na telefonu se naslovna vrstica brskalnika ob drsenju
+     skrči in `vh` se takrat spremeni — uvod bi poskočil sredi giba. `svh`
+     je najmanjša možna višina in se ne premika.
+     Višino nosi odsek (`uvod-zaslon`), vsebina v njem pa se razteza in
+     ostane navpično na sredini; pas s podatki se usede na dno. */
+  .uvod-zaslon {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .uvod-visina {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+/* OSNOVNI SLOG V PLASTI `base`.
+   Zunaj plasti bi ta pravila premagala vse Tailwindove razrede — `body` z
+   nastavljenim `background` bi tiho prevladal nad `bg-*` na istem elementu,
+   in razred bi bil videti, kot da ne dela. To je ista past kot pri
+   fokusnem obroču in se v tem projektu ponavlja. */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--color-papir);
+    color: var(--color-crnilo);
+    font-family: var(--font-besedilo);
+    font-size: var(--type-body);
+    line-height: var(--leading-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--color-poudarek);
+    color: var(--color-papir);
   }
 }

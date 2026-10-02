@@ -37,8 +37,9 @@ model Uporabnik {
 
   seje        Seja[]
   zetoniGesla ZetonGesla[]
+  nalozeno    MediaAsset[]
   createdAt   DateTime     @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt   DateTime     @updatedAt
 
   @@map("uporabniki")
 }
@@ -46,7 +47,7 @@ model Uporabnik {
 /// Seja v bazi in ne v podpisanem piškotku: tako se da odjaviti napravo, ki
 /// je ostala prijavljena na blagajni ali na tujem računalniku.
 model Seja {
-  id          String   @id @default(cuid())
+  id          String @id @default(cuid())
   uporabnikId String
 
   /// SHA-256 žetona iz piškotka. Kdor dobi izvoz baze, z njim ne more v sejo.
@@ -114,7 +115,7 @@ model Sporocilo {
 /// postavi takoj ob uporabi, da dvakrat poslana povezava ne odpre dveh
 /// ponastavitev.
 model ZetonGesla {
-  id          String   @id @default(cuid())
+  id          String @id @default(cuid())
   uporabnikId String
 
   zetonHash String    @unique
@@ -127,4 +128,535 @@ model ZetonGesla {
   @@index([uporabnikId])
   @@index([potece])
   @@map("zetoni_gesla")
+}
+
+// ============================================================================
+// ANALITIKA
+// ----------------------------------------------------------------------------
+// Štiri tabele, ker se brez njih na vprašanje »ali stran kaj prinese« ne da
+// odgovoriti. Vrstni red je obiskovalec → obisk → ogled → dogodek: vsak sloj
+// pove nekaj, česar prejšnji ne.
+//
+// Omrežnega naslova NE hranimo. Po GDPR je osebni podatek, za prepoznavo
+// istega človeka pa zadošča odtis (SHA-256, skrajšan) — ta služi SAMO temu,
+// da isti obiskovalec v drugem oknu ne šteje dvakrat.
+// ============================================================================
+
+/// Človek, kolikor ga brskalnik izda. Brez imena, brez naslova.
+model Obiskovalec {
+  id     String @id @default(cuid())
+  /// Naključna oznaka iz piškotka prve stranke. Ni vezana na osebo.
+  anonId String @unique
+
+  prviObisk   DateTime @default(now())
+  zadnjiObisk DateTime @default(now())
+
+  drzava    String?
+  mesto     String?
+  naprava   String?
+  os        String?
+  brskalnik String?
+  jezik     String?
+  ipHash    String?
+
+  obiski Obisk[]
+
+  @@index([zadnjiObisk])
+  @@map("obiskovalci")
+}
+
+/// Obisk od prihoda do odhoda. Vir se zapiše ENKRAT, ob prvem dotiku —
+/// pozneje bi ga povozila notranja povezava in vsak obisk bi bil videti,
+/// kot da je prišel z naše strani.
+model Obisk {
+  id            String @id @default(cuid())
+  obiskovalecId String
+
+  zacetek DateTime  @default(now())
+  konec   DateTime?
+
+  vir         String?
+  utmVir      String?
+  utmMedij    String?
+  utmKampanja String?
+  vstopnaPot  String?
+
+  obiskovalec Obiskovalec   @relation(fields: [obiskovalecId], references: [id], onDelete: Cascade)
+  ogledi      OgledStrani[]
+  dogodki     Dogodek[]
+
+  @@index([obiskovalecId])
+  @@index([zacetek])
+  @@map("obiski")
+}
+
+/// Ogled posamezne strani.
+model OgledStrani {
+  id      String @id @default(cuid())
+  obiskId String
+
+  pot    String
+  naslov String?
+
+  createdAt DateTime @default(now())
+
+  obisk Obisk @relation(fields: [obiskId], references: [id], onDelete: Cascade)
+
+  @@index([obiskId])
+  @@index([pot, createdAt])
+  @@map("ogledi_strani")
+}
+
+/// Kar ni ogled strani: klik na telefon, oddano povpraševanje, odprt cenik.
+/// Brez tega se ne da povedati, ali obisk sploh česa prinese.
+model Dogodek {
+  id      String @id @default(cuid())
+  obiskId String
+
+  ime     String
+  pot     String?
+  podatki Json?
+
+  createdAt DateTime @default(now())
+
+  obisk Obisk @relation(fields: [obiskId], references: [id], onDelete: Cascade)
+
+  @@index([ime, createdAt])
+  @@index([obiskId])
+  @@map("dogodki")
+}
+
+// ============================================================================
+// VSEBINA — strani iz blokov
+// ----------------------------------------------------------------------------
+// Dvoje, ker sta dve vrsti vsebine:
+//
+//   `DomovBlok`  odseki domače strani — kratka besedila v poljih, ki jih
+//                oblikuje koda. Urednik ureja besedilo in vrstni red,
+//                oblike ne more pokvariti. To je razlika med tem in
+//                WordPressom, kjer urejevalnik piše tudi obliko in se stran
+//                sčasoma razsuje.
+//
+//   `Stran`      pravna besedila (piškotki, zasebnost, pogoji) — eno dolgo
+//                besedilo, ki ga ni smisla razbijati v polja.
+//
+// Česar v bazi ni, se izriše iz privzetega v kodi. Prazna baza nikoli ne
+// pomeni prazne strani.
+// ============================================================================
+
+/// Stanje strani. Osnutek je viden samo v adminu.
+enum PageStatus {
+  DRAFT
+  PUBLISHED
+}
+
+/// Samostojna stran z dolgim besedilom: piškotki, zasebnost, pogoji.
+///
+/// ISTA OBLIKA kot `Page` na gostilnica-plus.si, da sta `lib/pages` in
+/// urejevalnik na obeh straneh ena koda. Odseki domače strani so nekaj
+/// drugega in živijo v `DomovBlok` — tam so kratka polja, ki jih oblikuje
+/// koda, tu pa eno dolgo besedilo, ki ga ni smisla razbijati.
+model Page {
+  id      String  @id @default(cuid())
+  slug    String  @unique
+  title   String
+  /// Prečiščen HTML iz urejevalnika.
+  body    String  @default("")
+  /// Kratek povzetek za sezname in kot zasilni SEO opis.
+  excerpt String?
+
+  /// SEO prepis naslova (≤ 60 znakov); prazno = uporabi `title`.
+  seoTitle       String?
+  /// SEO prepis opisa (≤ 155 znakov); prazno = uporabi `excerpt`.
+  seoDescription String?
+
+  status PageStatus @default(DRAFT)
+
+  /// Povezava v nogi — tu stojijo piškotki, zasebnost in pogoji.
+  showInFooter Boolean @default(true)
+  /// Povezava v glavnem meniju. Pravna besedila je tam bolje ne imeti.
+  showInMenu   Boolean @default(false)
+  /// Manjša številka je prej; ločeno za nogo in meni.
+  sortOrder    Int     @default(0)
+  menuOrder    Int     @default(0)
+
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status, sortOrder])
+  @@index([showInFooter, sortOrder])
+  @@map("strani")
+}
+
+/// Odsek javne strani.
+///
+/// Ena tabela za VSE štiri strani (domov, ponudba, dela, kontakt) in ne
+/// štiri: razlikujejo se samo po tem, kateri odseki obstajajo, kar pove
+/// register v kodi. Štiri tabele bi pomenile štirikrat isto poizvedbo in
+/// štiri mesta, kjer je treba popraviti isto napako.
+///
+/// Zapisa za odsek, ki še ni bil urejen, TU NI — in to ni napaka: odsek se
+/// takrat izriše iz privzetega besedila v kodi.
+model VsebinaBlok {
+  id String @id @default(cuid())
+
+  /// Katera stran: `domov`, `ponudba`, `dela`, `kontakt`.
+  stran String
+  /// Ključ iz registra (`hero`, `paketi`, `vprasanja` …).
+  kljuc String
+
+  viden     Boolean @default(true)
+  zaporedje Int     @default(0)
+
+  /// Besedila odseka; oblika je odvisna od ključa.
+  podatki Json @default("{}")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([stran, kljuc])
+  @@index([stran, viden, zaporedje])
+  @@map("vsebina_bloki")
+}
+
+/// Vrsta naložene datoteke. Nabor je kratek — kar ni slika, se na tej strani
+/// (še) ne nalaga.
+enum MediaKind {
+  IMAGE
+  VIDEO
+  DOCUMENT
+}
+
+/// Naložena datoteka v shrambi (Cloudflare R2).
+///
+/// ISTA OBLIKA kot na gostilnica-plus.si, da sta `lib/storage` in
+/// `lib/media` na obeh straneh ena koda.
+///
+/// Zapis v bazi NI kopija datoteke, ampak njen kazalec: pot v vedru, javni
+/// naslov in mere. Brez tega bi bilo treba za vsak izpis seznama slik
+/// povprašati shrambo — in ta je počasnejša od baze ter se zaračunava po
+/// klicu.
+model MediaAsset {
+  id          String    @id @default(cuid())
+  /// Vedro: `mediji` za slike strani, `listine` za dokumente strank.
+  bucket      String
+  /// Pot znotraj vedra.
+  path        String
+  /// Javni naslov datoteke.
+  url         String
+  kind        MediaKind @default(IMAGE)
+  mimeType    String
+  sizeBytes   Int
+  width       Int?
+  height      Int?
+  alt         String?
+  /// Drobna slika za podlago med nalaganjem — brez nje stran med nalaganjem
+  /// poskoči, ko slika pride.
+  blurDataUrl String?
+
+  uploadedById String?
+  uploadedBy   Uporabnik? @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@unique([bucket, path])
+  @@index([bucket])
+  @@map("mediji")
+}
+
+// ============================================================================
+// RAČUNI IN PLAČILA
+// ----------------------------------------------------------------------------
+// Tok je en sam in kratek: v adminu nastane račun, stran pošlje POVEZAVO,
+// stranka na njej plača s kartico, webhook račun označi za plačanega.
+//
+// Zakaj povezava in ne gumb na ponudbi: cena se pri vsaki hiši nekoliko
+// razlikuje in polovica se plača ob začetku, druga ob zagonu. Vnaprej
+// določen znesek na javni strani tega ne pokrije.
+// ============================================================================
+
+/// Predračun ali račun.
+///
+/// Ista tabela in ne dve: razlikujeta se po oznaki, številčenju in besedi na
+/// plačilni strani, vse ostalo (znesek, stranka, povezava, plačilo) je isto.
+/// Dve tabeli bi pomenili dvojno vzdrževanje za eno polje razlike — in
+/// pretvorba predračuna v račun bi terjala prepisovanje.
+enum VrstaRacuna {
+  PREDRACUN
+  RACUN
+}
+
+enum StanjeRacuna {
+  OSNUTEK
+  POSLAN
+  PLACAN
+  PREKLICAN
+}
+
+model Racun {
+  id String @id @default(cuid())
+
+  vrsta VrstaRacuna @default(RACUN)
+
+  /// Zaporedna oznaka za ljudi: `2026-001`, predračun `P-2026-001`.
+  /// Ločeno zaporedje na vrsto — računovodstvo zahteva neprekinjeno
+  /// številčenje računov, predračuni pa vanj ne spadajo.
+  stevilka String @unique
+
+  /// Komu je račun izdan.
+  stranka  String
+  epota    String?
+  podjetje String?
+
+  /// Kaj se plačuje — pokaže se na plačilni strani in na Stripovem računu.
+  opis String
+
+  /// Znesek v CENTIH. Decimalna števila se pri denarju seštevajo narobe in
+  /// Stripe tako ali tako dela s centi — pretvorba na enem mestu je manj
+  /// možnosti za napako kot zaokroževanje na desetih.
+  znesekCentov Int
+  valuta       String @default("EUR")
+
+  stanje StanjeRacuna @default(OSNUTEK)
+
+  /// Žeton v javni povezavi do plačilne strani.
+  ///
+  /// NI `cuid()`: ta je čas plus števec plus nekaj naključja in se ga da iz
+  /// nekaj zaporednih uganiti. Kdor ugane tuj žeton, vidi tuje ime, znesek
+  /// in opis. Žeton zato nastane iz `randomBytes(32)` v kodi.
+  zeton String @unique
+
+  /// Kar vrne Stripe — za povezavo s plačilom v njihovi nadzorni plošči.
+  stripeSejaId    String?
+  stripePlaciloId String?
+
+  poslanoAt DateTime?
+  placanoAt DateTime?
+  zapadlost DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([stanje, createdAt])
+  @@index([vrsta, stanje])
+  @@map("racuni")
+}
+
+/// Prejeto sporočilo Stripa.
+///
+/// Obstaja zaradi ENKRATNOSTI: Stripe isti dogodek ob negotovi dostavi pošlje
+/// večkrat, in brez tega zapisa bi se račun lahko označil za plačanega
+/// dvakrat — v dnevniku bi bili dve plačili, v resnici eno.
+model StripeDogodek {
+  id         String    @id @default(cuid())
+  dogodekId  String    @unique
+  vrsta      String
+  obdelanoAt DateTime?
+  napaka     String?
+  createdAt  DateTime  @default(now())
+
+  @@map("stripe_dogodki")
+}
+
+// ============================================================================
+// DNEVNIK POŠTE
+// ----------------------------------------------------------------------------
+// Vsa pošta te strani gre skozi ENA VRATA (`lib/posta/send.ts`), zato se tu
+// zapiše vsak poskus — tudi neuspel in tudi preskočen, ker v razvoju ni
+// ključa.
+//
+// Brez tega zapisa na vprašanje »ali je stranka dobila ponudbo« ni odgovora:
+// Resend hrani svoj dnevnik, a do njega pride samo lastnik računa in samo
+// določen čas. Pri pošiljanju vabil je to razlika med »poslano, čaka« in
+// »ni odšlo, pošlji znova«.
+//
+// Naslova prejemnika ne skrivamo — vedeti moraš, komu je pošta šla, in isti
+// naslov že stoji v povpraševanju.
+// ============================================================================
+
+enum StanjePoste {
+  POSLANA
+  NAPAKA
+  /// Ključa ni (razvoj) ali je pošiljanje izklopljeno.
+  PRESKOCENA
+}
+
+model DnevnikPoste {
+  id String @id @default(cuid())
+
+  /// Pri več naslovih zapisani z vejico.
+  prejemnik String
+  zadeva    String
+  /// Ključ predloge, kadar je znan.
+  predloga  String?
+
+  stanje StanjePoste
+
+  /// Oznaka sporočila pri Resendu — po njej se najde v njihovem dnevniku.
+  ponudnikId String?
+  napaka     String?
+
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([stanje, createdAt])
+  @@map("dnevnik_poste")
+}
+
+// ============================================================================
+// NASTAVITVE STRANI
+// ----------------------------------------------------------------------------
+// Ena sama vrstica (`id` je vedno `"singleton"`) — ista rešitev kot
+// `SiteSetting` na gostilnica-plus.si. Tabela z eno vrstico je videti
+// nenavadno, a je edina, ki dovoli urejanje iz admina brez objave: vrednosti
+// v kodi bi bilo treba spremeniti, prevesti in objaviti.
+//
+// TU STOJIJO PODATKI IZDAJATELJA. Na račun po ZDDV-1 sodijo ime, naslov in
+// davčna številka; brez IBAN-a ni UPN kode za nakazilo. Teh si ni mogoče
+// izmisliti, zato so prazni, dokler jih ne vpišeš — in dokler so prazni, se
+// račun ne izdela.
+//
+// Kontaktni podatki (telefon, e-pošta) ostajajo tudi v `lib/podatki.ts`: tam
+// so privzetki za javno stran, ki morajo delati tudi, kadar baza ne odgovori.
+model Nastavitve {
+  id String @id @default("singleton")
+
+  // ── Izdajatelj računov ──────────────────────────────────────────────────
+  /// Polno ime, kakor je v poslovnem registru.
+  izdajateljIme    String  @default("")
+  izdajateljUlica  String  @default("")
+  /// Poštna številka in kraj, npr. »8290 Sevnica«.
+  izdajateljPosta  String  @default("")
+  izdajateljDrzava String  @default("Slovenija")
+  /// Z predpono SI, če si zavezanec za DDV.
+  davcnaStevilka   String  @default("")
+  maticnaStevilka  String  @default("")
+  /// Kadar NISI zavezanec, mora na računu stati klavzula o oprostitvi.
+  zavezanecZaDdv   Boolean @default(false)
+  klavzulaBrezDdv  String  @default("DDV ni obračunan na podlagi 1. odstavka 94. člena ZDDV-1.")
+  /// Stopnja DDV v odstotkih. Uporabi se SAMO, kadar si zavezanec: račun mora
+  /// po 82. členu ZDDV-1 pokazati davčno osnovo, stopnjo in znesek davka —
+  /// en sam skupni znesek ni veljaven račun zavezanca.
+  stopnjaDdv       Int     @default(22)
+
+  // ── Banka ───────────────────────────────────────────────────────────────
+  iban  String @default("")
+  banka String @default("")
+  bic   String @default("")
+
+  // ── Stik ────────────────────────────────────────────────────────────────
+  telefon String @default("")
+  epota   String @default("")
+
+  // ── Družbena omrežja ────────────────────────────────────────────────────
+  /// Povezave so v nastavitvah in ne v kodi: ročaj se zamenja, koda se zato
+  /// ne objavlja znova. PRAZNO POLJE POMENI, DA SE POVEZAVA NE POKAŽE —
+  /// ikona, ki pelje na prazen profil, je slabša od ikone, ki je ni.
+  instagramUrl String @default("")
+  facebookUrl  String @default("")
+  linkedinUrl  String @default("")
+  /// Google Business Profile oziroma vpis na Zemljevidu. Pri lokalnem
+  /// izvajalcu je to najmočnejši zunanji signal — močnejši od obeh omrežij
+  /// skupaj — zato ni v istem košu z njima.
+  googleUrl    String @default("")
+
+  updatedAt DateTime @updatedAt
+
+  @@map("nastavitve")
+}
+
+// ============================================================================
+// VARNOST
+// ============================================================================
+
+/// Števec poskusov v časovnem oknu.
+///
+/// Brez tega je geslo v admin mogoče ugibati brez ovir: prijavni obrazec
+/// sprejme toliko poskusov na sekundo, kolikor jih strežnik zmore. Osem
+/// znakov je ob tisoč poskusih na sekundo vprašanje nekaj dni.
+///
+/// V bazi in ne v pomnilniku: na Vercelu vsak zahtevek lahko obdela drug
+/// proces, in števec v pomnilniku bi se vsakič začel znova.
+model OmejitevPoskusov {
+  id String @id @default(cuid())
+
+  /// Na primer `prijava:ip:1.2.3.4` ali `prijava:epota:info@zanmeke.com`.
+  kljuc       String
+  zacetekOkna DateTime
+  stevilo     Int      @default(1)
+  potece      DateTime
+
+  @@unique([kljuc, zacetekOkna])
+  @@index([potece])
+  @@map("omejitve_poskusov")
+}
+
+/// Kaj se je zgodilo v adminu.
+///
+/// Da je uporabnik en sam, ne spremeni ničesar: sled ni tu zato, da bi koga
+/// našla, ampak zato, da je čez pol leta mogoče odgovoriti, zakaj je nekaj
+/// drugače — kdaj je bil račun preklican, kdaj se je spremenilo geslo, kdaj
+/// je bila statistika ponastavljena. Brez nje je odgovor ugibanje.
+model Sled {
+  id String @id @default(cuid())
+
+  /// Kratek ključ dejanja: `PRIJAVA_USPEH`, `RACUN_PREKLICAN` …
+  dejanje String
+  /// Na čem je bilo opravljeno — `Racun`, `Nastavitve`, `Uporabnik`.
+  tarca   String?
+  /// Berljiva oznaka tarče, npr. številka računa.
+  oznaka  String?
+
+  uporabnikId String?
+  ip          String?
+  naprava     String?
+
+  /// Podrobnosti dejanja; oblika je odvisna od dejanja.
+  podatki Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([dejanje, createdAt])
+  @@index([createdAt])
+  @@map("sled")
+}
+
+// ============================================================================
+// PRIPOROČILA STRANK
+// ============================================================================
+// Edina stvar na strani, ki je ne napišem sam. Obiskovalec ve, da je vse
+// drugo moja beseda; tu je beseda nekoga, ki je plačal — in to je razlika
+// med »izgleda dobro« in »pokličimo ga«.
+//
+// Brez ocen v zvezdicah: ena ali dve priporočili s povprečjem 5,0 sta videti
+// izmišljeni. Poved z imenom, hišo in krajem pove več od vsake številke.
+// ============================================================================
+
+model Priporocilo {
+  id String @id @default(cuid())
+
+  /// Kdo je povedal — ime in priimek.
+  ime String
+  /// Hiša oziroma podjetje; pokaže se za imenom.
+  hisa String?
+  /// Vloga, če pomaga (»lastnik«, »vodja kuhinje«).
+  vloga String?
+  /// Kraj — pri lokalnem izvajalcu je bližina del dokaza.
+  kraj String?
+
+  /// Besedilo priporočila, kakor ga je povedala stranka.
+  besedilo String
+
+  /// Povezava na njihovo stran, če obstaja.
+  url String?
+
+  objavljeno Boolean @default(false)
+  sortOrder  Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([objavljeno, sortOrder])
+  @@map("priporocila")
 }

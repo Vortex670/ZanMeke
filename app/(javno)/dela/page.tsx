@@ -1,7 +1,14 @@
+import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
 
-import { STRAN } from "@/lib/podatki";
+import { Odsek } from "@/components/public/Odsek";
+import { OkvirBrskalnika } from "@/components/public/OkvirBrskalnika";
+import { GumbPovezava } from "@/components/ui/Gumb";
+import { BatchReveal } from "@/components/motion/BatchReveal";
+import { Stik } from "@/components/public/Stik";
+import { getVidniBloki } from "@/lib/domov/queries";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { drobtineLd } from "@/lib/seo/jsonLd";
 
 // ============================================================================
 // /dela — dve strani, ki danes tečeta
@@ -14,7 +21,8 @@ import { STRAN } from "@/lib/podatki";
 // stran. Živa stran je edini dokaz, ki ga ni mogoče narisati.
 // ============================================================================
 
-export const revalidate = 3600;
+// Vsebina je v bazi in se osveži ob shranjevanju odseka.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Dela",
@@ -26,6 +34,7 @@ export const metadata: Metadata = {
 type Primer = {
   ime: string;
   url: string;
+  slika: string;
   kraj: string;
   leto: string;
   tezava: string;
@@ -37,12 +46,13 @@ const PRIMERI: Primer[] = [
   {
     ime: "Gostilnica Plus",
     url: "https://gostilnica-plus.si",
+    slika: "/dela/gostilnica-plus.png",
     kraj: "Sevnica",
     leto: "2026",
     tezava:
       "Dnevno malico je vsak dan nekdo prepisal na Facebook, gostje pa so vseeno klicali in vprašali, kaj je danes. Naročila so se sprejemala po telefonu, med gnečo, s pomotami pri ceni. Ure zaposlenih so se vodile na list papirja.",
     naredil: [
-      "Jedilnik in tedensko ponudbo, ki ju lastnik ureja sam",
+      "Jedilnik in tedensko ponudbo, ki ju osebje ureja samo, brez klica meni",
       "Dnevne malice z e-pošto gostom in listom za na mizo",
       "Spletno naročanje s cenami, kakršne so na davčni blagajni",
       "Urnik, izmene in evidenco delovnega časa z izvozom za računovodstvo",
@@ -57,6 +67,7 @@ const PRIMERI: Primer[] = [
   {
     ime: "Second Home",
     url: "https://second-home.hr",
+    slika: "/dela/second-home.png",
     kraj: "Ražanj, Dalmacija",
     leto: "2026",
     tezava:
@@ -75,101 +86,147 @@ const PRIMERI: Primer[] = [
   },
 ];
 
-export default function Dela() {
+export default async function Dela() {
+  const vidni = await getVidniBloki("dela");
+  const vsebina = new Map(vidni.map((x) => [x.def.kljuc, x.data]));
+  const b = (kljuc: string) => vsebina.get(kljuc) ?? {};
+  const viden = (kljuc: string) => vsebina.has(kljuc);
+  const uvod = b("uvod");
+  const stik = b("stik");
+
   return (
     <>
-      <section className="bg-obrat text-na-obratu">
-        <div className="px-s2 uvod-y mx-auto max-w-5xl">
-          <p className="type-label text-poudarek">Dela</p>
-          <h1 className="type-h1 mt-s2 max-w-[20ch]">Dve strani, ki danes delata.</h1>
-          <p className="type-lead text-na-obratu/65 mt-s3 mera">
-            Pri vsaki piše, kaj je bilo narobe, kaj sem naredil in kaj se je spremenilo.
-            Obe lahko odprete — živi sta.
+      {/* ── Uvod ──────────────────────────────────────────────────────── */}
+      <Odsek plast="temna" sirina="sirok" visina={false} as="section" sij>
+        <div className="uvod-y">
+          <p className="type-poglavje text-poudarek">{uvod.oznaka || "Dela"}</p>
+          <h1 className="type-display mt-s3 max-w-[16ch]">
+            {uvod.naslov || "Dve strani, ki danes delata."}
+          </h1>
+          <p className="type-lead text-mirno mt-s3 mera">
+            {uvod.uvod ||
+              "Obe sta moji: postavil sem ju zase in ju vsak dan vodim. Pri vsaki piše, kaj je bilo narobe, kaj sem naredil in kaj se je spremenilo — in obe lahko odprete, ker živita."}
           </p>
         </div>
-      </section>
+      </Odsek>
 
-      <div className="px-s2 mx-auto max-w-5xl">
-        {PRIMERI.map((p, i) => (
-          <section
-            key={p.ime}
-            className={`odsek-y ${i > 0 ? "border-crta border-t" : ""}`}
-          >
-            <div className="gap-s2 flex flex-wrap items-baseline">
-              <h2 className="type-h2">{p.ime}</h2>
-              <a
-                href={p.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="type-label text-poudarek"
+      {/* ISTA PLAST RAZKRITIJ kot na domači strani: odseki vstopijo, ko
+          prideš do njih, vsak po enkrat in vsi po istem pragu. */}
+      <BatchReveal izbirnik="section">
+        {viden("primeri")
+          ? PRIMERI.map((p, i) => (
+              <Odsek
+                key={p.ime}
+                plast={i % 2 === 0 ? "svetla" : "mehka"}
+                sirina="sirok"
+                as="section"
               >
-                {p.url.replace("https://", "")} →
-              </a>
-              <span className="type-micro text-bledo ml-auto">
-                {p.kraj} · {p.leto}
-              </span>
-            </div>
-
-            <div className="mt-s3 gap-s4 grid sm:grid-cols-[1fr_1fr]">
-              <div>
-                <p className="type-label text-bledo">Kaj je bilo narobe</p>
-                <p className="type-body text-mirno mt-s1">{p.tezava}</p>
-
-                <p className="type-label text-bledo mt-s3">Kaj sem naredil</p>
-                <ul className="mt-s1 gap-s1 grid">
-                  {p.naredil.map((n) => (
-                    <li
-                      key={n}
-                      className="type-body text-mirno gap-s1 grid grid-cols-[1rem_1fr]"
-                    >
-                      <span aria-hidden>·</span>
-                      <span>{n}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="border-crta bg-ploskev p-s3 border">
-                <p className="type-label text-poudarek">Kaj se je spremenilo</p>
-                <ul className="mt-s2 gap-s2 grid">
-                  {p.izid.map((iz) => (
-                    <li key={iz} className="type-body gap-s1 grid grid-cols-[1rem_1fr]">
-                      <span aria-hidden className="text-poudarek">
-                        →
+                {/* Glava primera: številka, kje in kdaj, ime — in pot na ŽIVO
+                    stran. Odprta stran je močnejši dokaz od vsega, kar tu
+                    piše, zato mora biti vidna. */}
+                <div className="gap-s3 flex flex-wrap items-end justify-between">
+                  <div className="min-w-0">
+                    <p className="type-poglavje text-bledo gap-s1 flex flex-wrap items-center">
+                      <span className="text-poudarek stevilke">
+                        {String(i + 1).padStart(2, "0")}
                       </span>
-                      <span>{iz}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </section>
-        ))}
+                      <span>
+                        {p.kraj} · {p.leto}
+                      </span>
+                      <span aria-hidden className="text-bledo/40">
+                        ·
+                      </span>
+                      <span>lastni projekt</span>
+                    </p>
+                    <h2 className="type-h1 mt-s2">{p.ime}</h2>
+                  </div>
 
-        <section className="border-crta odsek-y border-t">
-          <div className="border-crta bg-ploskev p-s4 border">
-            <h2 className="type-h2">Naslednja je lahko vaša.</h2>
-            <p className="type-body text-mirno mt-s2 mera">
-              Pokličite in povem, kaj bi se pri vas spremenilo in koliko stane. Pol ure,
-              brez obveznosti.
-            </p>
-            <div className="mt-s3 gap-s1 flex flex-wrap items-center">
-              <a
-                href={`tel:${STRAN.telefonKlic}`}
-                className="type-label bg-poudarek text-na-obratu px-s3 rounded-full py-3"
-              >
-                <span className="stevilke">{STRAN.telefon}</span>
-              </a>
-              <Link
-                href="/ponudba"
-                className="type-label border-crta px-s3 rounded-full border py-3"
-              >
-                Poglej cene
-              </Link>
-            </div>
-          </div>
-        </section>
-      </div>
+                  <GumbPovezava
+                    href={p.url}
+                    videz="obris"
+                    ikona={<ArrowUpRight aria-hidden />}
+                  >
+                    Odpri stran
+                  </GumbPovezava>
+                </div>
+
+                {/* POSNETEK ČEZ VSO ŠIRINO VSEBNIKA in ne ob besedilu. Prej je
+                    stal v polovici stolpca, visok nekaj sto pikslov, in se na
+                    njem ni dalo videti ničesar — kar je pri dokazu najslabše,
+                    kar se mu lahko zgodi. */}
+                <figure className="mt-s4">
+                  <OkvirBrskalnika
+                    slika={p.slika}
+                    alt={`Spletna stran ${p.ime}`}
+                    domena={p.url.replace("https://", "")}
+                    prednostno={i === 0}
+                    vProstoru={false}
+                  />
+                </figure>
+
+                {/* Tri postaje v treh stolpcih: kaj je bilo narobe, kaj sem
+                    naredil, kaj se je spremenilo. Izid ima svojo ploskev —
+                    je edini del, ki ga bralec res išče. */}
+                <div className="mt-s4 gap-s3 grid lg:grid-cols-3">
+                  <div>
+                    <p className="type-poglavje text-bledo">Kaj je bilo narobe</p>
+                    <p className="type-body text-mirno mt-s2">{p.tezava}</p>
+                  </div>
+
+                  <div>
+                    <p className="type-poglavje text-bledo">Kaj sem naredil</p>
+                    <ul className="mt-s2 gap-s1 grid">
+                      {p.naredil.map((n) => (
+                        <li
+                          key={n}
+                          className="type-body text-mirno gap-s1 grid grid-cols-[1rem_1fr]"
+                        >
+                          <span aria-hidden className="text-bledo">
+                            ·
+                          </span>
+                          <span>{n}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="border-poudarek bg-poudarek-mehko p-s3 rounded-2xl border">
+                    <p className="type-poglavje text-poudarek">Kaj se je spremenilo</p>
+                    <ul className="mt-s2 gap-s2 grid">
+                      {p.izid.map((iz) => (
+                        <li
+                          key={iz}
+                          className="type-body gap-s1 grid grid-cols-[1rem_1fr]"
+                        >
+                          <span aria-hidden className="text-poudarek">
+                            →
+                          </span>
+                          <span>{iz}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </Odsek>
+            ))
+          : null}
+
+        <Stik
+          naslov={stik.naslov || "Naslednja je lahko vaša."}
+          uvod={
+            stik.uvod ||
+            "Pokličite in povem, kaj bi se pri vas spremenilo in koliko stane. Pol ure, brez obveznosti."
+          }
+          druga={{ href: "/ponudba", besedilo: "Poglej cene" }}
+        />
+      </BatchReveal>
+
+      <JsonLd
+        podatki={drobtineLd([
+          { ime: "Domov", pot: "/" },
+          { ime: "Dela", pot: "/dela" },
+        ])}
+      />
     </>
   );
 }

@@ -1,61 +1,201 @@
+import { ArrowUpRight, Camera, Monitor } from "lucide-react";
+
+import { GumbPiskotki } from "@/components/analytics/GumbPiskotki";
 import Link from "next/link";
 
+import {
+  IkonaFacebook,
+  IkonaGoogle,
+  IkonaInstagram,
+  IkonaLinkedin,
+} from "@/components/ui/IkoneOmrezij";
+import { getNastavitve } from "@/lib/nastavitve/queries";
+import { getFooterPages } from "@/lib/pages/queries";
 import { STRAN } from "@/lib/podatki";
+import { tiho } from "@/lib/tiho";
 
 // ============================================================================
 // Noga
 // ----------------------------------------------------------------------------
 // Noga je zadnja priložnost za klic in prvi kraj, kamor gre človek, ki išče
-// naslov ali številko. Zato nosi oboje — in nič drugega.
+// številko. Štirje pasovi, od zgoraj navzdol vedno tišji:
+//
+//   1 STIK — e-pošta in telefon kot veliki povezavi, ne kot gumba.
+//   2 TRIJE STOLPCI — strani, kaj delam, kje delam.
+//   3 ZNAMKA čez vso širino, odrezana ob spodnjem robu.
+//   4 DROBNI PAS — leto, pravna besedila, dejavnost.
+//
+// ZNAMKA JE SPODAJ in ne zgoraj. Zgoraj je bila okras pred vsebino; spodaj
+// je podpis za njo — in ker se izreže ob robu zaslona, se stran konča, kot
+// se konča plakat, in ne, kot se konča seznam.
+//
+// Česar tu ni: ponovljenega poziva k dejanju z gumbi. Vsaka stran se konča s
+// pasom `Stik`, kjer je številka največja stvar na zaslonu. Dva enaka poziva
+// drug pod drugim nista dvakrat močnejša, ampak dvakrat manj resna.
+//
+// Kraji so OBČINE POSAVJA. Prvi zapis je imel zraven Laško in Trebnje, dve
+// vrstici nižje pa »po vsem Posavju«; kdor pozna okolico, tako neujemanje
+// opazi takoj — in to je prva stvar, ki vzame zaupanje.
 // ============================================================================
 
-const POTI = [
-  { href: "/ponudba", label: "Ponudba in cene" },
-  { href: "/dela", label: "Dela" },
-  { href: "/kontakt", label: "Kontakt" },
+const STORITVI = [
+  { ikona: Monitor, label: "Izdelava spletnih strani" },
+  { ikona: Camera, label: "Fotografija za podjetja" },
 ];
 
-export function Noga() {
+export async function Noga() {
+  // Pravna besedila iz baze. Padec poizvedbe NE SME vzeti noge — brez
+  // telefonske številke na dnu je stran videti pokvarjena, brez povezave na
+  // piškotke pa le nepopolna.
+  const [pravne, n] = await Promise.all([
+    getFooterPages().catch(tiho("noga: pravne strani", [])),
+    getNastavitve().catch(tiho("noga: nastavitve", null)),
+  ]);
+
+  // Ikona se pokaže samo, če je povezava vpisana v nastavitvah. Ikona, ki
+  // pelje na prazen profil, je slabša od ikone, ki je ni.
+  const omrezja = [
+    { ikona: IkonaInstagram, naziv: "Instagram", url: n?.instagramUrl },
+    { ikona: IkonaFacebook, naziv: "Facebook", url: n?.facebookUrl },
+    { ikona: IkonaLinkedin, naziv: "LinkedIn", url: n?.linkedinUrl },
+    { ikona: IkonaGoogle, naziv: "Google", url: n?.googleUrl },
+  ].filter((o): o is { ikona: typeof IkonaInstagram; naziv: string; url: string } =>
+    Boolean(o.url),
+  );
+
   return (
-    <footer className="bg-obrat text-na-obratu mt-s5">
-      <div className="px-s2 py-s4 gap-s4 mx-auto grid max-w-5xl sm:grid-cols-[1fr_auto]">
+    <footer
+      // Brez `globina`: sij ima samo uvod strani. Noga stoji tik pod stikom,
+      // ki je prav tako temen, in dva sija drug pod drugim sta na stiku
+      // naredila vidno vodoravno črto.
+      className="plast-temna relative isolate overflow-hidden"
+    >
+      {/* ── 1 · Stik ───────────────────────────────────────────────────── */}
+      <div className="vsebnik-sirok pt-s5 pb-s4 gap-s4 grid lg:grid-cols-[1fr_1.4fr_0.8fr]">
         <div>
-          <p className="type-label tracking-[0.2em]">ŽAN MEKE</p>
-          <p className="type-body text-na-obratu/60 mt-s2 mera">
-            Spletne strani in fotografija za gostilne, apartmaje in manjša podjetja.
-            {" " + STRAN.kraj}, delam po vsem {STRAN.obmocje}u.
-          </p>
+          <p className="type-poglavje text-bledo">Kako do mene</p>
+
           <a
             href={`tel:${STRAN.telefonKlic}`}
-            className="type-h3 font-naslov stevilke mt-s3 hover:text-poudarek block"
+            className="type-h2 stevilke text-crnilo decoration-poudarek mt-s2 group flex items-center gap-3 underline-offset-[0.15em] hover:underline"
           >
             {STRAN.telefon}
+            <ArrowUpRight
+              className="size-[0.6em] shrink-0 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              strokeWidth={1.6}
+              aria-hidden
+            />
           </a>
           <a
             href={`mailto:${STRAN.epota}`}
-            className="type-body text-na-obratu/60 hover:text-na-obratu mt-s1 block"
+            className="type-lead text-mirno hover:text-crnilo mt-s1 block transition-colors"
           >
             {STRAN.epota}
           </a>
+
+          <p className="type-small text-bledo mt-s3 mera">
+            Delam sam, zato veste, kdo dvigne telefon. Če ne dvignem, sem pri stranki —
+            pokličem nazaj isti dan.
+          </p>
         </div>
 
-        <nav className="gap-s1 flex flex-col sm:items-end">
-          {POTI.map((p) => (
-            <Link
-              key={p.href}
-              href={p.href}
-              className="type-body text-na-obratu/60 hover:text-na-obratu transition-colors"
-            >
-              {p.label}
-            </Link>
-          ))}
-        </nav>
+        <div>
+          <p className="type-poglavje text-bledo">Kaj delam</p>
+          <ul className="mt-s2 gap-s1 grid">
+            {STORITVI.map((s) => (
+              <li key={s.label} className="type-body text-mirno flex items-center gap-2">
+                <s.ikona
+                  className="text-poudarek size-4 shrink-0"
+                  strokeWidth={1.6}
+                  aria-hidden
+                />
+                {s.label}
+              </li>
+            ))}
+          </ul>
+
+          <p className="type-small text-bledo mt-s3 mera">
+            Oboje isti človek: stran postavim sam in fotografije posnamem sam.
+          </p>
+        </div>
+
+        <div>
+          <p className="type-poglavje text-bledo">Drugje</p>
+
+          {omrezja.length > 0 ? (
+            <ul className="mt-s2 gap-s1 flex flex-wrap">
+              {omrezja.map((o) => (
+                <li key={o.naziv}>
+                  <a
+                    href={o.url}
+                    target="_blank"
+                    rel="me noopener noreferrer"
+                    aria-label={o.naziv}
+                    title={o.naziv}
+                    className="border-crta text-mirno hover:border-poudarek hover:text-crnilo inline-flex size-11 items-center justify-center rounded-full border transition-colors"
+                  >
+                    <o.ikona className="size-4" strokeWidth={1.6} aria-hidden />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="type-small text-bledo mt-s2">
+              Najhitreje po telefonu ali e-pošti.
+            </p>
+          )}
+
+          <p className="type-small text-bledo mt-s3 mera">
+            Na prvi pogovor pridem k vam. Po {STRAN.obmocjeV} poti ne zaračunam.
+          </p>
+        </div>
       </div>
 
-      <div className="border-na-obratu/10 px-s2 py-s2 mx-auto max-w-5xl border-t">
-        <p className="type-micro text-na-obratu/40">
-          © {new Date().getFullYear()} {STRAN.ime} · {STRAN.domena}
+      {/* ── 2 · Znamka ─────────────────────────────────────────────────── */}
+      {/* Odrezana ob spodnjem robu (`-mb` + `overflow-hidden` na nogi): napis
+          se ne konča, ampak izteče iz strani. Zato je tudi `select-none` in
+          `aria-hidden` — to je ploskev, ne besedilo. */}
+      <div className="vsebnik-sirok -mb-[0.14em] overflow-hidden">
+        <p
+          aria-hidden
+          className="font-naslov text-crnilo/8 text-[clamp(4rem,15vw,13rem)] leading-[0.8] tracking-tighter select-none"
+        >
+          Žan Meke<span className="text-poudarek/40">.</span>
         </p>
+      </div>
+
+      {/* ── 3 · Drobni pas ─────────────────────────────────────────────── */}
+      <div className="border-crta border-t">
+        <div className="vsebnik-sirok py-s2 gap-s2 flex flex-wrap items-center">
+          <p className="type-micro text-bledo">
+            © {new Date().getFullYear()} {STRAN.ime} · {STRAN.domena}
+          </p>
+
+          {/* Piškotki, zasebnost, pogoji — v drobnem pasu in ne med stranmi
+              zgoraj. Tja gre človek po informacijo, sem po pravilo. */}
+          {pravne.length > 0 ? (
+            <ul className="type-micro gap-s2 flex flex-wrap items-center">
+              {pravne.map((s) => (
+                <li key={s.slug}>
+                  <Link
+                    href={`/${s.slug}`}
+                    className="type-micro text-bledo hover:text-crnilo transition-colors"
+                  >
+                    {s.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+
+          {/* Izbiro o piškotkih je mogoče kadarkoli spremeniti — gumb pas
+              odpre znova. */}
+          <GumbPiskotki className="type-micro text-bledo hover:text-crnilo transition-colors" />
+
+          <p className="type-micro text-bledo/70 ml-auto">
+            Izdelava spletnih strani in fotografija · {STRAN.kraj}, {STRAN.obmocje}
+          </p>
+        </div>
       </div>
     </footer>
   );

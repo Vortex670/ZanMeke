@@ -1,5 +1,10 @@
 import { Glava } from "@/components/layout/Glava";
 import { Noga } from "@/components/layout/Noga";
+import { PlavajociGumbi } from "@/components/layout/PlavajociGumbi";
+import { Beleznik } from "@/components/analytics/Beleznik";
+import { PasPiskotkov } from "@/components/analytics/PasPiskotkov";
+import { CrtaNapredka } from "@/components/motion/CrtaNapredka";
+import { GladkoDrsenje } from "@/components/motion/GladkoDrsenje";
 
 // ============================================================================
 // Postavitev JAVNIH strani
@@ -12,9 +17,14 @@ import { Noga } from "@/components/layout/Noga";
 export default function JavnaPostavitev({ children }: { children: React.ReactNode }) {
   return (
     <>
+      <Beleznik />
+      <GladkoDrsenje />
+      <CrtaNapredka />
       <Glava />
       <main className="flex-1">{children}</main>
       <Noga />
+      <PlavajociGumbi />
+      <PasPiskotkov />
     </>
   );
 }

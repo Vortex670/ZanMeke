@@ -17,7 +17,7 @@ import { STRAN } from "@/lib/podatki";
 // razlike med grotesknima pisavama nihče ne vidi.
 // ============================================================================
 
-export const alt = "Žan Meke — spletne strani za gostilne in podjetja v Posavju";
+export const alt = "Žan Meke — spletne strani in fotografija za gostilne in apartmaje v Posavju";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -69,7 +69,7 @@ export default function Og() {
           Spletne strani, ki opravijo delo, ki ga zdaj opravlja telefon.
         </span>
         <span style={{ fontSize: 28, color: "#9aa6a3", maxWidth: 820 }}>
-          Za gostilne, apartmaje in manjša podjetja v {STRAN.obmocje}u.
+          Za gostilne, apartmaje in manjša podjetja v {STRAN.obmocjeV}.
         </span>
       </div>
 

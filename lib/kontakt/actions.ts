@@ -1,10 +1,10 @@
 "use server";
 
-import { Resend } from "resend";
 
 import { napaka, runAction, uspeh, type ActionResult } from "@/lib/actions/helpers";
 import { ZANIMANJE_NAPIS, povprasevanjeSchema } from "@/lib/kontakt/validation";
 import { STRAN } from "@/lib/podatki";
+import { posljiPosto } from "@/lib/posta/send";
 import { prisma } from "@/lib/prisma";
 
 // ============================================================================
@@ -23,7 +23,6 @@ import { prisma } from "@/lib/prisma";
 // ============================================================================
 
 const PREDAL = process.env.CONTACT_TO_EMAIL ?? STRAN.epota;
-const POSILJATELJ = process.env.RESEND_FROM_EMAIL ?? `Žan Meke <${STRAN.epota}>`;
 
 export async function posljiPovprasevanje(
   _prejsnje: ActionResult | null,
@@ -81,34 +80,33 @@ export async function posljiPovprasevanje(
       select: { id: true },
     });
 
-    const kljuc = process.env.RESEND_API_KEY;
-    if (!kljuc) {
-      console.warn("[kontakt] RESEND_API_KEY ni nastavljen; sporočilo samo v dnevnik");
-      console.info(vrstice);
-      return uspeh("Hvala, sporočilo je oddano. Oglasim se isti dan.");
-    }
-
-    const resend = new Resend(kljuc);
-    const { error } = await resend.emails.send({
-      from: POSILJATELJ,
-      to: PREDAL,
-      subject: `Povpraševanje — ${v.ime}${v.podjetje ? `, ${v.podjetje}` : ""}`,
-      text: vrstice,
-      ...(v.epota ? { replyTo: v.epota } : {}),
+    // Pošta gre skozi ENA VRATA (`lib/posta/send.ts`), kjer se vsak poskus
+    // zapiše v dnevnik — tudi neuspel in tudi preskočen, ker ključa ni.
+    // Prej je bil klic Resenda tu in o njem ni ostalo sledi nikjer.
+    const izid = await posljiPosto({
+      za: PREDAL,
+      zadeva: `Povpraševanje — ${v.ime}${v.podjetje ? `, ${v.podjetje}` : ""}`,
+      html: `<pre style="font:14px/1.6 ui-monospace,monospace">${vrstice.replace(/</g, "&lt;")}</pre>`,
+      besedilo: vrstice,
+      predloga: "povprasevanje",
+      ...(v.epota ? { odgovorNa: v.epota } : {}),
     });
 
-    if (error) {
-      console.error("[kontakt] Resend:", error);
-      // Zapis ostane v adminu z oznako, da obvestilo ni odšlo.
+    if (!izid.ok) {
+      // Zapis ostane v adminu z oznako, da obvestilo ni odšlo — sporočilo
+      // torej ni izgubljeno, tudi če pošta pade.
       return napaka(
         `Sporočila ni bilo mogoče poslati. Pokličite na ${STRAN.telefon} — odgovorim takoj.`,
       );
     }
 
-    await prisma.sporocilo.update({
-      where: { id: zapis.id },
-      data: { poslano: true },
-    });
+    // »Poslano« pomeni, da je pošta res odšla; preskočena (razvoj) to ni.
+    if (!izid.preskoceno) {
+      await prisma.sporocilo.update({
+        where: { id: zapis.id },
+        data: { poslano: true },
+      });
+    }
 
     return uspeh("Hvala, sporočilo je oddano. Oglasim se isti dan.");
   });

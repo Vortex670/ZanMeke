@@ -4,7 +4,7 @@ import { Eye, EyeOff } from "lucide-react";
 import type { ReactNode } from "react";
 import { useId, useState } from "react";
 
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/utils";
 
 // ============================================================================
 // Primitivi obrazca — Polje, Vnos, Besedilo, Gumb
@@ -39,7 +39,11 @@ export function Polje({ oznaka, napaka, namig, obvezno, children }: PoljeProps) 
     .join(" ");
 
   return (
-    <div className="gap-s1 grid">
+    // `content-start` JE BISTVENO. Brez njega mreža raztegne svoje vrstice
+    // čez vso višino celice, in ker ima eno polje pod sabo namig, sosednje
+    // pa ne, se v sosednjem prazen prostor razdeli vnosu — ta zraste za
+    // nekaj pikslov in dva vnosa v isti vrstici nista enako visoka.
+    <div className="gap-s1 grid content-start">
       <label htmlFor={id} className="type-label text-mirno">
         {oznaka}
         {obvezno ? <span className="text-poudarek"> *</span> : null}
@@ -65,15 +69,26 @@ export function Polje({ oznaka, napaka, namig, obvezno, children }: PoljeProps) 
   );
 }
 
+// VIŠINA JE FIKSNA, tako kot pri gumbih (`h-12`): vnos, gumb in pilula so v
+// istem obrazcu in morajo stati v isti vrsti. Višina iz oblazinjenja je
+// odvisna od pisave in se med polji razlikuje za piksel ali dva — dovolj, da
+// se vidi.
 const OSNOVA =
-  "border-crta bg-ploskev text-crnilo placeholder:text-bledo type-body w-full rounded-[2px] border px-3 py-2.5 transition-colors aria-[invalid=true]:border-poudarek";
+  "border-crta bg-ploskev text-crnilo placeholder:text-bledo type-body h-12 w-full rounded-[2px] border px-3 transition-colors aria-[invalid=true]:border-poudarek";
 
 export function Vnos({ className, ...rest }: React.ComponentProps<"input">) {
   return <input {...rest} className={cn(OSNOVA, className)} />;
 }
 
 export function Besedilo({ className, ...rest }: React.ComponentProps<"textarea">) {
-  return <textarea {...rest} className={cn(OSNOVA, "min-h-36 resize-y", className)} />;
+  // Besedilo raste: `h-auto` povozi fiksno višino iz `OSNOVA`, `py-3` vrne
+  // navpično oblazinjenje, ki ga pri enovrstičnem vnosu opravi `h-12`.
+  return (
+    <textarea
+      {...rest}
+      className={cn(OSNOVA, "h-auto min-h-36 resize-y py-3", className)}
+    />
+  );
 }
 
 /**
@@ -111,7 +126,7 @@ export function Pilula({
   privzeto?: boolean;
 }) {
   return (
-    <label className="type-body border-crta has-checked:border-poudarek has-checked:bg-poudarek-mehko has-checked:text-poudarek cursor-pointer rounded-full border px-4 py-2 transition-colors">
+    <label className="type-body border-crta has-checked:border-poudarek has-checked:bg-poudarek-mehko has-checked:text-poudarek inline-flex h-10 cursor-pointer items-center rounded-full border px-4 transition-colors">
       <input
         type="radio"
         name={ime}
@@ -194,23 +209,40 @@ export function VnosGeslo({
 }
 
 /** Kljukica z besedilom in razlago pod njim. */
+/**
+ * Kljukica.
+ *
+ * Deluje v obeh načinih: v obrazcu brez stanja (`privzeto`, vrednost prebere
+ * strežniško dejanje ob oddaji) in v izračunu, kjer vrednost živi v stanju
+ * (`izbrano` + `naIzbiro`). Dve ločeni komponenti za isto obliko bi pomenili
+ * dva kraja, kjer se spremeni videz kljukice — in sčasoma dva videza.
+ */
 export function Kljukica({
   ime,
   napis,
   razlaga,
   privzeto,
+  izbrano,
+  naIzbiro,
 }: {
   ime: string;
   napis: string;
   razlaga?: string;
   privzeto?: boolean;
+  /** Krmiljeno stanje; kadar je podano, `privzeto` ne velja. */
+  izbrano?: boolean;
+  naIzbiro?: (izbrano: boolean) => void;
 }) {
+  const krmiljeno = izbrano !== undefined;
+
   return (
     <label className="group gap-s1 grid cursor-pointer grid-cols-[1.15rem_1fr] items-start">
       <input
         type="checkbox"
         name={ime}
-        defaultChecked={privzeto}
+        {...(krmiljeno
+          ? { checked: izbrano, onChange: (e) => naIzbiro?.(e.target.checked) }
+          : { defaultChecked: privzeto })}
         className="border-crta text-poudarek accent-poudarek mt-0.5 size-[1.15rem] rounded-[3px]"
       />
       <span>

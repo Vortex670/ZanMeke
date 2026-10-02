@@ -45,15 +45,13 @@ export default async function Pregled() {
 
   return (
     <AdminPage
-      uporabnik={uporabnik}
-      oznaka="Pregled"
-      naslov={
+      eyebrow="Pregled"
+      title={
         <>
           Dober dan, <span className="text-accent">{ime}</span>
         </>
       }
-      opis={`${danes} — kar je tu, je za narediti danes.`}
-      znacke={{ "/admin/sporocila": stevila.novo }}
+      description={`${danes} — kar je tu, je za narediti danes.`}
     >
       <section className="grid grid-cols-2 gap-(--s2) lg:grid-cols-4">
         <StatCard

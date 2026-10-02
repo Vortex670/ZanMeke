@@ -1,6 +1,8 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
+import { GUMB_POLNI_NA_TEMNEM, GumbPovezava } from "@/components/ui/Gumb";
+import { Znak } from "@/components/ui/Znak";
 import { STRAN } from "@/lib/podatki";
 
 // ============================================================================
@@ -19,6 +21,19 @@ import { STRAN } from "@/lib/podatki";
 // tri; hamburger bi jih skril za dotik, ki ga marsikdo ne naredi.
 // ============================================================================
 
+// ŠTIRJE VNOSI IN NOBENE PANOGE. Stran dela za vsako podjetje; meni, ki
+// našteje dve panogi, vsem drugim pove, da niso na pravem naslovu. Panoga je
+// lahko primer v besedilu, nikoli pa pot.
+//
+// TRI POTI IN VSE TRI SO RAZLOG ZA OBISK: kaj stane, kaj je že narejeno,
+// kako do mene. Vmes sta bila »Evidenca ur« in »Izračun« — oba brezplačni
+// orodji, oba odstranjena. Prvo je razumel samo delodajalec z zaposlenimi,
+// drugo pa je stalo na ugibanju: »koliko klicev na dan bi odgovorila stran«
+// ni številka, ki jo kdo pozna. Rezultat, zgrajen na ugibanju, se bere kot
+// izmišljen — in to vzame zaupanje tudi vsemu drugemu na strani.
+//
+// Številk pred napisi ni več: »01 PONUDBA« je oblika menija na
+// gostilnica-plus.si.
 const MENI = [
   { href: "/ponudba", label: "Ponudba" },
   { href: "/dela", label: "Dela" },
@@ -28,58 +43,61 @@ const MENI = [
 export function Glava() {
   return (
     <header className="text-na-obratu absolute inset-x-0 top-0 z-50">
-      <div className="px-s2 gap-s3 mx-auto flex max-w-5xl items-center py-4">
-        <Link href="/" className="min-w-0 leading-none">
-          <span className="type-label block tracking-[0.22em] whitespace-nowrap">
-            ŽAN MEKE
-          </span>
-          <span className="type-micro text-na-obratu/50 mt-1 block whitespace-nowrap">
-            SPLETNE STRANI · FOTOGRAFIJA
+      <div className="vsebnik-sirok gap-s3 flex items-center py-4">
+        <Link
+          href="/"
+          aria-label="Žan Meke — domov"
+          className="group gap-s1 flex min-w-0 items-center leading-none"
+        >
+          <Znak className="text-poudarek size-7 shrink-0 transition-transform duration-500 group-hover:rotate-45 sm:size-8" />
+          <span className="min-w-0">
+            <span className="font-oznaka block text-[0.95rem] font-semibold tracking-[0.18em] whitespace-nowrap">
+              ŽAN MEKE
+            </span>
+            {/* Podnapis odpade pod 420 px. Z »nowrap« se je zlil pod gumb s
+                telefonsko številko in zadnja beseda je bila prerezana na
+                sredi — prerezan napis bere kot pokvarjena stran. Kaj delam,
+                pove uvod strani in noga; v glavi je na telefonu dovolj ime. */}
+            <span className="type-micro text-na-obratu/45 mt-0.5 block whitespace-nowrap max-[420px]:hidden">
+              SPLETNE STRANI · FOTOGRAFIJA
+            </span>
           </span>
         </Link>
 
-        <nav className="gap-s3 ml-auto hidden items-center sm:flex">
-          {MENI.map((m, i) => (
+        <nav className="gap-s2 xl:gap-s3 ml-auto hidden items-center lg:flex">
+          {MENI.map((m) => (
             <Link
               key={m.href}
               href={m.href}
-              className="type-label text-na-obratu/75 hover:text-na-obratu transition-colors"
+              className="type-label text-na-obratu/70 hover:text-na-obratu whitespace-nowrap transition-colors"
             >
-              <span className="text-na-obratu/35 stevilke mr-1.5">
-                {String(i + 1).padStart(2, "0")}
-              </span>
               {m.label}
             </Link>
           ))}
         </nav>
 
-        <a
+        <GumbPovezava
           href={`tel:${STRAN.telefonKlic}`}
-          className="type-label bg-poudarek text-na-obratu group ml-auto inline-flex items-center gap-2.5 rounded-full py-1.5 pr-4 pl-1.5 whitespace-nowrap transition-opacity hover:opacity-90 sm:ml-0"
+          velikost="mal"
+          ikona={<ArrowRight aria-hidden />}
+          className={`${GUMB_POLNI_NA_TEMNEM} ml-auto whitespace-nowrap lg:ml-0`}
         >
-          <span className="bg-na-obratu/15 inline-flex size-7 items-center justify-center rounded-full">
-            <ArrowRight
-              className="size-3.5 transition-transform group-hover:translate-x-0.5"
-              strokeWidth={2.2}
-              aria-hidden
-            />
-          </span>
           <span className="stevilke">{STRAN.telefon}</span>
-        </a>
+        </GumbPovezava>
       </div>
 
-      {/* Telefon: poti v drugi vrsti, da so dosegljive brez dodatnega dotika. */}
-      <nav className="border-na-obratu/10 border-y sm:hidden">
-        <div className="px-s2 divide-na-obratu/10 mx-auto grid max-w-5xl grid-cols-3 divide-x">
-          {MENI.map((m, i) => (
+      {/* Telefon in tablica: poti v drugi vrsti, da so dosegljive brez
+          dodatnega dotika. Vrstica se vodoravno podrsa — pet vnosov v eno
+          vrstico na 390 px ne gre, prelom v dve vrstici pa bi glavo podvojil
+          po višini in uvod potisnil pod pregib. */}
+      <nav className="border-na-obratu/10 border-y lg:hidden">
+        <div className="vsebnik-sirok gap-s3 flex scrollbar-none overflow-x-auto">
+          {MENI.map((m) => (
             <Link
               key={m.href}
               href={m.href}
-              className="type-label text-na-obratu/75 active:text-na-obratu py-2.5 text-center"
+              className="type-label text-na-obratu/70 active:text-na-obratu py-2.5 whitespace-nowrap"
             >
-              <span className="text-na-obratu/35 stevilke mr-1">
-                {String(i + 1).padStart(2, "0")}
-              </span>
               {m.label}
             </Link>
           ))}

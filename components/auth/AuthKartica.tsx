@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/utils";
 
 // ============================================================================
 // <AuthKartica /> — enotna kartica za vse zaslone prijave
