@@ -7,6 +7,7 @@ import {
   Tags,
   UtensilsCrossed,
   type LucideIcon,
+  Phone,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -36,6 +37,7 @@ type FunnelStage = {
     | "confirmed"
     | "offerViews"
     | "contactViews"
+    | "calls"
     | "inquiries";
   label: string;
   value: number;
@@ -67,6 +69,7 @@ const STAGE_META: Record<FunnelStage["key"], { Icon: LucideIcon; tone: string }>
     Icon: MessageSquare,
     tone: "bg-warning/15 text-warning ring-warning/25",
   },
+  calls: { Icon: Phone, tone: "bg-accent/15 text-accent ring-accent/25" },
   inquiries: { Icon: Send, tone: "bg-text/10 text-text ring-text/20" },
 };
 
@@ -112,9 +115,7 @@ export function ConversionFunnel({ stages, formatConversion }: Props) {
                 />
               </div>
               {conversionRate ? (
-                <p className="text-subtle type-small">
-                  {conversionText(conversionRate)}
-                </p>
+                <p className="text-subtle type-small">{conversionText(conversionRate)}</p>
               ) : null}
             </div>
           </li>

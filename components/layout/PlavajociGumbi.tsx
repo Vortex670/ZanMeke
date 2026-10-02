@@ -4,6 +4,7 @@ import { ArrowUp, MessageCircle, Phone, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { GumbIkona } from "@/components/ui/Gumb";
 import { STRAN } from "@/lib/podatki";
 
 // ============================================================================
@@ -15,6 +16,9 @@ import { STRAN } from "@/lib/podatki";
 //
 // »Na vrh« se pokaže šele po enem zaslonu drsenja — prej ni kam. Pojavi se
 // brez animacije velikosti, ker bi ta ob vsakem drsenju premikala stolpec.
+//
+// Vsi trije gumbi so <GumbIkona> in ne surovi <button>: oblika, radij in
+// odziv ob pritisku se tako spremenijo na enem mestu za vse tri strani.
 //
 // Klepet ni robot. Odpre predal s telefonsko številko, e-pošto in povezavo na
 // obrazec — tri poti do človeka, ki res odgovori. Pogovorno okno, ki odgovarja
@@ -58,14 +62,15 @@ export function PlavajociGumbi() {
         >
           <div className="bg-obrat text-na-obratu px-s2 flex items-center justify-between py-2.5">
             <span className="type-label">Kako do mene</span>
-            <button
-              type="button"
+            <GumbIkona
+              naziv="Zapri"
+              videz="tih"
+              velikost="mal"
               onClick={() => nastaviOdprt(false)}
-              aria-label="Zapri"
-              className="text-na-obratu/70 hover:text-na-obratu p-1"
+              className="text-na-obratu/70 hover:text-na-obratu size-8"
             >
               <X className="size-4" strokeWidth={2} aria-hidden />
-            </button>
+            </GumbIkona>
           </div>
 
           <div className="p-s2 gap-s1 grid">
@@ -104,30 +109,30 @@ export function PlavajociGumbi() {
       ) : null}
 
       {videnNaVrh ? (
-        <button
-          type="button"
+        <GumbIkona
+          naziv="Na vrh strani"
+          videz="obris"
+          velikost="mal"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          aria-label="Na vrh strani"
-          className="border-crta bg-ploskev text-crnilo hover:border-poudarek inline-flex size-11 items-center justify-center rounded-full border shadow-[0_8px_24px_-12px_rgba(15,21,19,0.4)] transition-colors"
+          className="size-11 shadow-[0_8px_24px_-12px_rgba(15,21,19,0.4)]"
         >
           <ArrowUp className="size-4" strokeWidth={2} aria-hidden />
-        </button>
+        </GumbIkona>
       ) : null}
 
       {videnStik || odprt ? (
-        <button
-          type="button"
+        <GumbIkona
+          naziv={odprt ? "Zapri stik" : "Odpri stik"}
           onClick={() => nastaviOdprt((v) => !v)}
           aria-expanded={odprt}
-          aria-label={odprt ? "Zapri stik" : "Odpri stik"}
-          className="bg-poudarek text-na-poudarku inline-flex size-12 items-center justify-center rounded-full shadow-[0_10px_28px_-12px_rgba(15,21,19,0.55)] transition-transform hover:scale-[1.04] active:scale-[0.97]"
+          className="shadow-[0_10px_28px_-12px_rgba(15,21,19,0.55)]"
         >
           {odprt ? (
             <X className="size-5" strokeWidth={2} aria-hidden />
           ) : (
             <MessageCircle className="size-5" strokeWidth={2} aria-hidden />
           )}
-        </button>
+        </GumbIkona>
       ) : null}
     </div>
   );

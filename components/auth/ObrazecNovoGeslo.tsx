@@ -3,6 +3,7 @@
 import { KeyRound } from "lucide-react";
 import { useActionState, useEffect, useRef } from "react";
 import { toast } from "sonner";
+import { HiddenField } from "@/components/ui/HiddenField";
 
 import { Gumb } from "@/components/ui/Gumb";
 import { Polje, VnosGeslo } from "@/components/ui/Polje";
@@ -32,7 +33,7 @@ export function ObrazecNovoGeslo({ zeton }: { zeton: string }) {
 
   return (
     <form action={oddaj} className="gap-s2 grid" noValidate>
-      <input type="hidden" name="zeton" value={zeton} />
+      <HiddenField name="zeton" value={zeton} />
 
       <Polje
         oznaka="Novo geslo"

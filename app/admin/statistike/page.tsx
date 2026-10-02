@@ -285,6 +285,11 @@ export default async function Statistike({
               },
               { key: "offerViews", label: "Ogledi ponudbe", value: ogledovPonudbe },
               { key: "contactViews", label: "Odprt kontakt", value: ogledovKontakta },
+              // Klic je pri tej strani pogostejši zaključek od obrazca — in
+              // doslej ga lijak ni pokazal, zato je izgledalo, kot da nihče
+              // ne naredi ničesar. Stoji PRED povpraševanjem, ker je nižji
+              // prag: številko pritisneš, obrazec izpolniš.
+              { key: "calls", label: "Klic na številko", value: posnetek.callsTotal },
               {
                 key: "inquiries",
                 label: "Oddano povpraševanje",

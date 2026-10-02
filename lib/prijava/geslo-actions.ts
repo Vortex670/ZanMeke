@@ -3,9 +3,9 @@
 import { createHash, randomBytes } from "node:crypto";
 
 import { redirect } from "next/navigation";
-import { z } from "zod";
 
 import GesloPonastavitev from "@/emails/GesloPonastavitev";
+import { novoGesloShema, zahtevaGeslaShema } from "@/lib/prijava/validation";
 import { napaka, runAction, uspeh, type ActionResult } from "@/lib/actions/helpers";
 import { zasifriraj } from "@/lib/auth/geslo";
 import { posljiPredlogo } from "@/lib/posta/send";
@@ -31,21 +31,6 @@ const VELJA_MINUT = 60;
 
 const hash = (zeton: string) => createHash("sha256").update(zeton).digest("hex");
 
-const zahtevaShema = z.object({
-  email: z.string().trim().toLowerCase().email("Vpiši veljaven e-naslov."),
-});
-
-const novoShema = z
-  .object({
-    zeton: z.string().min(10),
-    geslo: z.string().min(12, "Geslo naj ima vsaj 12 znakov."),
-    ponovi: z.string(),
-  })
-  .refine((v) => v.geslo === v.ponovi, {
-    path: ["ponovi"],
-    message: "Gesli se ne ujemata.",
-  });
-
 const ISTI_ODGOVOR =
   "Če ta e-naslov obstaja, je povezava za ponastavitev na poti. Velja eno uro.";
 
@@ -54,7 +39,7 @@ export async function zahtevajPonastavitev(
   podatki: FormData,
 ): Promise<ActionResult> {
   return runAction(async () => {
-    const vhod = zahtevaShema.safeParse({ email: podatki.get("email") });
+    const vhod = zahtevaGeslaShema.safeParse({ email: podatki.get("email") });
     if (!vhod.success) {
       return napaka("Preveri vnos.", { email: [vhod.error.issues[0]!.message] });
     }
@@ -106,7 +91,7 @@ export async function nastaviNovoGeslo(
   podatki: FormData,
 ): Promise<ActionResult> {
   const izid = await runAction(async () => {
-    const vhod = novoShema.safeParse({
+    const vhod = novoGesloShema.safeParse({
       zeton: podatki.get("zeton"),
       geslo: podatki.get("geslo"),
       ponovi: podatki.get("ponovi"),

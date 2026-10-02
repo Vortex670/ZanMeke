@@ -4,6 +4,7 @@ import { ArrowRight, AtSign, KeyRound } from "lucide-react";
 import Link from "next/link";
 import { useActionState, useEffect, useRef } from "react";
 import { toast } from "sonner";
+import { HiddenField } from "@/components/ui/HiddenField";
 
 import { Gumb } from "@/components/ui/Gumb";
 import { Kljukica, Polje, VnosGeslo, VnosZIkono } from "@/components/ui/Polje";
@@ -43,7 +44,7 @@ export function ObrazecPrijava({ next = "/admin" }: { next?: string }) {
   return (
     <form action={oddaj} className="gap-s2 grid" noValidate>
       {/* Kam po prijavi — pot je preverjena na strani, ki obrazec izriše. */}
-      <input type="hidden" name="next" value={next} />
+      <HiddenField name="next" value={next} />
 
       <Polje oznaka="E-naslov" obvezno napaka={napake.email?.[0]}>
         {(l) => (

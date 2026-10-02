@@ -47,6 +47,8 @@ type DashboardSnapshot = {
 
   /** Povpraševanja z obrazca — edino, kar na tej strani šteje kot izid. */
   contactsTotal: number;
+  /** Kliki na telefonsko številko — dejanje, ki ga stran največkrat sproži. */
+  callsTotal: number;
   contactsPrevious: number;
 
   daily: Array<{ date: string; views: number; visitors: number }>;
@@ -270,6 +272,7 @@ export async function getDashboardSnapshot(
     visitorsPrevious,
     contactsTotal,
     contactsPrevious,
+    callsTotal,
     eng,
     engPrej,
     strani,
@@ -287,6 +290,7 @@ export async function getDashboardSnapshot(
     prisma.obiskovalec.count({ where: { zadnjiObisk: vPrejsnjem } }),
     prisma.sporocilo.count({ where: { createdAt: vOknu } }),
     prisma.sporocilo.count({ where: { createdAt: vPrejsnjem } }),
+    prisma.dogodek.count({ where: { ime: "klic", createdAt: vOknu } }),
     engagement(od, now),
     engagement(odPrej, od),
 
@@ -390,6 +394,7 @@ export async function getDashboardSnapshot(
     engagementPrevious: engPrej,
     contactsTotal,
     contactsPrevious,
+    callsTotal,
 
     daily: dailyRaw.map((v) => ({
       date: oblika.format(new Date(v.kdaj)),

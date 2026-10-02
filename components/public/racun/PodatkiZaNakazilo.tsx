@@ -3,6 +3,8 @@
 import { Check, Copy } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+import { Pressable } from "@/components/ui/Pressable";
+
 // ============================================================================
 // <PodatkiZaNakazilo /> — IBAN, sklic in znesek s tipko »kopiraj«
 // ----------------------------------------------------------------------------
@@ -54,8 +56,7 @@ export function PodatkiZaNakazilo({ vrstice }: { vrstice: VrsticaNakazila[] }) {
         const je = kopirano === v.oznaka;
         return (
           <li key={v.oznaka}>
-            <button
-              type="button"
+            <Pressable
               onClick={(e) => kopiraj(v, e.currentTarget.querySelector("[data-v]")!)}
               aria-label={`Kopiraj ${v.oznaka.toLowerCase()}`}
               className="group gap-s2 hover:bg-poudarek-mehko/60 flex w-full items-baseline justify-between rounded-md px-2 py-2.5 text-left transition-colors"
@@ -78,7 +79,7 @@ export function PodatkiZaNakazilo({ vrstice }: { vrstice: VrsticaNakazila[] }) {
                   )}
                 </span>
               </span>
-            </button>
+            </Pressable>
           </li>
         );
       })}

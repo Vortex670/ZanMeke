@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { z } from "zod";
+import { prijavaShema } from "@/lib/prijava/validation";
 
 import { napaka, runAction, type ActionResult } from "@/lib/actions/helpers";
 import { preveri } from "@/lib/auth/geslo";
@@ -20,11 +20,6 @@ import { prisma } from "@/lib/prisma";
 // kateri računi obstajajo.
 // ============================================================================
 
-const shema = z.object({
-  email: z.string().trim().toLowerCase().email("Vpiši veljaven e-naslov."),
-  geslo: z.string().min(1, "Vpiši geslo."),
-});
-
 /** Lažen zapis za primerjavo, kadar uporabnika ni — izenači čas odgovora. */
 const PRAZEN_ZAPIS =
   "$argon2id$v=19$m=19456,t=2,p=1$c29tZXNhbHRzb21lc2FsdA$3Nt5V4qH2kqJ5wQ0z4bQbLZ0M7V8f8y1l7jX9W0nX0s";
@@ -34,7 +29,7 @@ export async function prijavi(
   podatki: FormData,
 ): Promise<ActionResult> {
   const izid = await runAction(async () => {
-    const vhod = shema.safeParse({
+    const vhod = prijavaShema.safeParse({
       email: podatki.get("email"),
       geslo: podatki.get("geslo"),
     });

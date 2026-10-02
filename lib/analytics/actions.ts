@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 
 import type { ActionResult } from "@/lib/actions/helpers";
+import { imeDogodkaShema, ogledShema } from "@/lib/analytics/validation";
 import { IME_PISKOTKA } from "@/lib/auth/seja";
 import { zahtevajPrijavo } from "@/lib/auth/straza";
 import { prisma } from "@/lib/prisma";
@@ -88,8 +89,23 @@ function jePajek(agent: string): boolean {
   );
 }
 
+/**
+ * Poti, ki se ne beležijo — isti seznam kot v `<Beleznik />`.
+ *
+ * Varovalo je na OBEH straneh namenoma. Odjemalec lahko kliče karkoli, zato
+ * je zadnja beseda tu: plačilna stran nosi v naslovu žeton, ki je edini ključ
+ * do tujega računa, in ta ne sme pristati v tabeli obiskov.
+ */
+const NE_BELEZI = ["/admin", "/prijava", "/racun"];
+
 export async function zabeleziOgled(pot: string, naslov?: string): Promise<void> {
   try {
+    // Vhod pride z odjemalca, zato skozi shemo kot vsak drug vhod te strani.
+    const vhod = ogledShema.safeParse({ pot, naslov });
+    if (!vhod.success) return;
+    ({ pot, naslov } = vhod.data);
+
+    if (NE_BELEZI.some((x) => pot.startsWith(x))) return;
     const glave = await headers();
     const agent = glave.get("user-agent") ?? "";
     if (jePajek(agent)) return;
@@ -178,6 +194,10 @@ export async function zabeleziDogodek(
   podatki?: Record<string, string | number | boolean>,
 ): Promise<void> {
   try {
+    // Ime dogodka je iz zaprtega seznama: tabela dogodkov se sicer v pol leta
+    // napolni s poimenovanji, ki jih nihče več ne zna razbrati.
+    if (!imeDogodkaShema.safeParse(ime).success) return;
+
     const piskotki = await cookies();
     // Isto pravilo kot pri ogledih: kdor je prijavljen, se ne šteje. Sicer bi
     // moji kliki na telefonsko številko med preizkušanjem izgledali kot

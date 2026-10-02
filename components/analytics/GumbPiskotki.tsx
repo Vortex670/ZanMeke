@@ -1,6 +1,7 @@
 "use client";
 
 import { odpriPasPiskotkov } from "@/components/analytics/PasPiskotkov";
+import { Pressable } from "@/components/ui/Pressable";
 
 // ============================================================================
 // <GumbPiskotki /> — »Piškotki« v nogi
@@ -16,8 +17,8 @@ import { odpriPasPiskotkov } from "@/components/analytics/PasPiskotkov";
 
 export function GumbPiskotki({ className }: { className?: string }) {
   return (
-    <button type="button" onClick={odpriPasPiskotkov} className={className}>
+    <Pressable onClick={odpriPasPiskotkov} className={className}>
       Nastavitve piškotkov
-    </button>
+    </Pressable>
   );
 }
