@@ -1,9 +1,10 @@
-import { ArrowUpRight, Check, Clock, CreditCard, Landmark } from "lucide-react";
+import { ArrowUpRight, Check, CreditCard, Landmark } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
 import { Odsek } from "@/components/public/Odsek";
+import { CakanjeNaPotrditev } from "@/components/public/racun/CakanjeNaPotrditev";
 import { GumbPlacaj } from "@/components/public/racun/GumbPlacaj";
 import {
   PodatkiZaNakazilo,
@@ -209,16 +210,10 @@ export default async function PlacilnaStran({
             karkoli drugega, pokličite {STRAN.telefon}.
           </Stanje>
         ) : vObdelavi ? (
-          // Vrnitev s Stripove blagajne še NI potrdilo. Potrdi webhook, ta pa
-          // pride v nekaj sekundah — zato tu piše, kaj se dogaja, in ne
-          // »plačano«, kar bi bilo lahko neresnično.
-          <Stanje
-            ikona={<Clock className="size-5" strokeWidth={2} aria-hidden />}
-            naslov="Plačilo je oddano"
-          >
-            Potrdilo pride po e-pošti, ta stran pa se posodobi, ko banka potrdi — navadno
-            v nekaj sekundah. Zavihka vam ni treba imeti odprtega.
-          </Stanje>
+          // Vrnitev s Stripove blagajne še NI potrdilo — to pove webhook.
+          // Komponenta sama poizveduje, dokler stanje ne pade v bazo; prej je
+          // tu samo PISALO, da se stran posodobi, in se ni posodabljalo nič.
+          <CakanjeNaPotrditev />
         ) : (
           <div className="gap-s3 grid md:grid-cols-2">
             {/* ── S kartico ─────────────────────────────────────────────── */}

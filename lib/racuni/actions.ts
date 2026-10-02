@@ -4,10 +4,15 @@ import { randomBytes } from "node:crypto";
 
 import { revalidatePath } from "next/cache";
 
+import OpomnikPlacila from "@/emails/OpomnikPlacila";
+import RacunPovezava from "@/emails/RacunPovezava";
 import { zahtevajPrijavo } from "@/lib/auth/straza";
 import { siteUrl } from "@/lib/config/siteUrl";
+import { getNastavitve } from "@/lib/nastavitve/queries";
+import { STRAN } from "@/lib/podatki";
+import { posljiPredlogo } from "@/lib/posta/send";
 import { naslednjaStevilka } from "@/lib/racuni/queries";
-import { racunSchema, vCente, type RacunInput } from "@/lib/racuni/validation";
+import { racunSchema, vCente, zneskovno, type RacunInput } from "@/lib/racuni/validation";
 import { prisma } from "@/lib/prisma";
 import { getStripe, jeStripePripravljen } from "@/lib/stripe/client";
 import type { ActionResult } from "@/lib/actions/helpers";
@@ -31,6 +36,13 @@ import type { ActionResult } from "@/lib/actions/helpers";
 function zeton(): string {
   return randomBytes(32).toString("base64url");
 }
+
+const DATUM = new Intl.DateTimeFormat("sl-SI", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "Europe/Ljubljana",
+});
 
 export async function ustvariRacunAction(
   vhod: RacunInput,
@@ -72,13 +84,35 @@ export async function ustvariRacunAction(
   };
 }
 
-/** Račun gre iz osnutka v »poslan« — od tod naprej ga stranka lahko plača. */
+/**
+ * Račun gre iz osnutka v »poslan« — in stranki ZARES ODIDE.
+ *
+ * Doslej je to samo prestavilo stanje v bazi, povezavo pa sem moral prilepiti
+ * v pošto na roko. »Poslan« je tako pomenil »poslan v mojih mislih«: listina
+ * je ležala v adminu, stranka pa ni vedela zanjo. Zdaj gre pošta s povezavo
+ * na plačilno stran, podatki za nakazilo in sklicem.
+ *
+ * Brez e-naslova pošte ni komu poslati — račun se vseeno označi, sporočilo pa
+ * to pove naravnost, da ne čakam na odgovor, ki ne more priti.
+ */
 export async function oznaciPoslanAction(id: string): Promise<ActionResult> {
   await zahtevajPrijavo();
 
   const racun = await prisma.racun.findUnique({
     where: { id },
-    select: { stanje: true },
+    select: {
+      stanje: true,
+      vrsta: true,
+      stevilka: true,
+      stranka: true,
+      podjetje: true,
+      epota: true,
+      opis: true,
+      znesekCentov: true,
+      valuta: true,
+      zeton: true,
+      zapadlost: true,
+    },
   });
   if (!racun) return { ok: false, message: "Tega računa ni." };
   if (racun.stanje === "PLACAN") return { ok: false, message: "Račun je že plačan." };
@@ -87,9 +121,91 @@ export async function oznaciPoslanAction(id: string): Promise<ActionResult> {
     where: { id },
     data: { stanje: "POSLAN", poslanoAt: new Date() },
   });
-
   revalidatePath("/admin/racuni");
-  return { ok: true, message: "Račun je označen kot poslan." };
+
+  if (!racun.epota) {
+    return {
+      ok: true,
+      message: "Račun je označen kot poslan. E-naslova ni, zato pošta ni odšla.",
+    };
+  }
+
+  const n = await getNastavitve().catch(() => null);
+  const izid = await posljiPredlogo({
+    za: racun.epota,
+    zadeva: `${racun.vrsta === "PREDRACUN" ? "Predračun" : "Račun"} ${racun.stevilka} — ${zneskovno(racun.znesekCentov, racun.valuta)}`,
+    predloga: "racun-povezava",
+    vsebina: RacunPovezava({
+      vrsta: racun.vrsta === "PREDRACUN" ? "Predračun" : "Račun",
+      stevilka: racun.stevilka,
+      stranka: racun.podjetje ?? racun.stranka,
+      opis: racun.opis,
+      znesek: zneskovno(racun.znesekCentov, racun.valuta),
+      placilnaUrl: `${siteUrl()}/racun/${racun.zeton}`,
+      ...(n?.iban ? { iban: n.iban } : {}),
+      ...(racun.zapadlost ? { rok: DATUM.format(racun.zapadlost) } : {}),
+    }),
+  });
+
+  if (!izid.ok) {
+    return {
+      ok: true,
+      message: `Račun je označen kot poslan, pošta pa ni odšla: ${izid.napaka}`,
+    };
+  }
+
+  return {
+    ok: true,
+    message: izid.preskoceno
+      ? "Račun je označen kot poslan. Pošta je preskočena (ni ključa)."
+      : `Račun je poslan na ${racun.epota}.`,
+  };
+}
+
+/**
+ * Opomnik za zapadli račun — na pritisk in ne samodejno.
+ *
+ * Samodejno opominjanje je prva stvar, ki stranko ujezi, kadar se je o roku
+ * dogovorila po telefonu. Tu se pošlje, ko se odločim jaz.
+ */
+export async function posljiOpomnikAction(id: string): Promise<ActionResult> {
+  await zahtevajPrijavo();
+
+  const racun = await prisma.racun.findUnique({
+    where: { id },
+    select: {
+      stanje: true,
+      stevilka: true,
+      stranka: true,
+      podjetje: true,
+      epota: true,
+      znesekCentov: true,
+      valuta: true,
+      zeton: true,
+      zapadlost: true,
+    },
+  });
+  if (!racun) return { ok: false, message: "Tega računa ni." };
+  if (racun.stanje === "PLACAN") return { ok: false, message: "Račun je že plačan." };
+  if (!racun.epota) return { ok: false, message: "Ta račun nima e-naslova." };
+
+  const izid = await posljiPredlogo({
+    za: racun.epota,
+    zadeva: `Opomnik — račun ${racun.stevilka}`,
+    predloga: "opomnik-placila",
+    vsebina: OpomnikPlacila({
+      stranka: racun.podjetje ?? racun.stranka,
+      stevilka: racun.stevilka,
+      znesek: zneskovno(racun.znesekCentov, racun.valuta),
+      zapadlost: racun.zapadlost ? DATUM.format(racun.zapadlost) : "po dogovoru",
+      placilnaUrl: `${siteUrl()}/racun/${racun.zeton}`,
+      telefon: STRAN.telefon,
+    }),
+  });
+
+  return izid.ok
+    ? { ok: true, message: `Opomnik je poslan na ${racun.epota}.` }
+    : { ok: false, message: `Opomnika ni bilo mogoče poslati: ${izid.napaka}` };
 }
 
 /**

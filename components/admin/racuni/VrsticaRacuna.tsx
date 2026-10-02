@@ -1,6 +1,6 @@
 "use client";
 
-import { Ban, Check, Copy, Send } from "lucide-react";
+import { Ban, BellRing, Check, Copy, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
@@ -9,14 +9,20 @@ import { Button } from "@/components/ui/Button";
 import {
   oznaciPlacanAction,
   oznaciPoslanAction,
+  posljiOpomnikAction,
   preklicIRacunAction,
 } from "@/lib/racuni/actions";
 
 // ============================================================================
 // <VrsticaRacuna /> — dejanja pri enem računu
 // ----------------------------------------------------------------------------
-// »Kopiraj povezavo« je prvo in največje dejanje: to je tisto, kar se res
-// počne — povezavo prilepiš v e-pošto ali sporočilo.
+// »Označi poslano« POŠLJE POŠTO. Prej je samo prestavilo stanje v bazi in
+// povezavo sem moral prilepiti v sporočilo na roko; »poslan« je torej pomenil
+// »poslan v mojih mislih«. Kopiranje povezave ostaja za primere, ko gre
+// račun po Viberju ali ko e-naslova ni.
+//
+// »Opomni« je ROČEN in ne samodejen: kdor se je o roku zmenil po telefonu, ga
+// samodejni opomnik ujezi, in jeza zaradi stotaka stane naslednji posel.
 //
 // »Označi plačano« je tu za nakazila na račun. Kartično plačilo se označi
 // samo, nikoli od tod.
@@ -85,7 +91,20 @@ export function VrsticaRacuna({
           onClick={() => dejanje(() => oznaciPoslanAction(id))}
           leftIcon={<Send className="h-4 w-4" aria-hidden />}
         >
-          Označi poslano
+          Pošlji stranki
+        </Button>
+      ) : null}
+
+      {stanje === "POSLAN" ? (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          disabled={tece}
+          onClick={() => dejanje(() => posljiOpomnikAction(id))}
+          leftIcon={<BellRing className="h-4 w-4" aria-hidden />}
+        >
+          Opomni
         </Button>
       ) : null}
 

@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 
 import type { ActionResult } from "@/lib/actions/helpers";
+import { IME_PISKOTKA } from "@/lib/auth/seja";
 import { zahtevajPrijavo } from "@/lib/auth/straza";
 import { prisma } from "@/lib/prisma";
 import { PISKOTEK_PRIVOLITVE } from "@/lib/privolitev";
@@ -25,6 +26,12 @@ import { PISKOTEK_PRIVOLITVE } from "@/lib/privolitev";
 // NASLOVA IP NE HRANIMO. Odtis (SHA-256, skrajšan) služi edinole temu, da
 // isti človek v drugem oknu ne šteje dvakrat; iz njega se naslova ne da
 // dobiti nazaj, soli pa ne shranjujemo nikjer drugje.
+//
+// LASTNIH OBISKOV NE ŠTEJEMO. Ko popravljam stran, jo odprem dvajsetkrat na
+// dan — in če se to šteje, statistika meri mene in ne strank. Pri petih
+// obiskih na dan je razlika med »tri povpraševanja na sto obiskov« in
+// »tri na tristo«, in po taki številki se odloča, ali oglas sploh deluje.
+// Merilo je sejni piškotek: kdor je prijavljen, se ne šteje.
 // ============================================================================
 
 const PISKOTEK = "zm_obisk";
@@ -93,6 +100,11 @@ export async function zabeleziOgled(pot: string, naslov?: string): Promise<void>
       null;
 
     const piskotki = await cookies();
+
+    // Prijavljen sem jaz. Piškotka ne preverjamo v bazi: poizvedba ob vsakem
+    // ogledu bi stala več kot natančnost, ki jo prinese, zavržen žeton pa
+    // kvečjemu zmanjša MOJE štetje — nikoli tujega.
+    if (piskotki.get(IME_PISKOTKA)?.value) return;
 
     // BREZ PRIVOLITVE SE NE ZAPIŠE NIČ. Odjemalec lahko laže ali pa se pas
     // sploh ne izriše (blokirnik, star predpomnilnik); zapis v bazo sme
@@ -167,6 +179,10 @@ export async function zabeleziDogodek(
 ): Promise<void> {
   try {
     const piskotki = await cookies();
+    // Isto pravilo kot pri ogledih: kdor je prijavljen, se ne šteje. Sicer bi
+    // moji kliki na telefonsko številko med preizkušanjem izgledali kot
+    // zanimanje strank.
+    if (piskotki.get(IME_PISKOTKA)?.value) return;
     if (piskotki.get(PISKOTEK_PRIVOLITVE)?.value !== "da") return;
 
     const anonId = piskotki.get(PISKOTEK)?.value;

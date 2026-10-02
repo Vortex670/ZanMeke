@@ -3,11 +3,12 @@
 import { createHash, randomBytes } from "node:crypto";
 
 import { redirect } from "next/navigation";
-import { Resend } from "resend";
 import { z } from "zod";
 
+import GesloPonastavitev from "@/emails/GesloPonastavitev";
 import { napaka, runAction, uspeh, type ActionResult } from "@/lib/actions/helpers";
 import { zasifriraj } from "@/lib/auth/geslo";
+import { posljiPredlogo } from "@/lib/posta/send";
 import { prisma } from "@/lib/prisma";
 import { STRAN } from "@/lib/podatki";
 
@@ -77,30 +78,25 @@ export async function zahtevajPonastavitev(
 
     const naslov = process.env.NEXT_PUBLIC_SITE_URL ?? STRAN.url;
     const povezava = `${naslov}/prijava/geslo/${zeton}`;
-    const kljuc = process.env.RESEND_API_KEY;
 
-    if (!kljuc) {
-      console.warn("[geslo] RESEND_API_KEY ni nastavljen; povezava samo v dnevnik");
-      console.info(povezava);
-      return uspeh(ISTI_ODGOVOR);
-    }
-
-    const resend = new Resend(kljuc);
-    const { error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL ?? `Žan Meke <${STRAN.epota}>`,
-      to: uporabnik.email,
-      subject: "Ponastavitev gesla",
-      text: [
-        `Pozdravljen, ${uporabnik.ime}.`,
-        "",
-        "Povezava za ponastavitev gesla (velja eno uro in samo enkrat):",
-        povezava,
-        "",
-        "Če tega nisi zahteval ti, sporočila ne upoštevaj — geslo ostane isto.",
-      ].join("\n"),
+    // Predloga in ne golo besedilo. Prej je bil tu svoj klic Resenda z
+    // besedilom v nizu: sporočilo ni šlo skozi dnevnik pošte in ni bilo
+    // videti kot nič drugega, kar ta stran pošlje. Predloga `emails/` je
+    // obstajala že ves čas — samo nihče je ni poslal.
+    const izid = await posljiPredlogo({
+      za: uporabnik.email,
+      zadeva: "Ponastavitev gesla",
+      predloga: "geslo-ponastavitev",
+      vsebina: GesloPonastavitev({
+        ime: uporabnik.ime,
+        ponastavitevUrl: povezava,
+        veljavnost: "60 minut",
+      }),
     });
 
-    if (error) console.error("[geslo] Resend:", error);
+    // Odgovor ostane isti tudi ob napaki: kdo ima račun in ali je pošta šla
+    // skozi, sta dve stvari, ki ju obrazec ne sme izdati.
+    if (!izid.ok) console.error("[geslo] pošta:", izid.napaka);
     return uspeh(ISTI_ODGOVOR);
   });
 }

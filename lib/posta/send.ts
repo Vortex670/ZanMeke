@@ -1,5 +1,7 @@
 import "server-only";
 
+import { render } from "@react-email/render";
+import type { ReactElement } from "react";
 import { Resend } from "resend";
 
 import { prisma } from "@/lib/prisma";
@@ -37,6 +39,40 @@ export type IzidPoste =
 
 function posiljatelj(): string {
   return process.env.RESEND_FROM_EMAIL?.trim() || `${STRAN.ime} <${STRAN.epota}>`;
+}
+
+/**
+ * Pošta iz PREDLOGE — edini način, kako naj gre kaj ven.
+ *
+ * Predloge v `emails/` so doslej živele samo v predogledu v adminu: resnična
+ * pošta je bila golo besedilo ali `<pre>`, in nihče ni opazil razlike, ker
+ * predogled je bil lep. Stranka je dobila nekaj drugega, kot sem videl jaz.
+ *
+ * Golo besedilo se izriše iz ISTE predloge in ne piše posebej: dve različici
+ * istega sporočila se vedno razideta, in tista, ki se razide, je tista, ki je
+ * nihče ne gleda.
+ */
+export async function posljiPredlogo(p: {
+  za: string | string[];
+  zadeva: string;
+  /** Ključ iz `lib/posta/katalog.ts` — zapiše se v dnevnik. */
+  predloga: string;
+  vsebina: ReactElement;
+  odgovorNa?: string;
+}): Promise<IzidPoste> {
+  const [html, besedilo] = await Promise.all([
+    render(p.vsebina),
+    render(p.vsebina, { plainText: true }),
+  ]);
+
+  return posljiPosto({
+    za: p.za,
+    zadeva: p.zadeva,
+    html,
+    besedilo,
+    predloga: p.predloga,
+    ...(p.odgovorNa ? { odgovorNa: p.odgovorNa } : {}),
+  });
 }
 
 export async function posljiPosto(pismo: Pismo): Promise<IzidPoste> {

@@ -1,10 +1,12 @@
 "use server";
 
 
+import PovprasevanjePotrditev from "@/emails/PovprasevanjePotrditev";
+import PovprasevanjePrejeto from "@/emails/PovprasevanjePrejeto";
 import { napaka, runAction, uspeh, type ActionResult } from "@/lib/actions/helpers";
 import { ZANIMANJE_NAPIS, povprasevanjeSchema } from "@/lib/kontakt/validation";
 import { STRAN } from "@/lib/podatki";
-import { posljiPosto } from "@/lib/posta/send";
+import { posljiPredlogo } from "@/lib/posta/send";
 import { prisma } from "@/lib/prisma";
 
 // ============================================================================
@@ -15,8 +17,13 @@ import { prisma } from "@/lib/prisma";
 // `replyTo` je nastavljen na obiskovalca, kadar je pustil e-naslov: na
 // sporočilo se odgovori s pritiskom na Odgovori, brez prepisovanja naslova.
 //
-// Sporočilo je NAVADNO BESEDILO in ne HTML. Povpraševanje se bere na telefonu
-// med delom; oblikovana pošta tam ne pomaga, zanesljivo dostavljena pa.
+// Pošteta gresta DVE: meni obvestilo s podatki, stranki potrdilo, da je
+// povpraševanje prispelo. Drugo je pomembnejše, kot zveni — kdor odda obrazec
+// in ne dobi ničesar, čez pol ure ne ve, ali je šlo skozi, in pokliče
+// konkurenco. Potrdilo gre samo, če je pustil e-naslov; ta ni obvezen.
+//
+// Obe gresta skozi predlogo iz `emails/`. Prej je bilo obvestilo `<pre>` z
+// golim besedilom, potrdila pa sploh ni bilo.
 //
 // Če ključa za pošto ni (razvoj), se sporočilo izpiše v dnevnik in akcija
 // uspe. Tako se obrazec da preizkusiti, ne da bi komu kaj poslali.
@@ -51,19 +58,6 @@ export async function posljiPovprasevanje(
     }
 
     const v = vhod.data;
-    const vrstice = [
-      `Ime: ${v.ime}`,
-      v.podjetje ? `Podjetje: ${v.podjetje}` : null,
-      `Telefon: ${v.telefon}`,
-      v.epota ? `E-pošta: ${v.epota}` : null,
-      `Zanima: ${ZANIMANJE_NAPIS[v.zanimanje]}`,
-      "",
-      v.sporocilo,
-      "",
-      `— poslano z ${STRAN.domena}`,
-    ]
-      .filter(Boolean)
-      .join("\n");
 
     // NAJPREJ V BAZO, šele potem pošta. E-pošta zna odpovedati — tiho in brez
     // sledi; povpraševanje pa je edina stvar, zaradi katere ta stran stoji, in
@@ -83,12 +77,18 @@ export async function posljiPovprasevanje(
     // Pošta gre skozi ENA VRATA (`lib/posta/send.ts`), kjer se vsak poskus
     // zapiše v dnevnik — tudi neuspel in tudi preskočen, ker ključa ni.
     // Prej je bil klic Resenda tu in o njem ni ostalo sledi nikjer.
-    const izid = await posljiPosto({
+    const izid = await posljiPredlogo({
       za: PREDAL,
       zadeva: `Povpraševanje — ${v.ime}${v.podjetje ? `, ${v.podjetje}` : ""}`,
-      html: `<pre style="font:14px/1.6 ui-monospace,monospace">${vrstice.replace(/</g, "&lt;")}</pre>`,
-      besedilo: vrstice,
-      predloga: "povprasevanje",
+      predloga: "povprasevanje-prejeto",
+      vsebina: PovprasevanjePrejeto({
+        ime: v.ime,
+        ...(v.podjetje ? { podjetje: v.podjetje } : {}),
+        telefon: v.telefon,
+        ...(v.epota ? { epota: v.epota } : {}),
+        zanimanje: ZANIMANJE_NAPIS[v.zanimanje],
+        sporocilo: v.sporocilo,
+      }),
       ...(v.epota ? { odgovorNa: v.epota } : {}),
     });
 
@@ -106,6 +106,19 @@ export async function posljiPovprasevanje(
         where: { id: zapis.id },
         data: { poslano: true },
       });
+    }
+
+    // Potrdilo stranki — ločeno od obvestila meni in NAMENOMA brez vpliva na
+    // izid. Če potrdilo ne gre skozi, povpraševanje vseeno stoji v adminu in
+    // obrazec ne sme javiti napake za nekaj, kar je stranka že opravila.
+    if (v.epota) {
+      const potrdilo = await posljiPredlogo({
+        za: v.epota,
+        zadeva: "Vaše povpraševanje je prispelo",
+        predloga: "povprasevanje-potrditev",
+        vsebina: PovprasevanjePotrditev({ ime: v.ime, telefon: STRAN.telefon }),
+      });
+      if (!potrdilo.ok) console.error("[kontakt] potrdilo:", potrdilo.napaka);
     }
 
     return uspeh("Hvala, sporočilo je oddano. Oglasim se isti dan.");

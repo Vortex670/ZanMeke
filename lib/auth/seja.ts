@@ -21,7 +21,11 @@ import { prisma } from "@/lib/prisma";
 // zahtevami s tujih strani) in `secure` v produkciji.
 // ============================================================================
 
-const IME_PISKOTKA = process.env.SESSION_COOKIE_NAME ?? "zm_seja";
+/**
+ * Ime sejnega piškotka. Izvoženo, ker ga poleg prijave bere tudi analitika —
+ * da lastnih obiskov ne šteje med tuje.
+ */
+export const IME_PISKOTKA = process.env.SESSION_COOKIE_NAME ?? "zm_seja";
 const TRAJANJE_DNI = Number(process.env.SESSION_TTL_DAYS ?? 30);
 
 const hash = (zeton: string) => createHash("sha256").update(zeton).digest("hex");
