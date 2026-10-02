@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { after, NextResponse, type NextRequest } from "next/server";
 import type Stripe from "stripe";
 import { posljiPotrdiloOPlacilu } from "@/lib/racuni/potrdilo";
 
@@ -114,7 +114,15 @@ export async function POST(req: NextRequest) {
         // negotovi dostavi ponovi; brez tega pogoja bi stranka dobila dve
         // enaki potrdili za eno plačilo — in to je trenutek, ko začne
         // dvomiti, ali je plačala dvakrat.
-        if (spremenjeni.count > 0) await posljiPotrdiloOPlacilu(racunId);
+        // POŠTA SE NE ČAKA. Potrdilo gre čez Resend, kar je klic na tuj
+        // strežnik; če ta odgovarja počasi, visi Stripova zahteva in se
+        // izteče, Stripe pa isti dogodek pošlje znova — in to točno takrat,
+        // ko je pošta počasna, torej znova in znova.
+        //
+        // `after()` zažene delo ŠELE PO ODGOVORU: Stripe dobi 200 takoj,
+        // pismo pa odide v istem izvajanju. Brez tega bi se funkcija po
+        // odgovoru ustavila in pošta bi se izgubila sredi poti.
+        if (spremenjeni.count > 0) after(posljiPotrdiloOPlacilu(racunId));
         break;
       }
 
