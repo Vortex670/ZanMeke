@@ -50,7 +50,7 @@ export function AdminSidebar({ znacke }: { znacke?: Record<string, number> }) {
     p.natanko ? pot === p.href : pot === p.href || pot.startsWith(`${p.href}/`);
 
   return (
-    <aside className="bg-surface border-chrome-line hidden w-60 shrink-0 flex-col border-r sm:flex">
+    <aside className="bg-surface border-chrome-line hidden w-[17rem] shrink-0 flex-col border-r sm:flex">
       <div className="border-chrome-line flex h-16 items-center border-b px-(--s2)">
         <Link href="/" className="leading-none">
           <span className="type-eyebrow text-text block">

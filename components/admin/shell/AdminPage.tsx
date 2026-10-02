@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { AdminFooter } from "@/components/admin/shell/AdminFooter";
 import { AdminSidebar } from "@/components/admin/shell/AdminSidebar";
 import { AdminTopbar } from "@/components/admin/shell/AdminTopbar";
+import { razlicicaStrani } from "@/lib/admin/brand";
 import type { PrijavljenUporabnik } from "@/lib/auth/seja";
 
 // ============================================================================
@@ -16,9 +17,9 @@ import type { PrijavljenUporabnik } from "@/lib/auth/seja";
 // Predpisan zato, ker se administracija bere s kotičkom očesa: ko je naslov
 // vedno na istem mestu, se ne iščeta ne stran ne dejanje.
 //
-// `fixed`-ovite postavitve ni: stranska vrstica je v mreži in se pomika z
-// vsebino. Pri desetih poteh je to bolj pošteno kot zaklenjen stolpec, ki na
-// prenosniku poje tretjino zaslona.
+// Vsebina teče čez vso širino desno od stranske vrstice in ni centrirana:
+// administracija je delovna miza, ne članek. Seznam s sedmimi stolpci na
+// širokem zaslonu potrebuje prostor, ne enakih robov na obeh straneh.
 // ============================================================================
 
 export function AdminPage({
@@ -49,7 +50,7 @@ export function AdminPage({
       <div className="flex min-w-0 flex-1 flex-col">
         <AdminTopbar uporabnik={uporabnik} />
 
-        <main className="mx-auto w-full max-w-6xl flex-1 px-(--s2) py-(--s3)">
+        <main className="w-full flex-1 px-(--s3) py-(--s3)">
           <div className="flex flex-wrap items-end justify-between gap-(--s2)">
             <div className="min-w-0">
               <p className="type-eyebrow text-subtle">{oznaka}</p>
@@ -64,7 +65,7 @@ export function AdminPage({
           <div className="mt-(--s3)">{children}</div>
         </main>
 
-        <AdminFooter razlicica={razlicica} />
+        <AdminFooter razlicica={razlicica ?? razlicicaStrani()} />
       </div>
     </div>
   );

@@ -1,5 +1,7 @@
 import { Bell } from "lucide-react";
 
+import { AdminDrobtine } from "@/components/admin/shell/AdminDrobtine";
+
 import { Gumb } from "@/components/ui/Gumb";
 import type { PrijavljenUporabnik } from "@/lib/auth/seja";
 import { odjavi } from "@/lib/prijava/actions";
@@ -26,6 +28,10 @@ export function AdminTopbar({ uporabnik }: { uporabnik: PrijavljenUporabnik }) {
           ZANMEKE<span className="text-accent">.COM</span>
         </span>
       </span>
+
+      <div className="hidden min-w-0 sm:block">
+        <AdminDrobtine />
+      </div>
 
       <div className="ml-auto flex items-center gap-(--s2)">
         <span
