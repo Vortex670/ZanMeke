@@ -1,7 +1,8 @@
-import { Inbox, Phone, Timer } from "lucide-react";
+import { Clock, Inbox, Phone, Timer } from "lucide-react";
 import Link from "next/link";
 
-import { AdminOgrodje } from "@/components/admin/AdminOgrodje";
+import { AdminPage } from "@/components/admin/shell/AdminPage";
+import { StatCard } from "@/components/admin/kit/StatCard";
 import { zahtevajPrijavo } from "@/lib/auth/straza";
 import { STRAN } from "@/lib/podatki";
 import { stejSporocila, zadnjaSporocila } from "@/lib/sporocila/queries";
@@ -9,15 +10,23 @@ import { stejSporocila, zadnjaSporocila } from "@/lib/sporocila/queries";
 // ============================================================================
 // /admin — pregled
 // ----------------------------------------------------------------------------
-// Tri številke in nič več. Pregled je operativen: pove, ali je kaj za narediti
-// zdaj. Statistika (koliko jih je bilo lani) sodi drugam in je tu ne bo,
-// dokler ne bo česa šteti.
+// Pregled je OPERATIVEN: pove, ali je kaj za narediti zdaj. Analitika (koliko
+// jih je bilo lani, od kod so prišli) sodi v Statistike in je tu ne bo, dokler
+// ne bo česa šteti.
 //
-// Pod številkami stojijo ZADNJA sporočila, ne graf: pri treh povpraševanjih na
-// teden je graf okras, seznam pa delo.
+// Štiri kartice je zgornja meja — peta se vedno najde, a od pete naprej se
+// nehajo brati vse. Pod njimi stojijo ZADNJA povpraševanja in ne graf: pri
+// treh na teden je graf okras, seznam pa delo.
 // ============================================================================
 
 export const dynamic = "force-dynamic";
+
+const DATUM = new Intl.DateTimeFormat("sl-SI", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  timeZone: "Europe/Ljubljana",
+});
 
 const CAS = new Intl.DateTimeFormat("sl-SI", {
   day: "numeric",
@@ -31,61 +40,87 @@ export default async function Pregled() {
   const uporabnik = await zahtevajPrijavo();
   const [stevila, zadnja] = await Promise.all([stejSporocila(), zadnjaSporocila(5)]);
 
-  const kartice = [
-    { ikona: Inbox, oznaka: "Novo", vrednost: stevila.novo, pod: "čaka odgovor" },
-    { ikona: Timer, oznaka: "V teku", vrednost: stevila.vTeku, pod: "v pogovoru" },
-    { ikona: Phone, oznaka: "Skupaj", vrednost: stevila.skupaj, pod: "od začetka" },
-  ];
+  const danes = DATUM.format(new Date());
+  const ime = uporabnik.ime.trim().split(" ")[0];
 
   return (
-    <AdminOgrodje
+    <AdminPage
       uporabnik={uporabnik}
-      naslov={`Dober dan, ${uporabnik.ime.split(" ")[0]}.`}
-      opis="Kar je tu, je za narediti danes."
+      oznaka="Pregled"
+      naslov={
+        <>
+          Dober dan, <span className="text-accent">{ime}</span>
+        </>
+      }
+      opis={`${danes} — kar je tu, je za narediti danes.`}
+      znacke={{ "/admin/sporocila": stevila.novo }}
     >
-      <section className="gap-s2 grid sm:grid-cols-3">
-        {kartice.map((k) => (
-          <div key={k.oznaka} className="border-crta bg-ploskev p-s3 border">
-            <p className="type-label text-mirno flex items-center gap-2">
-              <k.ikona className="size-3.5" strokeWidth={2} aria-hidden />
-              {k.oznaka}
-            </p>
-            <p className="type-h1 font-naslov stevilke mt-s1">{k.vrednost}</p>
-            <p className="type-micro text-bledo">{k.pod}</p>
-          </div>
-        ))}
+      <section className="grid grid-cols-2 gap-(--s2) lg:grid-cols-4">
+        <StatCard
+          label="Nova povpraševanja"
+          value={stevila.novo}
+          icon={<Inbox strokeWidth={1.8} aria-hidden />}
+          variant={stevila.novo > 0 ? "accent" : "neutral"}
+          live={stevila.novo > 0}
+          hint="Čakajo odgovor"
+          href="/admin/sporocila"
+        />
+        <StatCard
+          label="V teku"
+          value={stevila.vTeku}
+          icon={<Timer strokeWidth={1.8} aria-hidden />}
+          hint="Pogovor se je začel"
+        />
+        <StatCard
+          label="Vsa povpraševanja"
+          value={stevila.skupaj}
+          icon={<Phone strokeWidth={1.8} aria-hidden />}
+          hint="Od začetka strani"
+        />
+        <StatCard
+          label="Odzivni čas"
+          value="Isti dan"
+          icon={<Clock strokeWidth={1.8} aria-hidden />}
+          variant="success"
+          hint="Kar obljublja stran"
+        />
       </section>
 
-      <section className="mt-s4">
-        <div className="flex items-baseline justify-between">
+      <section className="mt-(--s4)">
+        <div className="flex items-baseline justify-between gap-(--s2)">
           <h2 className="type-h3">Zadnja povpraševanja</h2>
-          <Link href="/admin/sporocila" className="type-label text-poudarek">
+          <Link href="/admin/sporocila" className="type-eyebrow text-accent">
             Vsa →
           </Link>
         </div>
 
         {zadnja.length === 0 ? (
-          <p className="type-body text-mirno mt-s2 border-crta bg-ploskev p-s3 border">
-            Še nobenega povpraševanja. Ko ga kdo pošlje prek obrazca, se pojavi tu — in na{" "}
-            {STRAN.epota}.
-          </p>
+          <div className="border-border bg-surface mt-(--s2) rounded-2xl border border-dashed p-(--s4) text-center">
+            <p className="type-small text-muted">
+              Še nobenega povpraševanja. Ko ga kdo pošlje prek obrazca, se pojavi tu — in
+              na {STRAN.epota}.
+            </p>
+          </div>
         ) : (
-          <ul className="border-crta mt-s2 border-t">
+          <ul className="mt-(--s2) grid gap-(--s1)">
             {zadnja.map((s) => (
-              <li key={s.id} className="border-crta-mehka py-s2 border-b">
-                <div className="gap-s1 flex flex-wrap items-baseline">
-                  <span className="type-body font-naslov font-semibold">{s.ime}</span>
+              <li
+                key={s.id}
+                className="bg-surface gap-(--s1) rounded-2xl p-(--s3) shadow-(--shadow-card)"
+              >
+                <div className="flex flex-wrap items-baseline gap-2">
+                  <span className="type-small text-text font-semibold">{s.ime}</span>
                   {s.podjetje ? (
-                    <span className="type-micro text-bledo">{s.podjetje}</span>
+                    <span className="type-micro text-subtle">{s.podjetje}</span>
                   ) : null}
-                  <span className="type-micro text-bledo ml-auto">
+                  <span className="type-micro text-subtle ml-auto">
                     {CAS.format(s.createdAt)}
                   </span>
                 </div>
-                <p className="type-body text-mirno mt-0.5 line-clamp-2">{s.sporocilo}</p>
+                <p className="type-small text-muted mt-1 line-clamp-2">{s.sporocilo}</p>
                 <a
                   href={`tel:${s.telefon.replace(/\s/g, "")}`}
-                  className="type-label text-poudarek stevilke mt-1 inline-block"
+                  className="type-eyebrow text-accent mt-2 inline-block tabular-nums"
                 >
                   {s.telefon}
                 </a>
@@ -94,6 +129,6 @@ export default async function Pregled() {
           </ul>
         )}
       </section>
-    </AdminOgrodje>
+    </AdminPage>
   );
 }
