@@ -77,6 +77,23 @@ export async function getPublishedPage(slug: string) {
 }
 
 /** Povezave v nogi (piškotki, zasebnost, pogoji). */
+/**
+ * VSE objavljene strani za zemljevid — ne samo tiste v nogi.
+ *
+ * Zemljevid je bral `getFooterPages()`, torej je vanj prišla samo stran, ki
+ * sem jo postavil v nogo. Pravna besedila so tam in so se izpisala, nova
+ * pristajalna stran pa ne bi — in stran, ki je iskalnik ne najde v
+ * zemljevidu, je stran, ki sem jo pisal zase. Noga je odločitev o postavitvi
+ * in ne o tem, kaj sme v iskalnik.
+ */
+export async function getPublishedPagesForSitemap() {
+  return prisma.page.findMany({
+    where: { status: "PUBLISHED" },
+    orderBy: [{ sortOrder: "asc" }, { title: "asc" }],
+    select: { slug: true, updatedAt: true, showInFooter: true },
+  });
+}
+
 export async function getFooterPages() {
   return prisma.page.findMany({
     where: { status: "PUBLISHED", showInFooter: true },

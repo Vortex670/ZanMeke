@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-import { getFooterPages } from "@/lib/pages/queries";
+import { getPublishedPagesForSitemap } from "@/lib/pages/queries";
 import { siteUrl } from "@/lib/config/siteUrl";
 import { tiho } from "@/lib/tiho";
 
@@ -32,11 +32,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { pot: "/kontakt", pomen: 0.7 },
   ];
 
-  // Pravna besedila so v bazi in so bila doslej v zemljevidu izpuščena —
-  // povezane so iz noge vsake strani, iskalnik pa zanje ni vedel. Datum je
-  // njihov pravi `updatedAt`, ne čas gradnje: pri pravnem besedilu je datum
-  // zadnje spremembe podatek in ne okras.
-  const pravne = await getFooterPages().catch(tiho("zemljevid: pravne strani", []));
+  // VSE objavljene strani iz baze, ne samo tiste v nogi. Prej je zemljevid
+  // bral strani noge: pravna besedila so se izpisala, nova pristajalna stran
+  // pa ne bi — in stran, ki je v zemljevidu ni, iskalnik najde nazadnje ali
+  // nikoli. Datum je pravi `updatedAt` in ne čas gradnje.
+  const izBaze = await getPublishedPagesForSitemap().catch(
+    tiho("zemljevid: strani iz baze", []),
+  );
 
   return [
     ...strani.map((s) => ({
@@ -45,11 +47,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly" as const,
       priority: s.pomen,
     })),
-    ...pravne.map((s) => ({
+    // Pravno besedilo se spremeni enkrat na leto in nikogar ne pripelje;
+    // vsebinska stran je lahko glavni vhod z iskalnika. Zato ločena pomen in
+    // pogostost, ne ene same vrednosti za vse iz baze.
+    ...izBaze.map((s) => ({
       url: `${osnova}/${s.slug}`,
       lastModified: s.updatedAt ?? GRAJENO,
-      changeFrequency: "yearly" as const,
-      priority: 0.2,
+      changeFrequency: s.showInFooter ? ("yearly" as const) : ("monthly" as const),
+      priority: s.showInFooter ? 0.2 : 0.7,
     })),
   ];
 }

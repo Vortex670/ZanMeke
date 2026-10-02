@@ -17,7 +17,13 @@ import { STRAN } from "@/lib/podatki";
 // razlike med grotesknima pisavama nihče ne vidi.
 // ============================================================================
 
-export const alt = "Žan Meke — spletne strani in fotografija za gostilne in apartmaje v Posavju";
+// OPIS BREZ PANOG. Alt in podnapis sta še naštevala gostilne in apartmaje,
+// čeprav sta strani za ti dve panogi odstranjeni in vsa druga besedila
+// nagovarjajo katerokoli podjetje. Sličica v Messengerju in na LinkedInu je
+// pri marsikom PRVO, kar vidi — in če ta pove, da delam za gostilne,
+// trgovina z deli za traktorje ne klikne.
+export const alt =
+  "Žan Meke — izdelava spletnih strani in fotografija za podjetja, Sevnica in Posavje";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -69,7 +75,7 @@ export default function Og() {
           Spletne strani, ki opravijo delo, ki ga zdaj opravlja telefon.
         </span>
         <span style={{ fontSize: 28, color: "#9aa6a3", maxWidth: 820 }}>
-          Za gostilne, apartmaje in manjša podjetja v {STRAN.obmocjeV}.
+          Za podjetja, obrtnike in dejavnosti v {STRAN.obmocjeV}. Tudi fotografije.
         </span>
       </div>
 
