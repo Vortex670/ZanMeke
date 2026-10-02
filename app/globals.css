@@ -1,0 +1,215 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   Žetoni — papir, črnilo in ena zelena; razmiki po zlatem rezu
+   ----------------------------------------------------------------------------
+   Pravila so prepisana iz `docs/standard-projekta.md`: barve, velikosti pisav,
+   razmiki, trajanja in krivulje so ŽETONI. V komponenti ni `text-sm`, ni
+   `bg-[#...]` in ni `duration-300`.
+
+   Barv je malo nalašč. Stran prodaja delo in ne sebe: barva nosi poudarek
+   (cena, povezava, ena beseda), vse ostalo je papir in črnilo.
+
+   Zelena in ne opečnata: opečnata je znamka gostilnice, ki je stranka, ne
+   izvajalec. V temi se zelena dvigne (svetlejša, manj nasičena), sicer na
+   temnem papirju nima kontrasta.
+
+   Razmiki gredo po φ = 1,618: 0,618 · 1 · 1,618 · 2,618 · 4,236 rem. Zato
+   razmik med odstavkom in naslovom ni nikoli »na oko«.
+   ============================================================================ */
+
+@theme {
+  /* ── Barve ──────────────────────────────────────────────────────────── */
+  --color-papir: #f5f7f6;
+  --color-ploskev: #ffffff;
+  --color-crnilo: #0f1513;
+  --color-mirno: #596663;
+  --color-bledo: #8b9794;
+  --color-crta: #dde3e1;
+  --color-crta-mehka: #e8edeb;
+  --color-poudarek: #0f5d4c;
+  --color-poudarek-mehko: #e2efea;
+
+  /* ── Obrnjena ploskev — glava, noga, hero ───────────────────────────
+     Žetona `crnilo` in `papir` sta POMENSKA (besedilo in podlaga) in se v
+     temni temi zamenjata — tako mora biti. Temen pas pa mora ostati temen
+     tudi v temni temi, sicer se hero obrne v svetlega in stran razpade.
+     Zato svoj par, ki se v temi samo rahlo dvigne. */
+  --color-obrat: #0f1513;
+  --color-na-obratu: #f5f7f6;
+
+  /* ── Pisavi ─────────────────────────────────────────────────────────── */
+  --font-naslov: var(--pisava-naslov), ui-sans-serif, system-ui, sans-serif;
+  --font-besedilo: var(--pisava-besedilo), ui-sans-serif, system-ui, sans-serif;
+
+  /* ── Razmiki po φ ───────────────────────────────────────────────────── */
+  --spacing-s1: 0.618rem;
+  --spacing-s2: 1rem;
+  --spacing-s3: 1.618rem;
+  --spacing-s4: 2.618rem;
+  --spacing-s5: 4.236rem;
+
+  /* ── Trajanja in krivulje ───────────────────────────────────────────── */
+  --dur-fast: 200ms;
+  --dur-base: 400ms;
+  --dur-slow: 800ms;
+}
+
+:root {
+  /* Velikosti pisav — sedem stopenj, vsaka ima svoj namen. */
+  --type-micro: 0.7rem;
+  --type-label: 0.786rem;
+  --type-body: 1rem;
+  --type-lead: 1.272rem;
+  --type-h3: clamp(1.272rem, 1.1rem + 0.7vw, 1.618rem);
+  --type-h2: clamp(1.618rem, 1.3rem + 1.4vw, 2.058rem);
+  --type-h1: clamp(2.058rem, 1.5rem + 3.2vw, 3.33rem);
+
+  --leading-body: 1.618;
+  --leading-lead: 1.5;
+  --leading-heading: 1.1;
+
+  --razmik-label: 0.14em;
+
+  /* Odsek po višini — isto merilo na vsaki strani. */
+  --section-y: clamp(2.618rem, 1.6rem + 2.8vw, 4.236rem);
+  --mera: 62ch;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --color-papir: #0c100f;
+    --color-ploskev: #141a18;
+    --color-crnilo: #e8edeb;
+    --color-mirno: #9aa6a3;
+    --color-bledo: #6f7b78;
+    --color-crta: #232b29;
+    --color-crta-mehka: #1b2220;
+    --color-poudarek: #5fd3b4;
+    --color-poudarek-mehko: #10231e;
+    --color-obrat: #171d1b;
+    --color-na-obratu: #e8edeb;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-papir: #0c100f;
+  --color-ploskev: #141a18;
+  --color-crnilo: #e8edeb;
+  --color-mirno: #9aa6a3;
+  --color-bledo: #6f7b78;
+  --color-crta: #232b29;
+  --color-crta-mehka: #1b2220;
+  --color-poudarek: #5fd3b4;
+  --color-poudarek-mehko: #10231e;
+  --color-obrat: #171d1b;
+  --color-na-obratu: #e8edeb;
+}
+
+/* ----------------------------------------------------------------------------
+   Osnova
+   -------------------------------------------------------------------------- */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-papir);
+  color: var(--color-crnilo);
+  font-family: var(--font-besedilo);
+  font-size: var(--type-body);
+  line-height: var(--leading-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-poudarek);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: var(--color-poudarek);
+  color: var(--color-papir);
+}
+
+/* ----------------------------------------------------------------------------
+   Tipografske pomožne klase — velikost pisave se v komponenti nikoli ne piše
+   s Tailwindovo privzeto lestvico (`text-sm`), ampak s temi.
+   -------------------------------------------------------------------------- */
+
+@layer components {
+  .type-h1 {
+    font-family: var(--font-naslov);
+    font-size: var(--type-h1);
+    line-height: var(--leading-heading);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+  .type-h2 {
+    font-family: var(--font-naslov);
+    font-size: var(--type-h2);
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+  .type-h3 {
+    font-family: var(--font-naslov);
+    font-size: var(--type-h3);
+    line-height: 1.25;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+  .type-lead {
+    font-size: var(--type-lead);
+    line-height: var(--leading-lead);
+  }
+  .type-body {
+    font-size: var(--type-body);
+    line-height: var(--leading-body);
+  }
+  .type-label {
+    font-family: var(--font-naslov);
+    font-size: var(--type-label);
+    line-height: 1.3;
+    font-weight: 600;
+    letter-spacing: var(--razmik-label);
+    text-transform: uppercase;
+  }
+  .type-micro {
+    font-size: var(--type-micro);
+    line-height: 1.4;
+  }
+
+  /* Širina odstavka — oko se ne izgubi med vrsticami. */
+  .mera {
+    max-width: var(--mera);
+  }
+
+  /* Višina odseka — ista na vsaki strani, da stran drži ritem. */
+  .odsek-y {
+    padding-block: var(--section-y);
+  }
+
+  /* Številke se primerjajo po stolpcih: cena pod ceno, ura pod uro. */
+  .stevilke {
+    font-variant-numeric: tabular-nums;
+  }
+}
