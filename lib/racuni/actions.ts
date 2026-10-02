@@ -12,6 +12,7 @@ import { getNastavitve } from "@/lib/nastavitve/queries";
 import { STRAN } from "@/lib/podatki";
 import { posljiPredlogo } from "@/lib/posta/send";
 import { naslednjaStevilka } from "@/lib/racuni/queries";
+import { uskladiSStripom } from "@/lib/racuni/uskladi";
 import { racunSchema, vCente, zneskovno, type RacunInput } from "@/lib/racuni/validation";
 import { prisma } from "@/lib/prisma";
 import { getStripe, jeStripePripravljen } from "@/lib/stripe/client";
@@ -160,6 +161,26 @@ export async function oznaciPoslanAction(id: string): Promise<ActionResult> {
       ? "Račun je označen kot poslan. Pošta je preskočena (ni ključa)."
       : `Račun je poslan na ${racun.epota}.`,
   };
+}
+
+/**
+ * Vprašaj Stripa, ali je ta račun plačan.
+ *
+ * Webhook pride sam in takoj, zato je prva pot — a ni edina resnica: dovolj
+ * je napačna podpisna skrivnost ali izpad in račun ostane neplačan, čeprav
+ * je denar nakazan. Ta gumb pove, kaj o računu misli Stripe, in njegovemu
+ * odgovoru verjame.
+ */
+export async function uskladiPlaciloAction(id: string): Promise<ActionResult> {
+  await zahtevajPrijavo();
+
+  const spremenjen = await uskladiSStripom(id);
+  revalidatePath("/admin/racuni");
+  revalidatePath(`/admin/racuni/${id}`);
+
+  return spremenjen
+    ? { ok: true, message: "Stripe potrjuje plačilo — račun je označen kot plačan." }
+    : { ok: true, message: "Pri Stripu za ta račun (še) ni plačila." };
 }
 
 /**

@@ -1,6 +1,6 @@
 "use client";
 
-import { Ban, BellRing, Check, Copy, Send } from "lucide-react";
+import { Ban, BellRing, Check, Copy, RefreshCw, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
@@ -11,6 +11,7 @@ import {
   oznaciPoslanAction,
   posljiOpomnikAction,
   preklicIRacunAction,
+  uskladiPlaciloAction,
 } from "@/lib/racuni/actions";
 
 // ============================================================================
@@ -92,6 +93,22 @@ export function VrsticaRacuna({
           leftIcon={<Send className="h-4 w-4" aria-hidden />}
         >
           Pošlji stranki
+        </Button>
+      ) : null}
+
+      {/* »Preveri pri Stripu« obstaja zato, ker webhook ni edina resnica:
+          napačna podpisna skrivnost ali izpad pomenita plačan račun, ki v
+          seznamu stoji kot neplačan. Gumb vpraša Stripa in verjame njemu. */}
+      {stanje !== "PLACAN" && stanje !== "PREKLICAN" ? (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          disabled={tece}
+          onClick={() => dejanje(() => uskladiPlaciloAction(id))}
+          leftIcon={<RefreshCw className="h-4 w-4" aria-hidden />}
+        >
+          Preveri pri Stripu
         </Button>
       ) : null}
 

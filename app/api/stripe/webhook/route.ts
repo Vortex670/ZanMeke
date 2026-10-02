@@ -1,8 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type Stripe from "stripe";
-import PotrdiloPlacila from "@/emails/PotrdiloPlacila";
-import { posljiPredlogo } from "@/lib/posta/send";
-import { zneskovno } from "@/lib/racuni/validation";
+import { posljiPotrdiloOPlacilu } from "@/lib/racuni/potrdilo";
 
 import { prisma } from "@/lib/prisma";
 import {
@@ -116,7 +114,7 @@ export async function POST(req: NextRequest) {
         // negotovi dostavi ponovi; brez tega pogoja bi stranka dobila dve
         // enaki potrdili za eno plačilo — in to je trenutek, ko začne
         // dvomiti, ali je plačala dvakrat.
-        if (spremenjeni.count > 0) await posljiPotrdilo(racunId);
+        if (spremenjeni.count > 0) await posljiPotrdiloOPlacilu(racunId);
         break;
       }
 
@@ -145,57 +143,4 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ prejeto: true });
-}
-
-// ----------------------------------------------------------------------------
-// Potrdilo o plačilu
-// ----------------------------------------------------------------------------
-// Pošta NE SME podreti webhooka. Stripe ob odgovoru, ki ni 200, dogodek
-// ponovi — in če bi padel zaradi pošte, bi ponovil plačilo, ki je že
-// obdelano. Zato je vse v `try` in napaka gre v dnevnik, ne v odgovor.
-//
-// Brez e-naslova potrdila ni komu poslati; račun je plačan in to je
-// pomembnejše od pisma.
-// ----------------------------------------------------------------------------
-
-async function posljiPotrdilo(racunId: string): Promise<void> {
-  try {
-    const racun = await prisma.racun.findUnique({
-      where: { id: racunId },
-      select: {
-        epota: true,
-        stranka: true,
-        podjetje: true,
-        stevilka: true,
-        znesekCentov: true,
-        valuta: true,
-        placanoAt: true,
-        vrsta: true,
-      },
-    });
-    if (!racun?.epota) return;
-
-    await posljiPredlogo({
-      za: racun.epota,
-      zadeva: `Plačilo prejeto — ${zneskovno(racun.znesekCentov, racun.valuta)}`,
-      predloga: "potrdilo-placila",
-      vsebina: PotrdiloPlacila({
-        stranka: racun.podjetje ?? racun.stranka,
-        stevilka: racun.stevilka,
-        znesek: zneskovno(racun.znesekCentov, racun.valuta),
-        datum: new Intl.DateTimeFormat("sl-SI", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-          timeZone: "Europe/Ljubljana",
-        }).format(racun.placanoAt ?? new Date()),
-        naslednjiKorak:
-          racun.vrsta === "PREDRACUN"
-            ? "Z delom začnem takoj; javim se v enem delovnem dnevu."
-            : "Nič več ni treba narediti. Za vprašanja o listini pokličite.",
-      }),
-    });
-  } catch (e) {
-    console.error("[stripe] potrdila ni bilo mogoče poslati:", e);
-  }
 }

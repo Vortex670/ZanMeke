@@ -16,6 +16,7 @@ import { STRAN } from "@/lib/podatki";
 import { upnKoda } from "@/lib/racuni/qr";
 import { upnSklicIzpis } from "@/lib/racuni/upn";
 import { getRacunPoZetonu } from "@/lib/racuni/queries";
+import { uskladiSStripom } from "@/lib/racuni/uskladi";
 import { zneskovno } from "@/lib/racuni/validation";
 import { jeStripePripravljen, jeStripeTestni } from "@/lib/stripe/client";
 
@@ -84,8 +85,22 @@ export default async function PlacilnaStran({
   searchParams: Promise<{ placano?: string }>;
 }) {
   const [{ zeton }, { placano }] = await Promise.all([params, searchParams]);
-  const racun = await getRacunPoZetonu(zeton);
+  let racun = await getRacunPoZetonu(zeton);
   if (!racun) notFound();
+
+  // VRNITEV Z BLAGAJNE JE TRENUTEK NAJVEČJEGA DVOMA, zato Stripa vprašamo
+  // sami in ne čakamo samo na webhook. Prvič, ko sva vklopila živa plačila,
+  // se podpis webhooka ni ujemal in račun je ostal »poslan«, čeprav je bil
+  // denar nakazan — stranka pa je gledala stran, ki ji je obljubljala, da
+  // se bo sama posodobila.
+  //
+  // Klic se zgodi SAMO ob vrnitvi z blagajne in samo, dokler račun ni
+  // plačan; vsak drug ogled strani ostane navadno branje iz baze.
+  if (placano && racun.stanje !== "PLACAN" && racun.stripeSejaId) {
+    if (await uskladiSStripom(racun.id)) {
+      racun = (await getRacunPoZetonu(zeton)) ?? racun;
+    }
+  }
 
   const jePlacan = racun.stanje === "PLACAN";
   const vObdelavi = !jePlacan && Boolean(placano);
