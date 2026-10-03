@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
@@ -15,6 +15,7 @@ import { DUR, EASE } from "@/components/motion/tokens";
 import { usePresence } from "@/components/motion/use-presence";
 import { cn } from "@/lib/utils";
 import { Pressable } from "@/components/ui/Pressable";
+import { STRAN } from "@/lib/podatki";
 
 type Props = {
   /** a11y label za hamburger + drawer dialog. */
@@ -152,6 +153,23 @@ export function AdminMobileNav({ openLabel, closeLabel, children }: Props) {
                 paddingBottom: "env(safe-area-inset-bottom)",
               }}
             >
+              {/* GLAVA PREDALA. Prej je predal odprl gol seznam povezav:
+                  brez imena strani in brez gumba za zapiranje, torej brez
+                  vsakršnega znaka, kje si in kako nazaj. Na namizju to vlogo
+                  opravi vrhnja vrstica, v predalu pa je ni bilo nič. */}
+              <div className="border-chrome-line flex h-14 shrink-0 items-center justify-between gap-2 border-b px-3">
+                <span className="type-eyebrow text-text truncate tracking-[0.2em]">
+                  {STRAN.domena.toUpperCase()}
+                </span>
+                <Pressable
+                  onClick={() => setOpen(false)}
+                  aria-label={closeLabel}
+                  className={cn(CHROME_PILL, CHROME_PILL_ICON)}
+                >
+                  <X strokeWidth={1.7} aria-hidden />
+                </Pressable>
+              </div>
+
               {children}
             </div>
           </div>,

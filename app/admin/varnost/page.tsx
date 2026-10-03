@@ -1,4 +1,4 @@
-import { Monitor, ScrollText, Shield, ShieldCheck } from "lucide-react";
+import { ScrollText, Shield, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
 
 import { AdminList } from "@/components/admin/kit/AdminList";
