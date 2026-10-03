@@ -147,7 +147,13 @@ export function StatCard({
     // KVADRATNA na telefonu: brez namiga in pripisa ima kartica oznako,
     // ikono in številko — vsebine za okoli 100 px. Razmerje 1 : 1 jih v
     // dveh stolpcih poravna v mrežo namesto v stolpec neenakih višin.
-    "max-sm:aspect-square max-sm:justify-center",
+    //
+    // `justify-between` in NE `justify-center`: pri dveh karticah v vrsti se
+    // ena oznaka prelomi v dve vrstici (»NOVA POVPRAŠEVANJA«), druga ne — in
+    // sredinjena vsebina postavi številki vsako na svojo višino. Oznaka na
+    // vrh, številka na dno: številki sta potem v isti vrstici ne glede na
+    // dolžino napisa nad njima.
+    "max-sm:aspect-square max-sm:justify-between",
     nested ? "bg-bg/60" : "bg-surface",
     href &&
       "cursor-pointer transition-all duration-(--dur-fast) hover:-translate-y-0.5 hover:shadow-(--shadow-card-hover)",

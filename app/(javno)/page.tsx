@@ -133,12 +133,19 @@ export default async function Domov() {
               <div className="relative z-10 lg:max-w-[58%]">
                 <p className="type-lead text-mirno mera">{hero.uvod || OPIS}</p>
 
-                <div className="mt-s3 gap-s1 flex flex-wrap items-center">
-                  <MagnetniGumb>
+                {/* NA TELEFONU STA GUMBA ENAKO ŠIROKA, čez vso širino. Ker
+                    se širina ravna po napisu, je bil »Poglej ponudbo« za
+                    petdeset pikslov širši od telefonske številke in sta
+                    stala kot dve različno dolgi stopnici — na 375 px je to
+                    prva stvar, ki jo oko opazi, še preden prebere napis.
+                    Od `sm` naprej se spet ravnata po vsebini in stojita v
+                    isti vrstici. */}
+                <div className="mt-s3 gap-s1 grid sm:flex sm:flex-wrap sm:items-center">
+                  <MagnetniGumb className="max-sm:w-full">
                     <GumbPovezava
                       href="/ponudba"
                       ikona={<ArrowRight aria-hidden />}
-                      className={GUMB_POLNI_NA_TEMNEM}
+                      className={`${GUMB_POLNI_NA_TEMNEM} max-sm:w-full`}
                     >
                       Poglej ponudbo
                     </GumbPovezava>
@@ -147,7 +154,7 @@ export default async function Domov() {
                     href={`tel:${STRAN.telefonKlic}`}
                     videz="obris"
                     ikona={<Phone aria-hidden />}
-                    className={GUMB_NA_TEMNEM}
+                    className={`${GUMB_NA_TEMNEM} max-sm:w-full`}
                   >
                     <span className="stevilke">{STRAN.telefon}</span>
                   </GumbPovezava>
