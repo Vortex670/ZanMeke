@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpRight, Mail, Menu, Phone, X } from "lucide-react";
+import { Menu, Phone, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
@@ -229,9 +229,11 @@ export function MobilniMeni({
                   ) : null}
                 </nav>
 
-                {/* Klic in e-pošta sta na dnu, pod palcem, in ne med
-                    povezavami: to sta dejanji, zaradi katerih ta stran
-                    stoji, in nista isto kot pot do podstrani. */}
+                {/* SAMO TELEFON. E-pošta je bila tu kot drugi gumb, a je na
+                    strani že štirikrat drugje — in dve dejanji na dnu
+                    predala pomenita, da nobeno ni prvo. Kdor odpre meni na
+                    telefonu, hoče poklicati; e-pošta ga počaka v nogi in na
+                    strani s kontaktom. */}
                 <div
                   data-meni-vnos
                   className="border-crta gap-s1 flex shrink-0 flex-col border-t p-4"
@@ -243,14 +245,6 @@ export function MobilniMeni({
                   >
                     <Phone className="size-4" aria-hidden />
                     <span className="stevilke">{STRAN.telefon}</span>
-                  </a>
-                  <a
-                    href={`mailto:${STRAN.epota}`}
-                    className="border-crta text-crnilo hover:border-poudarek inline-flex h-12 items-center justify-center gap-2 rounded-md border transition-colors"
-                  >
-                    <Mail className="size-4" aria-hidden />
-                    {STRAN.epota}
-                    <ArrowUpRight className="size-4" aria-hidden />
                   </a>
                 </div>
               </div>
