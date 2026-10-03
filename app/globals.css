@@ -432,11 +432,23 @@
      izgubiti, kot se je pri oknu, širokem natanko toliko kot vsebnik.
      Rob raste z zaslonom: na telefonu dovolj, da besedilo ne visi na robu,
      na namizju toliko, da stran ni prilepljena na steklo. */
+  /* ROB RASTE Z ZASLONOM in ni povsod enak. Prej je bil `--s3` (25,9 px) od
+     telefona do namizja: na 375 px je to 52 px, ki jih vsebina nima, torej
+     eno besedo manj v vrstici in kartica, ki je za toliko ožja. Administracija
+     je ves čas uporabljala 16 px (`px-4 sm:px-6 lg:px-8`, isto kot
+     gostilnica-plus.si) — isti projekt je imel torej dve meri.
+     Lestvica: telefon 16 px → tablica 25,9 px → namizje 41,9 px. */
   .vsebnik {
     margin-inline: auto;
     width: 100%;
     max-width: 72rem;
-    padding-inline: var(--s3);
+    padding-inline: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .vsebnik {
+      padding-inline: var(--s3);
+    }
   }
 
   @media (min-width: 1024px) {
@@ -454,7 +466,13 @@
     margin-inline: auto;
     width: 100%;
     max-width: 88rem;
-    padding-inline: var(--s3);
+    padding-inline: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .vsebnik-sirok {
+      padding-inline: var(--s3);
+    }
   }
 
   @media (min-width: 1024px) {

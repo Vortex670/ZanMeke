@@ -4,7 +4,6 @@ import { Trash2 } from "lucide-react";
 import { useActionState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 
-import { AdminSection } from "@/components/admin/kit/AdminSection";
 import { FieldGroup } from "@/components/admin/kit/FieldGroup";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -20,6 +19,11 @@ import { izbrisiMojRacunAction } from "@/lib/varnost/actions";
 // Tri zapore: geslo, prepis lastnega e-naslova in pravilo, da zadnjega računa
 // ni mogoče izbrisati. Brez tretje bi stran ostala brez vsakogar, ki bi se
 // sploh lahko prijavil — in nazaj ne bi bilo poti.
+//
+// OKVIR JE RDEČ. Prej je bil ta odsek videti natanko kot »Prijavljene
+// naprave«: ista kartica, ista obroba, isti razmik. Najbolj nepovratno
+// dejanje v administraciji se ne sme brati kot vsako drugo — barva je tu
+// opozorilo in ne okras.
 // ============================================================================
 
 export function IzbrisRacuna({ epota }: { epota: string }) {
@@ -43,37 +47,55 @@ export function IzbrisRacuna({ epota }: { epota: string }) {
   const napake = izid && !izid.ok ? (izid.fieldErrors ?? {}) : {};
 
   return (
-    <AdminSection
-      icon={<Trash2 className="h-5 w-5" aria-hidden />}
-      title="Izbris računa"
-      description="Nepovratno. Računi strank, sporočila in listine ostanejo — niso last tega računa."
-    >
-      <form action={oddaj} className="grid max-w-md gap-(--s2)" noValidate>
+    <section className="border-danger/35 bg-danger-bg/30 rounded-2xl border p-(--s3)">
+      <header className="flex items-start gap-3">
+        <span className="bg-danger/15 text-danger flex size-10 shrink-0 items-center justify-center rounded-full">
+          <Trash2 className="h-5 w-5" aria-hidden />
+        </span>
+        <div className="min-w-0">
+          <h2 className="type-lead text-text font-semibold">Izbris računa</h2>
+          <p className="type-small text-muted mt-0.5 max-w-prose">
+            Nepovratno in takojšnje. Računi strank, sporočila in listine ostanejo — niso
+            last tega računa.
+          </p>
+        </div>
+      </header>
+
+      <form action={oddaj} className="mt-(--s3) grid max-w-md gap-(--s2)" noValidate>
         <FieldGroup label="Geslo" required error={napake.geslo}>
           <Input name="geslo" type="password" autoComplete="current-password" required />
         </FieldGroup>
 
         <FieldGroup
-          label="Za potrditev prepiši svoj e-naslov"
+          label="Prepiši svoj e-naslov"
           required
-          hint={epota}
+          hint={
+            <>
+              Natanko <span className="text-text">{epota}</span>
+            </>
+          }
           error={napake.potrdilo}
         >
-          <Input name="potrdilo" autoComplete="off" required />
+          <Input
+            name="potrdilo"
+            autoComplete="off"
+            placeholder={epota}
+            inputMode="email"
+            required
+          />
         </FieldGroup>
 
         <div>
           <Button
             type="submit"
-            variant="ghost"
+            variant="danger"
             disabled={tece}
             leftIcon={<Trash2 className="h-4 w-4" aria-hidden />}
-            className="text-danger hover:text-danger"
           >
             {tece ? "Brišem …" : "Izbriši moj račun"}
           </Button>
         </div>
       </form>
-    </AdminSection>
+    </section>
   );
 }

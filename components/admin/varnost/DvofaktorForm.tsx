@@ -187,66 +187,111 @@ export function DvofaktorForm({ stanje }: { stanje: Stanje }) {
       ) : null}
 
       {/* ── Vklopljena ───────────────────────────────────────────────── */}
+      {/* DVE DEJANJI, DVE ŠKATLI. Prej sta bila dva gola obrazca eden pod
+          drugim, oba z enakim poljem za geslo in skoraj enakim napisom nad
+          njim — drugi pa je izklapljal zaščito. Dve dejanji z različnima
+          posledicama, ki izgledata enako, sta napaka, ki se zgodi enkrat. */}
       {stanje.vklopljena && !prikaziQr ? (
-        <div className="grid gap-(--s3)">
-          <p className="type-small text-muted">
-            Preostalih rezervnih kod:{" "}
-            <strong className="text-text">{stanje.preostaleKode}</strong>. Vsaka velja
-            enkrat.
-          </p>
-
-          <form action={izdajKode} className="grid max-w-xs gap-(--s1)" noValidate>
-            <FieldGroup
-              label="Nov komplet rezervnih kod"
-              hint="Stare prenehajo veljati takoj."
-              error={izidKod && !izidKod.ok ? izidKod.fieldErrors?.geslo : null}
-            >
-              <Input
-                name="geslo"
-                type="password"
-                autoComplete="current-password"
-                placeholder="Potrdi z geslom"
+        <div className="grid gap-(--s2) lg:grid-cols-2">
+          <Skatla
+            naslov="Rezervne kode"
+            opis={
+              <>
+                Preostale:{" "}
+                <strong className="text-text stevilke">{stanje.preostaleKode}</strong> od
+                10. Z njimi se prijaviš, kadar telefona nimaš; vsaka velja enkrat.
+              </>
+            }
+          >
+            <form action={izdajKode} className="grid gap-(--s1)" noValidate>
+              <FieldGroup
+                label="Geslo"
                 required
-              />
-            </FieldGroup>
-            <div>
-              <Button type="submit" variant="secondary" disabled={izdajam}>
-                {izdajam ? "Izdajam …" : "Izdaj nove kode"}
-              </Button>
-            </div>
-          </form>
-
-          <form action={izklopi} className="grid max-w-xs gap-(--s1)" noValidate>
-            <FieldGroup
-              label="Izklop dvofaktorske prijave"
-              hint="Rezervne kode se ob izklopu zavržejo."
-              error={
-                izidIzklopa && !izidIzklopa.ok ? izidIzklopa.fieldErrors?.geslo : null
-              }
-            >
-              <Input
-                name="geslo"
-                type="password"
-                autoComplete="current-password"
-                placeholder="Potrdi z geslom"
-                required
-              />
-            </FieldGroup>
-            <div>
-              <Button
-                type="submit"
-                variant="ghost"
-                disabled={izklapljam}
-                leftIcon={<ShieldOff className="h-4 w-4" aria-hidden />}
-                className="text-danger hover:text-danger"
+                hint="Nov komplet; stare kode prenehajo veljati takoj."
+                error={izidKod && !izidKod.ok ? izidKod.fieldErrors?.geslo : null}
               >
-                {izklapljam ? "Izklapljam …" : "Izklopi"}
-              </Button>
-            </div>
-          </form>
+                <Input
+                  name="geslo"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                />
+              </FieldGroup>
+              <div>
+                <Button type="submit" variant="secondary" disabled={izdajam}>
+                  {izdajam ? "Izdajam …" : "Izdaj nove kode"}
+                </Button>
+              </div>
+            </form>
+          </Skatla>
+
+          <Skatla
+            nevarna
+            naslov="Izklop"
+            opis="Za prijavo bo spet dovolj samo geslo. Rezervne kode se zavržejo."
+          >
+            <form action={izklopi} className="grid gap-(--s1)" noValidate>
+              <FieldGroup
+                label="Geslo"
+                required
+                error={
+                  izidIzklopa && !izidIzklopa.ok ? izidIzklopa.fieldErrors?.geslo : null
+                }
+              >
+                <Input
+                  name="geslo"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                />
+              </FieldGroup>
+              <div>
+                <Button
+                  type="submit"
+                  variant="danger"
+                  disabled={izklapljam}
+                  leftIcon={<ShieldOff className="h-4 w-4" aria-hidden />}
+                >
+                  {izklapljam ? "Izklapljam …" : "Izklopi dvofaktorsko prijavo"}
+                </Button>
+              </div>
+            </form>
+          </Skatla>
         </div>
       ) : null}
     </AdminSection>
+  );
+}
+
+/**
+ * Škatla okoli enega dejanja — da se dve dejanji ne zlijeta v eno.
+ *
+ * `nevarna` jo obarva: barva je opozorilo in ne okras, ker gre za izklop
+ * zaščite, kar se čez teden dni bere kot »nekaj sem pritisnil«.
+ */
+function Skatla({
+  naslov,
+  opis,
+  nevarna,
+  children,
+}: {
+  naslov: string;
+  opis: React.ReactNode;
+  nevarna?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={
+        nevarna
+          ? "border-danger/35 bg-danger-bg/25 rounded-xl border p-(--s2)"
+          : "border-border/60 bg-surface-2/40 rounded-xl border p-(--s2)"
+      }
+    >
+      <h3 className="type-small text-text font-semibold">{naslov}</h3>
+      <p className="type-small text-muted mt-0.5 mb-(--s2)">{opis}</p>
+      {children}
+    </div>
   );
 }
 

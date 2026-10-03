@@ -49,28 +49,39 @@ export function GesloForm() {
       title="Geslo"
       description="Ob zamenjavi se odjavijo vse druge naprave; ta ostane prijavljena."
     >
-      <form ref={obrazec} action={oddaj} className="grid max-w-md gap-(--s2)" noValidate>
-        <FieldGroup label="Trenutno geslo" required error={napake.trenutno}>
+      {/* NOVO IN PONOVI STA V ISTI VRSTICI, trenutno geslo nad njima. Trije
+          enaki stolpci pod sabo so trije enaki kvadratki, med katerimi se
+          ne vidi, kateri je kateri — razporeditev je tu del pomena. */}
+      <form ref={obrazec} action={oddaj} className="grid max-w-2xl gap-(--s2)" noValidate>
+        <FieldGroup
+          label="Trenutno geslo"
+          required
+          hint="Brez njega zamenjave ni — odprta administracija na tujem računalniku ne zadošča."
+          error={napake.trenutno}
+        >
           <Input
             name="trenutno"
             type="password"
             autoComplete="current-password"
+            className="sm:max-w-xs"
             required
           />
         </FieldGroup>
 
-        <FieldGroup
-          label="Novo geslo"
-          required
-          hint="Vsaj dvanajst znakov. Daljše geslo je boljše od bolj zapletenega."
-          error={napake.novo}
-        >
-          <Input name="novo" type="password" autoComplete="new-password" required />
-        </FieldGroup>
+        <div className="grid gap-(--s2) sm:grid-cols-2">
+          <FieldGroup
+            label="Novo geslo"
+            required
+            hint="Vsaj dvanajst znakov. Daljše je boljše od bolj zapletenega."
+            error={napake.novo}
+          >
+            <Input name="novo" type="password" autoComplete="new-password" required />
+          </FieldGroup>
 
-        <FieldGroup label="Ponovi novo geslo" required error={napake.ponovi}>
-          <Input name="ponovi" type="password" autoComplete="new-password" required />
-        </FieldGroup>
+          <FieldGroup label="Ponovi novo geslo" required error={napake.ponovi}>
+            <Input name="ponovi" type="password" autoComplete="new-password" required />
+          </FieldGroup>
+        </div>
 
         <div>
           <Button type="submit" disabled={tece}>
