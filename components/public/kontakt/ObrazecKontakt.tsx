@@ -100,8 +100,11 @@ export function ObrazecKontakt({
         {(l) => <Besedilo {...l} name="sporocilo" required />}
       </Polje>
 
-      <div className="gap-s2 flex flex-wrap items-center">
-        <Gumb type="submit" disabled={teče}>
+      {/* Gumb je na telefonu čez vso širino: pri enem samem dejanju je
+          polovična ploskev videti kot nedokončana vrstica, palec pa ima manj
+          cilja. Od `sm` naprej se spet ravna po napisu. */}
+      <div className="gap-s2 grid sm:flex sm:flex-wrap sm:items-center">
+        <Gumb type="submit" disabled={teče} className="max-sm:w-full">
           {teče ? "Pošiljam …" : "Pošlji povpraševanje"}
         </Gumb>
         <p className="type-micro text-bledo">

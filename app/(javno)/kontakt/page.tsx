@@ -106,7 +106,11 @@ export default async function Kontakt() {
             </div>
           </div>
 
-          <div className="bg-ploskev p-s3 rounded-2xl shadow-(--shadow-card)">
+          {/* ROB KARTICE JE NA TELEFONU OŽJI. `--s3` je 26 px; skupaj z robom
+              strani je to 42 px na vsaki strani, torej 84 od 375 — polja so
+              zato merila 291 px namesto 311. Na širšem zaslonu ostane
+              prejšnji rob, ker tam prostora ne manjka. */}
+          <div className="p-s2 sm:p-s3 bg-ploskev rounded-2xl shadow-(--shadow-card)">
             <ObrazecKontakt />
             {obrazec.zasebnost ? (
               <p className="type-micro text-bledo mt-s2">{obrazec.zasebnost}</p>

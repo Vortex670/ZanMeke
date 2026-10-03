@@ -1,7 +1,9 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
+import { MobilniMeni } from "@/components/layout/MobilniMeni";
 import { GUMB_POLNI_NA_TEMNEM, GumbPovezava } from "@/components/ui/Gumb";
+import { getFooterPages } from "@/lib/pages/queries";
 import { Znak } from "@/components/ui/Znak";
 import { STRAN } from "@/lib/podatki";
 
@@ -17,8 +19,12 @@ import { STRAN } from "@/lib/podatki";
 // človek besedila ne bere. Telefonska številka je v njej, ker je klic edino
 // dejanje, ki na tej strani kaj prinese.
 //
-// NA TELEFONU JE MENI V DRUGI VRSTI in ne pod gumbom s tremi črtami. Poti so
-// tri; hamburger bi jih skril za dotik, ki ga marsikdo ne naredi.
+// NA TELEFONU JE MENI V PREDALU. Dolgo je bil v drugi vrstici, ker so poti
+// tri in hamburger jih skrije za dotik — za tri postavke je to načeloma
+// boljše. Stalo pa je dvoje: vrstica je jemala višino prvemu zaslonu, in v
+// njej ni bilo prostora za nobeno povezavo več. Predal nosi poleg treh poti
+// še pravna besedila, klic in e-pošto; isti vzorec kot na gostilnica-plus.si
+// in second-home.hr.
 // ============================================================================
 
 // ŠTIRJE VNOSI IN NOBENE PANOGE. Stran dela za vsako podjetje; meni, ki
@@ -40,7 +46,14 @@ const MENI = [
   { href: "/kontakt", label: "Kontakt" },
 ];
 
-export function Glava() {
+export async function Glava() {
+  // Pravna besedila v predal: na telefonu je noga daleč, dosegljiva pa morajo
+  // biti z vsake strani. Ista poizvedba kot v nogi.
+  const pravne = (await getFooterPages().catch(() => [])).map((p) => ({
+    href: `/${p.slug}`,
+    label: p.title,
+  }));
+
   return (
     <header className="text-na-obratu absolute inset-x-0 top-0 z-50">
       <div className="vsebnik-sirok gap-s3 flex items-center py-4">
@@ -76,33 +89,22 @@ export function Glava() {
           ))}
         </nav>
 
-        <GumbPovezava
-          href={`tel:${STRAN.telefonKlic}`}
-          velikost="mal"
-          ikona={<ArrowRight aria-hidden />}
-          className={`${GUMB_POLNI_NA_TEMNEM} ml-auto whitespace-nowrap lg:ml-0`}
-        >
-          <span className="stevilke">{STRAN.telefon}</span>
-        </GumbPovezava>
-      </div>
+        <div className="gap-s1 ml-auto flex items-center lg:ml-0">
+          {/* Telefonska številka se na najožjih zaslonih umakne: tam sta ob
+              znamki in gumbu s tremi črtami dve dejanji preveč, številka pa
+              je prva stvar v predalu. */}
+          <GumbPovezava
+            href={`tel:${STRAN.telefonKlic}`}
+            velikost="mal"
+            ikona={<ArrowRight aria-hidden />}
+            className={`${GUMB_POLNI_NA_TEMNEM} whitespace-nowrap max-[420px]:hidden`}
+          >
+            <span className="stevilke">{STRAN.telefon}</span>
+          </GumbPovezava>
 
-      {/* Telefon in tablica: poti v drugi vrsti, da so dosegljive brez
-          dodatnega dotika. Vrstica se vodoravno podrsa — pet vnosov v eno
-          vrstico na 390 px ne gre, prelom v dve vrstici pa bi glavo podvojil
-          po višini in uvod potisnil pod pregib. */}
-      <nav className="border-na-obratu/10 border-y lg:hidden">
-        <div className="vsebnik-sirok gap-s3 flex scrollbar-none overflow-x-auto">
-          {MENI.map((m) => (
-            <Link
-              key={m.href}
-              href={m.href}
-              className="type-label text-na-obratu/70 active:text-na-obratu py-2.5 whitespace-nowrap"
-            >
-              {m.label}
-            </Link>
-          ))}
+          <MobilniMeni povezave={MENI} pravne={pravne} />
         </div>
-      </nav>
+      </div>
     </header>
   );
 }
