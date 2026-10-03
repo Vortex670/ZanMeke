@@ -77,7 +77,13 @@ export async function Noga() {
 
           <a
             href={`tel:${STRAN.telefonKlic}`}
-            className="type-h2 stevilke text-crnilo decoration-poudarek mt-s2 group flex items-center gap-3 underline-offset-[0.15em] hover:underline"
+            // NOGA JE NASLOV, NE POZIV. Številka je bila `type-h2` — enako
+            // velika kot naslov odseka in enako velika kot ista številka v
+            // odseku »Stik«, ki stoji 343 px više. Isti podatek dvakrat v
+            // istem zaslonu in dvakrat v isti velikosti se ne bere kot
+            // poudarek, ampak kot nered. Dejanje je v »Stiku«, tu je
+            // podatek, h kateremu se človek vrne.
+            className="type-h3 stevilke text-crnilo decoration-poudarek mt-s2 group flex items-center gap-3 underline-offset-[0.15em] hover:underline"
           >
             {STRAN.telefon}
             <ArrowUpRight
@@ -88,7 +94,7 @@ export async function Noga() {
           </a>
           <a
             href={`mailto:${STRAN.epota}`}
-            className="type-lead text-mirno hover:text-crnilo mt-s1 block transition-colors"
+            className="type-body text-mirno hover:text-crnilo mt-s1 block transition-colors"
           >
             {STRAN.epota}
           </a>
