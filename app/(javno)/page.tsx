@@ -164,7 +164,12 @@ export default async function Domov() {
                     Človek, ki okleva pred klicem, ne okleva zaradi cene,
                     ampak zato, ker ne ve, k čemu ga klic zaveže. Ta stavek
                     odgovori na to, preden vprašanje nastane. */}
-                <p className="type-small font-oznaka text-bledo mt-s2">
+                {/* MONO JE ZA OZNAKE IN ŠTEVILKE, NE ZA POVEDI. Ta stavek je
+                    bil v mono pisavi: na 390 px se je lomil narobe, ker ima
+                    vsak znak isto širino, in se je bral kot izpis orodja in
+                    ne kot obljuba človeka. `text-pretty` prepreči, da bi
+                    zadnja beseda ostala sama v vrstici. */}
+                <p className="type-small text-bledo mt-s2 mera text-pretty">
                   Pol ure pri vas, brez obveznosti. Po pogovoru veste ceno in rok.
                 </p>
               </div>
@@ -182,7 +187,7 @@ export default async function Domov() {
                   prednostno
                   className="border-na-obratu/15"
                 />
-                <figcaption className="type-micro font-oznaka text-bledo mt-s1">
+                <figcaption className="type-micro text-bledo mt-s1 text-pretty">
                   {hero.podnapis ||
                     "Živa stran v Sevnici — ponudba, naročanje in evidenca dela."}
                 </figcaption>
@@ -194,18 +199,27 @@ export default async function Domov() {
         {/* Pas dejstev kot ENA VRSTICA v mono pisavi, ločena s poševnicami.
             Trije enaki stolpci so bili tabela — in ista tabela stoji pod
             uvodom gostilnice. Vrstica se bere kot vrstica stanja v orodju:
-            trije podatki, nič okvirjev. */}
+            trije podatki, nič okvirjev.
+
+            NA TELEFONU PA NE. Tam se vrstica prelomi v tri in drugi dve se
+            začneta s poševnico, ki je ločilo med podatkoma — na začetku
+            vrstice pa ne loči ničesar in izgleda kot napaka. Pod `sm` je
+            zato vsak podatek svoja vrstica: oznaka levo, vrednost desno,
+            poševnic ni. */}
         <div className="border-crta relative border-t">
-          <dl className="vsebnik-sirok type-micro font-oznaka gap-x-s3 flex flex-wrap items-center gap-y-1 py-3">
+          <dl className="vsebnik-sirok type-micro font-oznaka gap-x-s3 flex flex-wrap items-center gap-y-1 py-3 max-sm:gap-y-2 max-sm:py-(--s2)">
             {dejstva(b("dejstva")).map((d, i) => (
-              <div key={d.oznaka} className="flex items-center gap-2">
+              <div
+                key={d.oznaka}
+                className="flex items-center gap-2 max-sm:w-full max-sm:justify-between max-sm:gap-3"
+              >
                 {i > 0 ? (
-                  <span aria-hidden className="text-bledo/40 mr-s2">
+                  <span aria-hidden className="text-bledo/40 mr-s2 max-sm:hidden">
                     /
                   </span>
                 ) : null}
-                <dt className="text-bledo">{d.oznaka.toLowerCase()}</dt>
-                <dd className="text-crnilo flex items-center gap-1.5">
+                <dt className="text-bledo max-sm:shrink-0">{d.oznaka.toLowerCase()}</dt>
+                <dd className="text-crnilo flex items-center gap-1.5 max-sm:ml-auto">
                   {d.zivo ? (
                     <span
                       aria-hidden
