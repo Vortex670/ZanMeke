@@ -47,7 +47,7 @@ export function IzbrisRacuna({ epota }: { epota: string }) {
   const napake = izid && !izid.ok ? (izid.fieldErrors ?? {}) : {};
 
   return (
-    <section className="border-danger/35 bg-danger-bg/30 rounded-2xl border p-(--s3)">
+    <section className="border-danger/55 bg-danger-bg/40 rounded-2xl border p-(--s3)">
       <header className="flex items-start gap-3">
         <span className="bg-danger/15 text-danger flex size-10 shrink-0 items-center justify-center rounded-full">
           <Trash2 className="h-5 w-5" aria-hidden />

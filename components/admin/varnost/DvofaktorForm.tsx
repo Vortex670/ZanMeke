@@ -284,7 +284,7 @@ function Skatla({
     <div
       className={
         nevarna
-          ? "border-danger/35 bg-danger-bg/25 rounded-xl border p-(--s2)"
+          ? "border-danger/50 bg-danger-bg/30 rounded-xl border p-(--s2)"
           : "border-border/60 bg-surface-2/40 rounded-xl border p-(--s2)"
       }
     >

@@ -216,10 +216,17 @@
   --type-micro: 0.7rem;
   --type-label: 0.786rem;
   --type-body: 1rem;
-  --type-lead: 1.272rem;
+  /* TEKOČE IN NE FIKSNO. 1,272rem je bilo enako na 375 px in na namizju: na
+     telefonu je to 20 px uvodnega besedila, torej pet besed v vrstici in
+     odstavek, ki zasede pol zaslona. Namizje ostane pri 20 px, telefon dobi
+     17 px. */
+  --type-lead: clamp(1.0625rem, 0.95rem + 0.5vw, 1.272rem);
   --type-h3: clamp(1.272rem, 1.1rem + 0.7vw, 1.618rem);
   --type-h2: clamp(1.618rem, 1.3rem + 1.4vw, 2.058rem);
-  --type-h1: clamp(2.058rem, 1.5rem + 3.2vw, 3.33rem);
+  /* Spodnji konec je bil 36 px na telefonu — naslov čez tri vrstice, preden
+     se pove karkoli. Zgornji konec in širina, pri kateri ga doseže, ostaneta
+     enaka; spremenjen je samo naklon. */
+  --type-h1: clamp(1.8rem, 1.1rem + 3.6vw, 3.33rem);
 
   --leading-body: 1.618;
   --leading-lead: 1.5;
@@ -570,7 +577,11 @@
      -------------------------------------------------------------------- */
   .type-display {
     font-family: var(--font-naslov);
-    font-size: clamp(2.6rem, 1.2rem + 6.4vw, 6.2rem);
+    /* Na 375 px je ta vrstica dajala 43 px, kar je dve besedi na vrstico in
+       naslov čez pol zaslona. Vrh (6,2rem) in širina, pri kateri ga doseže
+       (~1250 px), sta nespremenjena — spremenjen je naklon, da telefon dobi
+       34 px. */
+    font-size: clamp(2.125rem, 0.4rem + 7.4vw, 6.2rem);
     line-height: 0.98;
     font-weight: 500;
     letter-spacing: -0.03em;
