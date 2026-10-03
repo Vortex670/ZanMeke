@@ -257,7 +257,13 @@ export function DvofaktorForm({ stanje }: { stanje: Stanje }) {
                   disabled={izklapljam}
                   leftIcon={<ShieldOff className="h-4 w-4" aria-hidden />}
                 >
-                  {izklapljam ? "Izklapljam …" : "Izklopi dvofaktorsko prijavo"}
+                  {/* »Izklopi« in ne »Izklopi dvofaktorsko prijavo«: naslov
+                      škatle to že pove, dolg napis pa je gumb razširil na
+                      dvakratno širino sosednjega. Enako visoka gumba, od
+                      katerih je eden dvakrat širši in poln, se bereta kot
+                      različno velika — in oko ima prav, čeprav merilo pravi
+                      drugače. */}
+                  {izklapljam ? "Izklapljam …" : "Izklopi"}
                 </Button>
               </div>
             </form>
