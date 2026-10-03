@@ -49,10 +49,14 @@ export function GesloForm() {
       title="Geslo"
       description="Ob zamenjavi se odjavijo vse druge naprave; ta ostane prijavljena."
     >
-      {/* NOVO IN PONOVI STA V ISTI VRSTICI, trenutno geslo nad njima. Trije
+      {/* POLJA ZAPOLNIJO ŠIRINO KARTICE. Prej so stala pri 60 % in desno je
+          ostal prazen pas, ki je kartico razdelil na del z vsebino in del
+          brez — oko to bere kot nedokončano postavitev.
+
+          NOVO IN PONOVI STA V ISTI VRSTICI, trenutno geslo nad njima. Trije
           enaki stolpci pod sabo so trije enaki kvadratki, med katerimi se
           ne vidi, kateri je kateri — razporeditev je tu del pomena. */}
-      <form ref={obrazec} action={oddaj} className="grid max-w-2xl gap-(--s2)" noValidate>
+      <form ref={obrazec} action={oddaj} className="grid gap-(--s2)" noValidate>
         <FieldGroup
           label="Trenutno geslo"
           required
@@ -63,7 +67,6 @@ export function GesloForm() {
             name="trenutno"
             type="password"
             autoComplete="current-password"
-            className="sm:max-w-xs"
             required
           />
         </FieldGroup>

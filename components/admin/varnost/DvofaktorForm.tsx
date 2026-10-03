@@ -10,6 +10,7 @@ import { FieldGroup } from "@/components/admin/kit/FieldGroup";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { cn } from "@/lib/utils";
 import type { ActionResult } from "@/lib/actions/helpers";
 import {
   izklopiTotpAction,
@@ -154,7 +155,7 @@ export function DvofaktorForm({ stanje }: { stanje: Stanje }) {
               </code>
             </div>
 
-            <form action={potrdi} className="grid max-w-xs gap-(--s1)" noValidate>
+            <form action={potrdi} className="grid max-w-sm gap-(--s1)" noValidate>
               <FieldGroup
                 label="2. Vpiši kodo iz generatorja"
                 required
@@ -203,7 +204,11 @@ export function DvofaktorForm({ stanje }: { stanje: Stanje }) {
               </>
             }
           >
-            <form action={izdajKode} className="grid gap-(--s1)" noValidate>
+            <form
+              action={izdajKode}
+              className="flex flex-1 flex-col gap-(--s1)"
+              noValidate
+            >
               <FieldGroup
                 label="Geslo"
                 required
@@ -217,7 +222,7 @@ export function DvofaktorForm({ stanje }: { stanje: Stanje }) {
                   required
                 />
               </FieldGroup>
-              <div>
+              <div className="mt-auto pt-(--s1)">
                 <Button type="submit" variant="secondary" disabled={izdajam}>
                   {izdajam ? "Izdajam …" : "Izdaj nove kode"}
                 </Button>
@@ -230,7 +235,7 @@ export function DvofaktorForm({ stanje }: { stanje: Stanje }) {
             naslov="Izklop"
             opis="Za prijavo bo spet dovolj samo geslo. Rezervne kode se zavržejo."
           >
-            <form action={izklopi} className="grid gap-(--s1)" noValidate>
+            <form action={izklopi} className="flex flex-1 flex-col gap-(--s1)" noValidate>
               <FieldGroup
                 label="Geslo"
                 required
@@ -245,7 +250,7 @@ export function DvofaktorForm({ stanje }: { stanje: Stanje }) {
                   required
                 />
               </FieldGroup>
-              <div>
+              <div className="mt-auto pt-(--s1)">
                 <Button
                   type="submit"
                   variant="danger"
@@ -282,11 +287,14 @@ function Skatla({
 }) {
   return (
     <div
-      className={
-        nevarna
-          ? "border-danger/50 bg-danger-bg/30 rounded-xl border p-(--s2)"
-          : "border-border/60 bg-surface-2/40 rounded-xl border p-(--s2)"
-      }
+      className={cn(
+        // `h-full` in stolpec: škatli v isti vrstici sta enako visoki, gumba
+        // pa se usedeta na dno. Brez tega levega potisne namig pod poljem
+        // niže od desnega in dva gumba v isti vrstici stojita vsak drugje —
+        // kar oko opazi prej kot karkoli drugega na strani.
+        "flex h-full flex-col rounded-xl border p-(--s2)",
+        nevarna ? "border-danger/50 bg-danger-bg/30" : "border-border/60 bg-surface-2/40",
+      )}
     >
       <h3 className="type-small text-text font-semibold">{naslov}</h3>
       <p className="type-small text-muted mt-0.5 mb-(--s2)">{opis}</p>

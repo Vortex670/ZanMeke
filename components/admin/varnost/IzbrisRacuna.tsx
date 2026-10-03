@@ -61,29 +61,37 @@ export function IzbrisRacuna({ epota }: { epota: string }) {
         </div>
       </header>
 
-      <form action={oddaj} className="mt-(--s3) grid max-w-md gap-(--s2)" noValidate>
-        <FieldGroup label="Geslo" required error={napake.geslo}>
-          <Input name="geslo" type="password" autoComplete="current-password" required />
-        </FieldGroup>
+      <form action={oddaj} className="mt-(--s3) grid gap-(--s2)" noValidate>
+        {/* Obe polji sta potrditev istega dejanja, zato stojita skupaj. */}
+        <div className="grid gap-(--s2) sm:grid-cols-2">
+          <FieldGroup label="Geslo" required error={napake.geslo}>
+            <Input
+              name="geslo"
+              type="password"
+              autoComplete="current-password"
+              required
+            />
+          </FieldGroup>
 
-        <FieldGroup
-          label="Prepiši svoj e-naslov"
-          required
-          hint={
-            <>
-              Natanko <span className="text-text">{epota}</span>
-            </>
-          }
-          error={napake.potrdilo}
-        >
-          <Input
-            name="potrdilo"
-            autoComplete="off"
-            placeholder={epota}
-            inputMode="email"
+          <FieldGroup
+            label="Prepiši svoj e-naslov"
             required
-          />
-        </FieldGroup>
+            hint={
+              <>
+                Natanko <span className="text-text">{epota}</span>
+              </>
+            }
+            error={napake.potrdilo}
+          >
+            <Input
+              name="potrdilo"
+              autoComplete="off"
+              placeholder={epota}
+              inputMode="email"
+              required
+            />
+          </FieldGroup>
+        </div>
 
         <div>
           <Button
