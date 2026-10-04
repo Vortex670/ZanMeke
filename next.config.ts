@@ -89,6 +89,31 @@ const nextConfig: NextConfig = {
         source: "/(admin|prijava|racun)/:path*",
         headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
+      // Zasebne strani pod /h/… (3D model hiše): zaščitene z geslom v proxy.ts,
+      // nikoli v indeksu. Stran nalaga three.js z jsDelivr in pisave z Google
+      // Fonts, zato ima tu svojo, ožje omejeno politiko — velja samo za /h/.
+      {
+        source: "/h/:path*",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+          { key: "Referrer-Policy", value: "no-referrer" },
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' data: https://fonts.gstatic.com",
+              "img-src 'self' data: blob:",
+              "connect-src 'self'",
+              "frame-ancestors 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "object-src 'none'",
+            ].join("; "),
+          },
+        ],
+      },
     ];
   },
 };
