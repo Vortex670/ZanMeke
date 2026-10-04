@@ -161,7 +161,7 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
       <div><b id="stLan">–</b><span>mrežnih priključkov</span></div>
       <div><b>17</b><span>mest stikal</span></div>
     </div>
-    <p class="small" style="margin-top:14px;color:var(--faint)">različica 126 – nakupovalni seznam: kaj, kje, kdaj</p>
+    <p class="small" style="margin-top:14px;color:var(--faint)">različica 127 – manj vtičnic, sosednje združene v dvojne</p>
   </header>
 
   <section class="viewer" id="model" aria-label="3D pogled">
@@ -848,14 +848,14 @@ const H=2.6;
 const rooms=[
  {c:"S2-1",n:"Vhod s stopniščem (pritličje)",a:"10,59",s:1,w:"ob vhodu – sesalnik / polnilec; garderoba in shramba pod stopnicami"},
  {c:"S2-2",n:"Stopnišče",a:"11,43",s:1,w:"na podestu, za čiščenje"},
- {c:"S2-3",n:"Predprostor + delovno mesto",a:"7,41",s:8,w:"ob garderobi + ob vhodu v dnevni"},
+ {c:"S2-3",n:"Predprostor + delovno mesto",a:"7,41",s:6,w:"1 ob garderobi, 2 dvojni za delovnim mestom (nad mizo in pod njo), 1 za tiskalnik"},
  {c:"S2-4",n:"WC",a:"2,35",s:1,w:"ob umivalniku (fen, britvica)"},
  {c:"S2-5",n:"Shramba",a:"2,56",s:2,w:"zamrzovalnik, polnilnik sesalnika"},
- {c:"S2-6",n:"Utility",a:"7,19",s:6,w:"pralni + sušilni stroj, 2 za likanje, 2 za omarico pametne hiše"},
- {c:"S2-7",n:"Otroška soba 1",a:"11,55",s:11,w:"6 ob mizi pod oknom (pod parapetom: računalnik, 2 monitorja, tiskalnik, luč, polnilec), 4 ob postelji (USB-C), 1 ob omari"},
- {c:"S2-8",n:"Otroška soba 2",a:"8,34",s:11,w:"6 ob mizi pod oknom (pod parapetom), 3 ob postelji (USB-C, bralna luč), 2 splošni"},
+ {c:"S2-6",n:"Utility",a:"7,19",s:5,w:"pralni in sušilni stroj (za strojema), 1 za likanje ob vratih, dvojna v omrežni omarici"},
+ {c:"S2-7",n:"Otroška soba 1",a:"11,55",s:8,w:"dvojna nad pisalno mizo (monitorja, luč), 1 za tiskalnik, 1 pod mizo (PC), dvojna nad nočno omarico (polnilci, USB-C), 1 splošna"},
+ {c:"S2-8",n:"Otroška soba 2",a:"8,34",s:7,w:"dvojna nad pisalno mizo, 1 za tiskalnik, 1 pod mizo (PC), dvojna nad nočno omarico, 1 splošna"},
  {c:"S2-9",n:"Kopalnica",a:"7,43",s:2,w:"dvojna ob umivalniku (fen, zobna ščetka); LED ogledalo je fiksni priključek"},
- {c:"S2-10",n:"Spalnica",a:"14,22",s:11,w:"3+3 ob nočnih omaricah (telefon, ura, budilka – USB-C), 2 ob komodi, 2 za TV in T-2 box, 1 čiščenje"},
+ {c:"S2-10",n:"Spalnica",a:"14,22",s:6,w:"dvojna nad vsako nočno omarico (telefon, ura, budilka – USB-C), 1 za komodo / TV, 1 za čiščenje"},
  {c:"S2-11",n:"Hodnik",a:"5,72",s:1,w:"za sesalnik"},
  {c:"S2-12",n:"Bivalni prostor – kuhinja",a:"",s:11,w:"robotski sesalnik (postaja v visokem elementu), dvoconska vinska vitrina v otoku (npr. Klarstein Vinovilla 60 cm), 4 nad pultom (mešalnik ob koritu, toaster, kavni aparat, kuhalnik vode – vse za aparati), 3 v bokih otoka (ročni mešalnik ob plošči, 2 za šank – polnjenje), airfryer prek uvodnice v pultu, ameriški hladilnik, mikrovalovna, kavni aparat, BORA Dish v otoku, LED pod elementi"},
  {c:"S2-12",n:"Morski akvarij (tehnika v shrambi S2-5)",a:"",s:2,w:"dvojna vtičnica v omarici pod akvarijem, lasten tokokrog s FID: 1 za krmilnik z letvijo 8 krmiljenih vtičnic (povratna črpalka, posnemalnik, 2 grelca, 2 tokovni črpalki, LED z UV, dolivanje), 1 rezervna (dozirna črpalka / hladilnik vode poleti)"},
@@ -1763,11 +1763,11 @@ function setKitchen(id){const v=kitchenVariants[id];
 // Vtičnice [x,z(px), višina m, fiksni?]
 const sockets=[
  [672.5,660,.3],[672.5,668,.3],[788,742.5,.3],[740,857,1.1],[901,780,.3],[899.5,850,1.1],
- [700,981.5,.5],[735,981.5,.5],[800,866,1.1],[895,865.5,1.1],[900,915,1.6,1],[676,895,1.8,1],
- [890,408,.85],[900,408,.85],[867,522,.3],[961,655,.3],[1038,455,.3],[1038,445,.3],
- [1060,408.5,.3],[1090,584,.3],[1060,408,.85],[1070,408,.85],[1178,555,.3],
+ [700,981.5,.5],[735,981.5,.5],[800,866,1.1],[900,915,1.6,1],[676,895,1.8,1],
+ [890,408,.85],[900,408,.85],[867,522,.3],[1038,450,.3],
+ [1060,408,.85],[1070,408,.85],[1178,555,.3],
  [1196,407.5,1.1],[1204,407.5,1.1],[1379.5,528,.4,1],
- [1416,408.5,.3],[1424,408.5,.3],[1562,408.5,.3],[1568,408.5,.3],[1396,500,.3],[1396,520,.3],[1600.5,485,.3],
+ [1418,408.5,.68],[1574,408.5,.68],[1396,510,.3],[1600.5,485,.3],
  [1200,596,.3],
  [1290,667,1.1],[1329,667,1.1],[1358,667,1.1],
  [1169,790,.75],[1300,790,.3,1],[1248,782,.6,1],[1150,669,.3],[1194,669,.9,1],[1194,669,1.45],
@@ -1775,20 +1775,25 @@ const sockets=[
  [916.5,880,.3],[916.5,895,.3],[916.5,910,.3],[916.5,925,.3],[1096,893,.02,1],[1383,715,.3],[1383,940,.3],
  [1220,667,1.1],[1326,790,.75],[1326,805,.75],[1300,667,1.45,1],
  [916.5,910,1.2],[916.5,925,1.2],[1052,670,.2,1],
- [975,408,.85],[985,408,.85],[930,408,.3],[951,655.5,.7],[961,655.5,.7],
- [1150,408,.85],[1160,408,.85],[1110,408,.3],[1112,584,.7],[1120,584,.7],[1104,584,.3],
- [1428,408.5,.7],[1574,408.5,.7],
+ [975,408,.85],[930,408,.3],[951,655.5,.7],[961,655.5,.7],
+ [1150,408,.85],[1110,408,.3],[1112,584,.7],[1120,584,.7],
+ [1426,408.5,.68],[1582,408.5,.68],
  [899.5,796,.55],[899.5,804,.55],
  [1194,669,.2],[1154,983.5,.3],[1162,983.5,.3],
  [916.5,966,.3],[916.5,960,1.45,1],
- [735,742.5,.85],[745,742.5,.85],[780,742.5,.85],[790,742.5,.85],[740,742.5,.3],[750,742.5,.3],
- [855,983,1.25],[865,983,1.25],[875,983,1.25],[885,983,1.25],
+ [735,742.5,.85],[745,742.5,.85],[740,742.5,.3],[750,742.5,.3],
+ 
  [1500,669,1.1],[1397,950,.4],[1590,669.5,1.05],[690,613,-2.6],[858,982,1.1],[866,982,1.1],
 ];
 // talne doze: v estrihu, pokrov z vstavkom za ploščico – na tleh se vidi le tanek kovinski okvir 12 × 12 cm v ravnini ploščic
 {const fr=M(0xa9a39a,{metalness:.6,roughness:.35});sockets.filter(q=>q[2]>=0&&q[2]<=.05).forEach(q=>{cyl(q[0],q[1],.035,.004,.001,fr,undefined,24);cyl(q[0],q[1],.012,.005,.001,mt.black,undefined,12);});}   // fiksni izvod iz tal: uvodnica Ø 7 cm v ravnini ploščic, kabel gre skrito v sedežno
 const sg=new THREE.BoxGeometry(.09,.09,.09); mat.lan=M(0x2fa36b,{emissive:0x0f4a2a,emissiveIntensity:.4});
-sockets.forEach(s=>{const me=new THREE.Mesh(sg,s[3]?mat.fix:mat.sock);me.position.set(mx(s[0]),s[2],mz(s[1]));me.userData.label=(s[2]<=.05?'Fiksni izvod iz tal (pod sedežno)':s[3]?'Fiksni priključek 230 V':'Vtičnica 230 V')+' · višina '+(Math.round(s[2]*100))+' cm';groups.sock.add(me);});
+{const used=new Set();sockets.forEach((q,i)=>{if(used.has(i))return;const cl=[q];used.add(i);
+  sockets.forEach((o,j)=>{if(used.has(j)||!!o[3]!==!!q[3]||Math.abs(o[2]-q[2])>.06)return;if(cl.some(c=>Math.hypot(c[0]-o[0],c[1]-o[1])<11)){cl.push(o);used.add(j);}});
+  const n=cl.length,cx=cl.reduce((a,c)=>a+c[0],0)/n,cz=cl.reduce((a,c)=>a+c[1],0)/n,alongX=n>1&&Math.abs(cl[0][0]-cl[n-1][0])>=Math.abs(cl[0][1]-cl[n-1][1]);
+  const me=new THREE.Mesh(sg,q[3]?mat.fix:mat.sock);me.position.set(mx(cx),q[2],mz(cz));if(n>1)me.userData.baseScale=alongX?[1+.85*(n-1),1,1]:[1,1,1+.85*(n-1)];
+  if(me.userData.baseScale)me.scale.set(...me.userData.baseScale);
+  me.userData.label=(q[2]<=.05?'Fiksni izvod iz tal (pod sedežno)':q[3]?'Fiksni priključek 230 V':(n===1?'Vtičnica 230 V':n===2?'Dvojna vtičnica 230 V':n+'-kratna vtičnica 230 V'))+' · višina '+Math.round(q[2]*100)+' cm';groups.sock.add(me);});}
 
 // Pametna hiša: LAN [x,z,h], dostopne točke na stropu, senzorji, omarica, kasete senčil
 // UTP (RJ45) priključki: [x, z, višina, za kaj] – vsi v steni za napravo
@@ -1847,7 +1852,7 @@ function go(k){const v=views[k];anim={from:cam.position.clone(),to:new THREE.Vec
  if(room&&wallH<H){wallH=H;buildWalls();setLayer('tLow',new THREE.Group(),false);}
  roomLights.visible=room&&!window.__night; window.__house=!!v.house; if(!window.__night){ if(v.house)scene.background=new THREE.Color(0xc9d8e4); else themeBg(); } window.__room=room; coveG.visible=room||!!window.__night; ceil.visible=wallH>=H; setRoof(!!v.house); if(v.house){setLayer('tSock',groups.sock,false);setLayer('tSmart',groups.smart,false);setLayer('tLab',groups.lab,false);}}
 {const _go=go;go=function(k){_go(k);const sk=!!views[k].sock;   // pogled »Vtičnice«: nizke stene, povečane oznake vtičnic, priključkov in stikal
- groups.sock.children.forEach(c=>{c.scale.setScalar(sk?2.6:1);c.renderOrder=sk?20:0;}); lanG.children.forEach(c=>{c.scale.setScalar(sk?2.6:1);c.renderOrder=sk?20:0;}); lanG.visible=sk||groups.smart.visible;
+ groups.sock.children.forEach(c=>{const b=c.userData.baseScale||[1,1,1],k=sk?1.6:1;c.scale.set(b[0]*k,b[1]*k,b[2]*k);c.renderOrder=sk?20:0;}); lanG.children.forEach(c=>{c.scale.setScalar(sk?1.6:1);c.renderOrder=sk?20:0;}); lanG.visible=sk||groups.smart.visible;
  [mat.sock,mat.fix,mat.lan,window.__swMk].forEach(m_=>{if(!m_)return;m_.depthTest=!sk;m_.transparent=sk;m_.opacity=1;m_.emissiveIntensity=sk?.9:.4;m_.needsUpdate=true;});   // oznake vidne tudi skozi pohištvo
  if(sk){setLayer('tSock',groups.sock,true);setLayer('tSmart',groups.smart,false);setLayer('tLab',groups.lab,true);wallH=1.3;buildWalls();ceil.visible=false;document.getElementById('tLow').setAttribute('aria-pressed','true');hint.textContent='Pogled Vtičnice: oranžno = vtičnica 230 V · modro = fiksni priključek 230 V (aparat, luč, 400 V za BORA) · zeleno = UTP (RJ45) · rumeno = stikalo · miška nad oznako = kaj je in na kateri višini · vse je v steni ali za pohištvom, brez podaljškov';}
  else if(wallH===1.3){wallH=H;buildWalls();ceil.visible=true;document.getElementById('tLow').setAttribute('aria-pressed','false');hint.textContent=hint.dataset.t||hint.textContent;}};}
@@ -2097,7 +2102,7 @@ document.getElementById('tXmas').addEventListener('click',()=>{xmas.visible=!xma
  LBL="ob postelji v otroških sobah: luč + žaluzija (iz postelje)";sw(957,654,'z',-1,1.0,2,null,[0,[0]]); sw(1052.5,565,'x',1,.8,2,null,[0,[1]]);   // ob postelji v otroških sobah: luč + žaluzija (iz postelje)
  LBL="kopalnica (zunaj v hodniku): luč, ogledalo + niša, senčilo okna";sw(1264,597,'z',1,1.05,3,null,[0,0,[2]]);                         // kopalnica (zunaj v hodniku): luč, ogledalo + niša, senčilo okna
  LBL="spalnica: strop, ogledalo/komoda, senčila (pod termostatom)";sw(1395,578,'x',1,1.05,3,null,[0,0,[5]]);                         // spalnica: strop, ogledalo/komoda, senčila (pod termostatom)
- LBL="ob postelji: bralna luč, »vse ugasni«, senčila spalnice";sw(1423,408,'z',1,.75,3,null,[0,0,[5]]); sw(1578,408,'z',1,.75,3,null,[0,0,[5]]);  // ob postelji: bralna luč, »vse ugasni«, senčila spalnice
+ LBL="ob postelji: bralna luč, »vse ugasni«, senčila spalnice";sw(1423,408,'z',1,.95,3,null,[0,0,[5]]); sw(1578,408,'z',1,.95,3,null,[0,0,[5]]);  // ob postelji: bralna luč, »vse ugasni«, senčila spalnice
  LBL="hodnik: na obeh koncih";sw(1180,654,'z',-1,1.05,2); sw(1372,654,'z',-1,1.05,1);   // hodnik: na obeh koncih
  LBL="dnevni ob terasnih vratih: terasa luči, senčilo terasnih vrat, zunanja vtičnica";sw(1383,921,'x',-1,1.05,3,null,[0,[6],0]);                        // dnevni ob terasnih vratih: terasa luči, senčilo terasnih vrat, zunanja vtičnica
  LBL="dnevni na zidu med oknoma O6: senčili levega in desnega okna O6";sw(1158,983,'z',-1,1.05,2,null,[[3],[4]]);                        // dnevni na zidu med oknoma O6: senčili levega in desnega okna O6
