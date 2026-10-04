@@ -161,7 +161,7 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
       <div><b id="stLan">–</b><span>mrežnih priključkov</span></div>
       <div><b>17</b><span>mest stikal</span></div>
     </div>
-    <p class="small" style="margin-top:14px;color:var(--faint)">različica 124 – manj vtičnic: dnevni, kuhinja, akvarij</p>
+    <p class="small" style="margin-top:14px;color:var(--faint)">različica 125 – vtičnice, priključki, UTP in stikala v svojih barvah</p>
   </header>
 
   <section class="viewer" id="model" aria-label="3D pogled">
@@ -230,7 +230,9 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
     <div class="legend">
       <span><span class="dot" style="background:var(--brick)"></span>vtičnica (230 V)</span>
       <span><span class="dot" style="background:var(--fixed)"></span>fiksni priključek</span>
-      <span><span class="dot" style="background:var(--smart)"></span>LAN / senzor / senčilo</span>
+      <span><span class="dot" style="background:#2fa36b"></span>UTP (RJ45)</span>
+      <span><span class="dot" style="background:#ffc928"></span>stikalo</span>
+      <span><span class="dot" style="background:var(--smart)"></span>senzor / senčilo</span>
       <span><span class="dot" style="background:#cdbba3"></span>ploščice 120 × 60</span>
       <span><span class="dot" style="background:#a9a59c"></span>zunanja keramika</span>
     </div>
@@ -1750,12 +1752,17 @@ const sockets=[
 ];
 // talne doze: v estrihu, pokrov z vstavkom za ploščico – na tleh se vidi le tanek kovinski okvir 12 × 12 cm v ravnini ploščic
 {const fr=M(0xa9a39a,{metalness:.6,roughness:.35});sockets.filter(q=>q[2]>=0&&q[2]<=.05).forEach(q=>{cyl(q[0],q[1],.035,.004,.001,fr,undefined,24);cyl(q[0],q[1],.012,.005,.001,mt.black,undefined,12);});}   // fiksni izvod iz tal: uvodnica Ø 7 cm v ravnini ploščic, kabel gre skrito v sedežno
-const sg=new THREE.BoxGeometry(.09,.09,.09);
+const sg=new THREE.BoxGeometry(.09,.09,.09); mat.lan=M(0x2fa36b,{emissive:0x0f4a2a,emissiveIntensity:.4});
 sockets.forEach(s=>{const me=new THREE.Mesh(sg,s[3]?mat.fix:mat.sock);me.position.set(mx(s[0]),s[2],mz(s[1]));me.userData.label=(s[2]<=.05?'Fiksni izvod iz tal (pod sedežno)':s[3]?'Fiksni priključek 230 V':'Vtičnica 230 V')+' · višina '+(Math.round(s[2]*100))+' cm';groups.sock.add(me);});
 
 // Pametna hiša: LAN [x,z,h], dostopne točke na stropu, senzorji, omarica, kasete senčil
-[[950,408,.3],[958,408,.3],[1120,408,.3],[1128,408,.3],[1396,530,.3],[1396,540,.3],[916.5,870,.3],[916.5,935,.3],[1215,669.5,.3],[880,975,1.3],[870,975,1.3]]
- .forEach(s=>{const me=new THREE.Mesh(sg,mat.smart);me.position.set(mx(s[0]),s[2],mz(s[1]));me.userData.label='Mrežni priključek UTP (RJ45, Cat6A)';groups.smart.add(me);});
+// UTP (RJ45) priključki: [x, z, višina, za kaj] – vsi v steni za napravo
+const lanG=new THREE.Group();scene.add(lanG);window.__lanG=lanG;
+[[765,744,.3,'PC na delovnem mestu'],[773,744,.3,'tiskalnik'],[781,744,.3,'rezerva'],[899.5,808,.55,'krmilnik akvarija'],[874,915,1.2,'TČ'],[700,889,1.95,'rekuperacija'],
+ [950,408,.3,'PC'],[958,408,.3,'tiskalnik'],[966,408,.3,'rezerva'],[1120,408,.3,'PC'],[1128,408,.3,'tiskalnik'],[1136,408,.3,'rezerva'],
+ [1396,530,.3,'TV + T-2 box v spalnici'],[1396,540,.3,'rezerva'],[1207,654,1.45,'glavna stenska enota'],
+ [916.5,868,1.2,'TV'],[916.5,887,.3,'Xbox'],[916.5,902,.3,'T-2 box (IPTV)'],[916.5,917,.3,'soundbar'],[1215,669.5,.3,'kuhinja'],[1150,669,.5,'rezerva za hladilnikom'],[1600,981.5,2.2,'kamera na terasi']]
+ .forEach(s=>{const me=new THREE.Mesh(sg,mat.lan);me.position.set(mx(s[0]),s[2],mz(s[1]));me.userData.label='UTP (RJ45, Cat6A) – '+s[3]+' · višina '+Math.round(s[2]*100)+' cm';lanG.add(me);});
 [[1215,625],[1150,840]].forEach(a=>{const me=new THREE.Mesh(new THREE.CylinderGeometry(.11,.11,.04,24),mat.smart);me.position.set(mx(a[0]),H-.03,mz(a[1]));me.userData.label='Dostopna točka Wi-Fi na stropu (PoE)';groups.smart.add(me);});
 [[765,560],[775,705],[950,560],[1110,520],[1300,470],[1500,540],[1050,800]].forEach(a=>{const me=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,.02,24),mat.smart);me.position.set(mx(a[0]),H-.012,mz(a[1]));me.userData.label='Senzor na stropu (gibanje / CO₂ / vlaga / dim)';groups.smart.add(me);});
 LBL="Pametna hiša: LAN [x,z,h], dostopne točke na stropu, senzorji, omarica, kasete senčil";box(850,960,892,975,1.0,1.6,mat.smart,groups.smart);
@@ -1805,9 +1812,9 @@ function go(k){const v=views[k];anim={from:cam.position.clone(),to:new THREE.Vec
  if(room&&wallH<H){wallH=H;buildWalls();setLayer('tLow',new THREE.Group(),false);}
  roomLights.visible=room&&!window.__night; window.__house=!!v.house; if(!window.__night){ if(v.house)scene.background=new THREE.Color(0xc9d8e4); else themeBg(); } window.__room=room; coveG.visible=room||!!window.__night; ceil.visible=wallH>=H; setRoof(!!v.house); if(v.house){setLayer('tSock',groups.sock,false);setLayer('tSmart',groups.smart,false);setLayer('tLab',groups.lab,false);}}
 {const _go=go;go=function(k){_go(k);const sk=!!views[k].sock;   // pogled »Vtičnice«: nizke stene, povečane oznake vtičnic, priključkov in stikal
- groups.sock.children.forEach(c=>{c.scale.setScalar(sk?2.6:1);c.renderOrder=sk?20:0;});
- [mat.sock,mat.fix,window.__swMk].forEach(m_=>{if(!m_)return;m_.depthTest=!sk;m_.transparent=sk;m_.opacity=1;m_.emissiveIntensity=sk?.9:.4;m_.needsUpdate=true;});   // oznake vidne tudi skozi pohištvo
- if(sk){setLayer('tSock',groups.sock,true);setLayer('tSmart',groups.smart,false);setLayer('tLab',groups.lab,true);wallH=1.3;buildWalls();ceil.visible=false;document.getElementById('tLow').setAttribute('aria-pressed','true');hint.textContent='Pogled Vtičnice: oranžno = vtičnica 230 V · modro = fiksni priključek (aparat, luč) · rumeno = stikalo · miška nad oznako = kaj je in na kateri višini · vse je v steni ali za pohištvom, brez podaljškov';}
+ groups.sock.children.forEach(c=>{c.scale.setScalar(sk?2.6:1);c.renderOrder=sk?20:0;}); lanG.children.forEach(c=>{c.scale.setScalar(sk?2.6:1);c.renderOrder=sk?20:0;}); lanG.visible=sk||groups.smart.visible;
+ [mat.sock,mat.fix,mat.lan,window.__swMk].forEach(m_=>{if(!m_)return;m_.depthTest=!sk;m_.transparent=sk;m_.opacity=1;m_.emissiveIntensity=sk?.9:.4;m_.needsUpdate=true;});   // oznake vidne tudi skozi pohištvo
+ if(sk){setLayer('tSock',groups.sock,true);setLayer('tSmart',groups.smart,false);setLayer('tLab',groups.lab,true);wallH=1.3;buildWalls();ceil.visible=false;document.getElementById('tLow').setAttribute('aria-pressed','true');hint.textContent='Pogled Vtičnice: oranžno = vtičnica 230 V · modro = fiksni priključek 230 V (aparat, luč, 400 V za BORA) · zeleno = UTP (RJ45) · rumeno = stikalo · miška nad oznako = kaj je in na kateri višini · vse je v steni ali za pohištvom, brez podaljškov';}
  else if(wallH===1.3){wallH=H;buildWalls();ceil.visible=true;document.getElementById('tLow').setAttribute('aria-pressed','false');hint.textContent=hint.dataset.t||hint.textContent;}};}
 function setRoof(on){if(roofOn===on)return;roofOn=on;RF.visible=on;if(on){wallH=H;document.getElementById('tLow').setAttribute('aria-pressed','false');ceil.visible=true;}buildWalls();document.getElementById('tRoof').setAttribute('aria-pressed',String(on));}
 ceil.visible=true;
@@ -1821,7 +1828,7 @@ vb.forEach(id=>document.getElementById(id).addEventListener('click',()=>{
 function tog(id,fn){const b=document.getElementById(id);b.addEventListener('click',()=>{const on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',String(on));fn(on);});}
 tog('tSock',on=>groups.sock.visible=on);
 tog('tFurn',on=>groups.furn.visible=on);
-tog('tSmart',on=>groups.smart.visible=on);
+tog('tSmart',on=>{groups.smart.visible=on;lanG.visible=on;});
 tog('tDuct',on=>{if(window.__ductG)window.__ductG.visible=on;});
 tog('tLab',on=>groups.lab.visible=on);
 document.getElementById('tRoof').addEventListener('click',()=>setRoof(!roofOn));
