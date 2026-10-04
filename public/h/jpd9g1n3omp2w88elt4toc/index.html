@@ -128,6 +128,8 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
 .planwrap.max .ptools button.t{background:var(--ink);color:var(--paper);border-color:var(--ink);font-size:16px;padding:6px 14px}
 .plegend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:14px;color:var(--muted)}
 .plegend svg{vertical-align:middle;margin-right:6px}
+#planSvg.numbered .tx{display:none}
+@media print{#planList{break-before:auto}}
 @media print{.topnav,.hero,.viewer,section.grid,.foot,#planTabs,.phead .actions{display:none!important}.plans{border:none;padding:0}.planwrap{border:none}body{background:#fff}.plegend{color:#000}}
 
 .bar.tabs{padding:0 12px;gap:0 22px;align-items:stretch;border-bottom:1px solid var(--line)}
@@ -161,7 +163,7 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
       <div><b id="stLan">–</b><span>mrežnih priključkov</span></div>
       <div><b>17</b><span>mest stikal</span></div>
     </div>
-    <p class="small" style="margin-top:14px;color:var(--faint)">različica 127 – manj vtičnic, sosednje združene v dvojne</p>
+    <p class="small" style="margin-top:14px;color:var(--faint)">različica 128 – načrti po strokah z oštevilčenimi seznami, voda in odtoki v 3D</p>
   </header>
 
   <section class="viewer" id="model" aria-label="3D pogled">
@@ -199,6 +201,8 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
       <button class="t" id="tLow" aria-pressed="false">Nizke stene</button>
       <button class="t" id="tSmart" aria-pressed="true">Pametna hiša</button>
       <button class="t" id="tDuct" aria-pressed="true">Kanali rekuperacije</button>
+      <button class="t" id="tWater" aria-pressed="false">Voda in odtoki</button>
+      <button class="t" id="tLan" aria-pressed="true">UTP</button>
       <button class="t" id="tLab" aria-pressed="true">Oznake</button>
     </div>
     <div class="stage" id="stage">
@@ -243,21 +247,22 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
       <div>
         <p class="eyebrow">Za projektanta in izvajalce</p>
         <h2 id="s-plans">Načrti inštalacij</h2>
-        <p class="small" style="max-width:70ch">Vse, kar sva dodala v model, narisano na originalnem tlorisu mansarde (list 3). Izberi sloje, ki jih želiš videti. Klik na načrt ga poveča čez cel zaslon (+/−, vlečenje), z gumbom »Prenesi PNG« pa ga shraniš v visoki ločljivosti za projektanta. Položaji so predlog za PZI, točne mere določi projektant.</p>
+        <p class="small" style="max-width:70ch">Vse, kar sva dodala v model, narisano na originalnem tlorisu mansarde (list 3). Izberi stroko (električar, vodovodar, strojnik …): točke se oštevilčijo, pod načrtom pa je seznam s prostorom, opisom in višino od tal – to je delovni seznam za izvajalca. Klik na načrt ga poveča čez cel zaslon (+/−, vlečenje), z gumbom »Prenesi PNG« pa ga shraniš v visoki ločljivosti za projektanta. Položaji so predlog za PZI, točne mere določi projektant.</p>
       </div>
       <div class="actions" style="margin:0"><button class="btn" type="button" id="planZoom">⤢ Povečaj načrt</button><button class="btn ghost" type="button" id="planPng" hidden>Prenesi PNG</button></div>
     </div>
     <div class="bar chips" id="planTabs">
       <span class="lbl">Sloji</span>
-      <button class="t" data-l="el" aria-pressed="true">Vtičnice in priključki</button>
-      <button class="t" data-l="lu" aria-pressed="false">Luči in stikala</button>
+      <button class="t" data-l="el" aria-pressed="true">Električar – vtičnice in priključki</button>
+      <button class="t" data-l="lu" aria-pressed="false">Električar – luči in stikala</button>
       <button class="t" data-l="net" aria-pressed="false">Omrežje in pametna hiša</button>
-      <button class="t" data-l="hv" aria-pressed="false">Ogrevanje, rekuperacija, klima</button>
-      <button class="t" data-l="wa" aria-pressed="false">Voda in odtoki</button>
-      <button class="t" data-l="all" aria-pressed="false">Vse</button>
+      <button class="t" data-l="hv" aria-pressed="false">Strojnik – ogrevanje, rekuperacija, klima</button>
+      <button class="t" data-l="wa" aria-pressed="false">Vodovodar – voda in odtoki</button>
+      <button class="t" data-l="all" aria-pressed="false">Vse (pregled)</button>
     </div>
     <div class="planwrap" id="planWrap"><div class="ptools"><button class="t" id="pzOut" type="button" aria-label="Pomanjšaj">−</button><button class="t" id="pzIn" type="button" aria-label="Povečaj">+</button><button class="t" id="pzClose" type="button">✕ Zapri</button></div><div class="pin" id="planPin"><img id="planBase" alt="Tloris mansarde S2, list 3"><svg id="planSvg" viewBox="0 0 1120 820" role="img" aria-label="Načrt inštalacij"></svg></div></div>
     <div class="plegend" id="planLegend"></div>
+    <div id="planList"></div>
   </section>
   <section class="plans" id="nakup">
     <div class="phead"><div>
@@ -1784,6 +1789,8 @@ const sockets=[
  [735,742.5,.85],[745,742.5,.85],[740,742.5,.3],[750,742.5,.3],
  
  [1500,669,1.1],[1397,950,.4],[1590,669.5,1.05],[690,613,-2.6],[858,982,1.1],[866,982,1.1],
+,
+ [1204,791,.6,1],[1380.5,496,.3,1],[742.5,855.5,.3,1],[1187.5,452,1.85,1],[785.5,800,1.75,1]
 ];
 // talne doze: v estrihu, pokrov z vstavkom za ploščico – na tleh se vidi le tanek kovinski okvir 12 × 12 cm v ravnini ploščic
 {const fr=M(0xa9a39a,{metalness:.6,roughness:.35});sockets.filter(q=>q[2]>=0&&q[2]<=.05).forEach(q=>{cyl(q[0],q[1],.035,.004,.001,fr,undefined,24);cyl(q[0],q[1],.012,.005,.001,mt.black,undefined,12);});}   // fiksni izvod iz tal: uvodnica Ø 7 cm v ravnini ploščic, kabel gre skrito v sedežno
@@ -1793,9 +1800,36 @@ const sg=new THREE.BoxGeometry(.09,.09,.09); mat.lan=M(0x2fa36b,{emissive:0x0f4a
   const n=cl.length,cx=cl.reduce((a,c)=>a+c[0],0)/n,cz=cl.reduce((a,c)=>a+c[1],0)/n,alongX=n>1&&Math.abs(cl[0][0]-cl[n-1][0])>=Math.abs(cl[0][1]-cl[n-1][1]);
   const me=new THREE.Mesh(sg,q[3]?mat.fix:mat.sock);me.position.set(mx(cx),q[2],mz(cz));if(n>1)me.userData.baseScale=alongX?[1+.85*(n-1),1,1]:[1,1,1+.85*(n-1)];
   if(me.userData.baseScale)me.scale.set(...me.userData.baseScale);
+  (window.__sockCl=window.__sockCl||[]).push({x:cx,z:cz,h:q[2],n,fixed:!!q[3]});
   me.userData.label=(q[2]<=.05?'Fiksni izvod iz tal (pod sedežno)':q[3]?'Fiksni priključek 230 V':(n===1?'Vtičnica 230 V':n===2?'Dvojna vtičnica 230 V':n+'-kratna vtičnica 230 V'))+' · višina '+Math.round(q[2]*100)+' cm';groups.sock.add(me);});}
 
 // Pametna hiša: LAN [x,z,h], dostopne točke na stropu, senzorji, omarica, kasete senčil
+// VODA IN ODTOKI: [x, z, višina priključka (m), kaj, priključki, h=hladna t=topla o=odtok]
+const WATER=window.__WATER=[
+ [1265,669.5,.5,'Korito (kuhinja)','hladna + topla (kotna ventila), odtok Ø 50 na ~45 cm','hto'],
+ [1240,669.5,.5,'Filtrirana voda / Quooker pod koritom','hladna (+ 230 V v elementu)','h'],
+ [1255,800,0,'Pomivalni stroj BORA Dish v otoku','hladna + odtok Ø 50 iz tal (naklon 2 % do odtoka korita)','ho'],
+ [1134,669.5,.3,'Hladilnik LG (ledomat, točilnik)','hladna, kotni ventil z nepovratnim ventilom','h'],
+ [1187.5,432,.55,'Umivalnik 1 (kopalnica)','hladna + topla, odtok na ~50 cm','hto'],
+ [1187.5,472,.55,'Umivalnik 2 (kopalnica)','hladna + topla, odtok na ~50 cm','hto'],
+ [1380,481,.2,'Tuš-WC (kopalnica)','podometni nosilec: hladna, odtok Ø 110 (+ 230 V)','ho'],
+ [1243,581,1.05,'Tuš – termostatska armatura','hladna + topla, 2 izhoda: dežna (strop) in ročna prha','ht'],
+ [1231,579.5,0,'Tuš – linijska kanaleta','odtok Ø 50, sito za lase, naklon tal ~2 %','o'],
+ [730,855,.2,'Tuš-WC (WC)','podometni nosilec: hladna, odtok Ø 110 (+ 230 V)','ho'],
+ [785.5,812,.55,'Umivalnik (WC)','hladna + topla, odtok na ~50 cm','hto'],
+ [698,981.5,.6,'Pralni stroj','hladna (ventil), odtok s sifonom','ho'],
+ [735,981.5,.6,'Sušilni stroj','odtok kondenza','o'],
+ [686,889,1.1,'Rekuperacija – kondenz','odtok v sifon','o'],
+ [886,915,1.0,'TČ hidromodul','ogrevalna voda, hladna za polnjenje, odtok varnostnega ventila','ho'],
+ [1322,654,.3,'Razdelilnik talnega ogrevanja','dovod in povratek iz TČ','h'],
+ [899.5,815,.5,'Akvarij (RO filter, dolivanje)','hladna + odtok','ho'],
+ [1435,669.5,.5,'Zunanje korito (terasa)','hladna + topla, odtok; zaporni ventil znotraj (zima)','hto'],
+ [1592,669.5,.5,'Zunanja pipa (terasa)','hladna, zaporni ventil znotraj','h']];
+const waterG=new THREE.Group();scene.add(waterG);waterG.visible=false;window.__waterG=waterG;
+{const cm={h:M(0x2f7fd0,{emissive:0x0d3a66,emissiveIntensity:.5}),t:M(0xd0402f,{emissive:0x5a1208,emissiveIntensity:.5}),o:M(0x6b4a33,{emissive:0x2a1a10,emissiveIntensity:.4})};window.__waterMats=Object.values(cm);
+ const nm={h:'hladna voda',t:'topla voda',o:'odtok'};
+ WATER.forEach(w=>{[...w[5]].forEach((k,i)=>{const n=w[5].length,off=(i-(n-1)/2)*5;const me=new THREE.Mesh(k==='o'?new THREE.CylinderGeometry(.045,.045,.06,16):new THREE.SphereGeometry(.04,14,10),cm[k]);
+  me.position.set(mx(w[0])+m(off),k==='o'?Math.max(.03,w[2]-.05):w[2],mz(w[1]));me.userData.label=w[3]+' – '+nm[k]+' · '+w[4];waterG.add(me);});});}
 // UTP (RJ45) priključki: [x, z, višina, za kaj] – vsi v steni za napravo
 const lanG=new THREE.Group();scene.add(lanG);window.__lanG=lanG;
 [[765,744,.3,'PC na delovnem mestu'],[773,744,.3,'tiskalnik'],[781,744,.3,'rezerva'],[899.5,808,.55,'krmilnik akvarija'],[874,915,1.2,'TČ'],[700,889,1.95,'rekuperacija'],
@@ -1852,8 +1886,8 @@ function go(k){const v=views[k];anim={from:cam.position.clone(),to:new THREE.Vec
  if(room&&wallH<H){wallH=H;buildWalls();setLayer('tLow',new THREE.Group(),false);}
  roomLights.visible=room&&!window.__night; window.__house=!!v.house; if(!window.__night){ if(v.house)scene.background=new THREE.Color(0xc9d8e4); else themeBg(); } window.__room=room; coveG.visible=room||!!window.__night; ceil.visible=wallH>=H; setRoof(!!v.house); if(v.house){setLayer('tSock',groups.sock,false);setLayer('tSmart',groups.smart,false);setLayer('tLab',groups.lab,false);}}
 {const _go=go;go=function(k){_go(k);const sk=!!views[k].sock;   // pogled »Vtičnice«: nizke stene, povečane oznake vtičnic, priključkov in stikal
- groups.sock.children.forEach(c=>{const b=c.userData.baseScale||[1,1,1],k=sk?1.6:1;c.scale.set(b[0]*k,b[1]*k,b[2]*k);c.renderOrder=sk?20:0;}); lanG.children.forEach(c=>{c.scale.setScalar(sk?1.6:1);c.renderOrder=sk?20:0;}); lanG.visible=sk||groups.smart.visible;
- [mat.sock,mat.fix,mat.lan,window.__swMk].forEach(m_=>{if(!m_)return;m_.depthTest=!sk;m_.transparent=sk;m_.opacity=1;m_.emissiveIntensity=sk?.9:.4;m_.needsUpdate=true;});   // oznake vidne tudi skozi pohištvo
+ groups.sock.children.forEach(c=>{const b=c.userData.baseScale||[1,1,1],k=sk?1.6:1;c.scale.set(b[0]*k,b[1]*k,b[2]*k);c.renderOrder=sk?20:0;}); lanG.children.forEach(c=>{c.scale.setScalar(sk?1.6:1);c.renderOrder=sk?20:0;}); lanG.visible=sk||document.getElementById('tLan').getAttribute('aria-pressed')==='true'; if(sk){waterG.visible=true;document.getElementById('tWater').setAttribute('aria-pressed','true');}
+ [mat.sock,mat.fix,mat.lan,window.__swMk,...(window.__waterMats||[])].forEach(m_=>{if(!m_)return;m_.depthTest=!sk;m_.transparent=sk;m_.opacity=1;m_.emissiveIntensity=sk?.9:.4;m_.needsUpdate=true;});   // oznake vidne tudi skozi pohištvo
  if(sk){setLayer('tSock',groups.sock,true);setLayer('tSmart',groups.smart,false);setLayer('tLab',groups.lab,true);wallH=1.3;buildWalls();ceil.visible=false;document.getElementById('tLow').setAttribute('aria-pressed','true');hint.textContent='Pogled Vtičnice: oranžno = vtičnica 230 V · modro = fiksni priključek 230 V (aparat, luč, 400 V za BORA) · zeleno = UTP (RJ45) · rumeno = stikalo · miška nad oznako = kaj je in na kateri višini · vse je v steni ali za pohištvom, brez podaljškov';}
  else if(wallH===1.3){wallH=H;buildWalls();ceil.visible=true;document.getElementById('tLow').setAttribute('aria-pressed','false');hint.textContent=hint.dataset.t||hint.textContent;}};}
 function setRoof(on){if(roofOn===on)return;roofOn=on;RF.visible=on;if(on){wallH=H;document.getElementById('tLow').setAttribute('aria-pressed','false');ceil.visible=true;}buildWalls();document.getElementById('tRoof').setAttribute('aria-pressed',String(on));}
@@ -1870,6 +1904,8 @@ tog('tSock',on=>groups.sock.visible=on);
 tog('tFurn',on=>groups.furn.visible=on);
 tog('tSmart',on=>{groups.smart.visible=on;lanG.visible=on;});
 tog('tDuct',on=>{if(window.__ductG)window.__ductG.visible=on;});
+tog('tWater',on=>{waterG.visible=on;});
+tog('tLan',on=>{lanG.visible=on;});
 tog('tLab',on=>groups.lab.visible=on);
 document.getElementById('tRoof').addEventListener('click',()=>setRoof(!roofOn));
 tog('tLow',on=>{if(on&&roofOn)setRoof(false);wallH=on?1.1:H;buildWalls();ceil.visible=!on;});
@@ -2087,7 +2123,7 @@ document.getElementById('tXmas').addEventListener('click',()=>{xmas.visible=!xma
 // ---------- STIKALA: ob vratih na strani kljuke, 1,05 m od tal (KNX tipke iz stekla z LED), ob postelji 0,75 m ----------
 {const swM=M(0xf7f6f3,{roughness:.25}), swL=M(0xbfe3ff,{emissive:0x6ab8ff,emissiveIntensity:.9}), mk=window.__swMk=M(0xffc928,{emissive:0x8a6a00,emissiveIntensity:.4});
  const hitM=new THREE.MeshBasicMaterial({visible:false});
- const sw=(x,z,ax,d,y,n,g,acts)=>{PL.sw.push([x,z,n,y,!!g]);const hw=2.6*n;
+ const sw=(x,z,ax,d,y,n,g,acts)=>{PL.sw.push([x,z,n,y,!!g,LBL]);const hw=2.6*n;
   const one=acts&&acts.filter(Boolean).length===1; const swLab=LBL;
   const btn=(i,led,hit)=>{if(!acts||!acts[i])return;led.material=swL.clone();hit.userData={act:acts[i],led,label:(swLab||'Stikalo')+' – klik: žaluzija gor / dol'};if(one){hit.scale.set(ax==='x'?1:n,1,ax==='x'?n:1);hit.position[ax==='x'?'z':'x']=(ax==='x'?mz(z):mx(x));}swHits.push(hit);};
   if(ax==='x'){box(x,z-hw,x+d,z+hw,y-.045,y+.045,swM,g||F);for(let i=0;i<n;i++){const c=z-hw+2.6+i*5.2;btn(i,box(x+d,c-.4,x+d*1.15,c+.4,y+.028,y+.034,swL,g||F),box(x,c-2.5,x+d*1.7,c+2.5,y-.05,y+.05,hitM,g||F));}box(x+d*1.05,z-hw-.6,x+d*1.6,z+hw+.6,y-.055,y+.055,mk,g?g:groups.sock);}
@@ -2203,7 +2239,7 @@ document.getElementById('tReal').addEventListener('click',()=>{realOn=!realOn;do
 try{{const NS='http://www.w3.org/2000/svg',svg=document.getElementById('planSvg'),X=x=>x-559,Y=z=>z-282,inS=(x,z)=>x>=651&&x<=1622&&z>=387&&z<=1003;
  document.getElementById('planBase').src=document.getElementById('planImg').src;
  const el=(t,a,par)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);(par||svg).appendChild(e);return e;};
- const txt=(x,y,t,o={})=>{const e=el('text',Object.assign({x,y,'font-size':o.fs||9,'font-family':'Public Sans, Arial','font-weight':600,fill:o.c||'#222','text-anchor':o.a||'start','paint-order':'stroke',stroke:'#fff','stroke-width':2.5},o.g?{}:{}),o.g);e.textContent=t;return e;};
+ const txt=(x,y,t,o={})=>{const e=el('text',Object.assign({class:'tx',x,y,'font-size':o.fs||9,'font-family':'Public Sans, Arial','font-weight':600,fill:o.c||'#222','text-anchor':o.a||'start','paint-order':'stroke',stroke:'#fff','stroke-width':2.5},o.g?{}:{}),o.g);e.textContent=t;return e;};
  const C={el:'#c8643c',fix:'#2f6fa8',sw:'#d9a400',lu:'#b7791f',net:'#2f8f5a',sup:'#2f7fd0',ext:'#d9822b',ac:'#555',th:'#c0392b',wa:'#1597b5',eq:'#5b4a3f'};
  const layers={};const L=k=>layers[k]||(layers[k]=el('g',{'data-l':k}));
  // vtičnice in fiksni priključki (iz modela)
@@ -2245,21 +2281,49 @@ try{{const NS='http://www.w3.org/2000/svg',svg=document.getElementById('planSvg'
  // kuhinja: fiksni priključki (elektro)
  [[1204,791,'BORA X Pure Max 3×16 A'],[1194,700,'Oven Steam 16 A'],[1194,690,'mikrovalovna'],[1248,788,'airfryer (uvodnica v pultu)'],[1329,676,'kavni aparat'],[1358,676,'kuhalnik'],[1252,793,'BORA Dish 16 A'],[1149,672,'hladilnik'],[1300,800,'vinska vitrina'],[1258,700,'drobilec / Quooker']].forEach(q=>{const g=L('el');el('rect',{x:X(q[0])-4,y:Y(q[1])-4,width:8,height:8,fill:C.fix,stroke:'#fff','stroke-width':1},g);txt(X(q[0])+6,Y(q[1])-5,q[2],{g,fs:7.5,c:C.fix});});
  // voda in odtoki
- const wa=L('wa');[[1265,686,'korito: topla + hladna + odtok'],[1240,676,'filtrirana voda / Quooker'],[1255,800,'BORA Dish: voda + odtok v tleh'],[1255,792,'BORA Dish'],[1134,669,'hladilnik (voda)'],[1192,432,'umivalnik'],[1192,472,'umivalnik'],[1376,481,'tuš-WC + 230 V'],[1231,568,'tuš'],[730,846,'tuš-WC + 230 V'],[777,812,'umivalnik'],[698,955,'pralni s.'],[735,955,'sušilni s. (odtok)'],[686,889,'kondenz'],[850,815,'akvarij (dolivanje)'],[1435,686,'zunanje korito'],[1592,700,'zunanja pipa']].forEach(q=>{
-  el('circle',{cx:X(q[0]),cy:Y(q[1]),r:5,fill:C.wa,stroke:'#fff','stroke-width':1},wa);txt(X(q[0])+7,Y(q[1])+3,q[2],{g:wa,fs:8,c:'#0c6276'});});
+ const wa=L('wa');WATER.forEach(w=>{[...w[5]].forEach((k,i)=>{const n=w[5].length,off=(i-(n-1)/2)*7;el(k==='o'?'rect':'circle',k==='o'?{x:X(w[0])+off-3.5,y:Y(w[1])-3.5,width:7,height:7,fill:'#6b4a33',stroke:'#fff','stroke-width':1}:{cx:X(w[0])+off,cy:Y(w[1]),r:3.8,fill:k==='h'?'#2f7fd0':'#d0402f',stroke:'#fff','stroke-width':1},wa);});txt(X(w[0])+12,Y(w[1])+3,w[3],{g:wa,fs:7.5,c:'#0c6276'});});
  el('line',{x1:X(1196),y1:Y(579.5),x2:X(1266),y2:Y(579.5),stroke:C.wa,'stroke-width':3},wa);
  el('polyline',{points:`${X(1255)},${Y(800)} ${X(1255)},${Y(740)} ${X(1265)},${Y(740)} ${X(1265)},${Y(690)}`,fill:'none',stroke:'#0c6276','stroke-width':2.2,'stroke-dasharray':'6 3'},wa); txt(X(1272),Y(752),'odtok Ø 50 + voda v estrihu (naklon 2 %) do odtoka korita',{g:wa,fs:7.5,c:'#0c6276'});
  el('polyline',{points:`${X(1258)},${Y(800)} ${X(1258)},${Y(743)} ${X(1268)},${Y(743)} ${X(1268)},${Y(690)}`,fill:'none',stroke:C.wa,'stroke-width':1.2},wa); txt(X(1231),Y(592),'linijska kanaleta',{g:wa,fs:8,c:'#0c6276',a:'middle'});
+ // ---------- OŠTEVILČEN SEZNAM ZA IZVAJALCE (ena stroka naenkrat) ----------
+ const ROOMS=[['S2-4 WC',670,790,748,860],['S2-5 shramba',790,908,748,860],['S2-6 utility',661,908,860,993],['S2-3 predprostor',661,908,661,748],['S2-2 stopnišče',661,860,397,661],['S2-7 otroška 1',860,1045,397,661],['S2-8 otroška 2',1045,1182,397,590],['S2-9 kopalnica',1182,1388,397,590],['S2-11 hodnik',1045,1388,590,661],['S2-10 spalnica',1388,1612,397,661],['S2-13 terasa',1390,1622,661,1003],['S2-12 kuhinja',1110,1390,661,835],['S2-12 dnevni / jedilnica',893,1390,661,993]];
+ const roomOf=(x,z)=>{const r=ROOMS.find(q=>x>=q[1]-2&&x<=q[2]+2&&z>=q[3]-2&&z<=q[4]+2);return r?r[0]:'—';};
+ const FIX={'900,915':'TČ hidromodul (230 V)','676,895':'Rekuperacijska enota (230 V)','1379.5,528':'Električni grelec brisač','1300,790':'Vinska vitrina v otoku','1248,782':'Airfryer – vtičnica v otoku, kabel skozi uvodnico v pultu','1194,669':'Pečica BORA Oven Steam 16 A','1253,790':'Pomivalni stroj BORA Dish 16 A','1096,893':'Sedežna – zaprt izvod iz tal v modul sedežne','1300,667':'LED pod zgornjimi elementi (napajalnik)','1052,670':'Kamin – samodejna regulacija zraka','916.5,960':'LED polic TV stene (napajalnik)','1204,791':'Plošča BORA X Pure Max 3×16 A (400 V)','1380.5,496':'Tuš-WC kopalnica (230 V za školjko)','742.5,855.5':'Tuš-WC v WC (230 V za školjko)','1187.5,452':'LED ogledali + LED niša (napajalnik)','785.5,800':'LED ogledalo WC'};
+ const cm=h=>h===''||h==null?'—':Math.round(h*100)+' cm';
+ const IT={el:[],lu:[],net:[],hv:[],wa:[]};
+ (window.__sockCl||[]).filter(c=>inS(c.x,c.z)&&c.h>=0).forEach(c=>{const k=Math.round(c.x*10)/10+','+Math.round(c.z*10)/10;IT.el.push({x:c.x,z:c.z,h:c.h,t:c.fixed?(FIX[k]||'Fiksni priključek 230 V'):(c.n===1?'Vtičnica 230 V':c.n===2?'Dvojna vtičnica 230 V':c.n+'-kratna vtičnica 230 V')});});
+ PL.sw.filter(q=>!q[4]).forEach(q=>IT.lu.push({x:q[0],z:q[1],h:q[3],t:'Stikalo, '+q[2]+' tipk'+(q[5]?' – '+q[5]:'')}));
+ PL.light.filter(q=>inS(...q)).forEach(q=>IT.lu.push({x:q[0],z:q[1],h:'',t:'Vgradni spot brez okvirja (Hue)'}));
+ PL.pend.filter(q=>inS(...q)).forEach(q=>IT.lu.push({x:q[0],z:q[1],h:'',t:'Viseča luč (dovod v stropu)'}));
+ (PL.lin||[]).forEach(q=>IT.lu.push({x:(q[0]+q[2])/2,z:(q[1]+q[3])/2,h:'',t:'Linijska luč v stropu'}));
+ ledPlan.forEach(q=>IT.lu.push({x:(q[0]+q[2])/2,z:(q[1]+q[3])/2,h:'',t:'LED trak – '+q[4]+' (24 V, napajalnik dostopen)'}));
+ lan.forEach(q=>IT.net.push({x:q[0],z:q[1],h:'',t:'UTP Cat6A'+(q[2]?' – '+q[2]:'')}));
+ [[1215,625],[1150,840],[790,915],[1500,850]].forEach(q=>IT.net.push({x:q[0],z:q[1],h:2.6,t:'Dostopna točka Wi-Fi na stropu (PoE)'}));
+ [[765,560,'gibanje'],[775,705,'gibanje'],[950,560,'CO₂'],[1110,520,'CO₂'],[1300,470,'vlaga'],[1500,540,'prisotnost'],[1050,800,'dim'],[1215,640,'dim'],[1000,700,'CO']].forEach(q=>IT.net.push({x:q[0],z:q[1],h:2.6,t:'Senzor na stropu – '+q[2]}));
+ IT.net.push({x:869,z:970,h:1.2,t:'Omrežna omarica 15U (ONT, router, PoE stikalo, patch panel, UPS)'});
+ PL.sup.forEach((v,i)=>IT.hv.push({x:v[0],z:v[1],h:2.6,t:'Rekuperacija – dovodni ventil'+(PL.qs&&PL.qs[i]?' '+PL.qs[i]+' m³/h':'')}));
+ PL.ext.forEach((v,i)=>IT.hv.push({x:v[0],z:v[1],h:2.6,t:'Rekuperacija – odvodni ventil'+(PL.qe&&PL.qe[i]?' '+PL.qe[i]+' m³/h':'')}));
+ PL.ac.forEach((q,i)=>IT.hv.push({x:(q[0]+q[2])/2,z:(q[1]+q[3])/2,h:2.6,t:i===4?'Klima – povratna rešetka':'Klima – dovodna linijska rešetka'}));
+ [[1038,585],[1395,578],[1106,583]].forEach(q=>IT.hv.push({x:q[0],z:q[1],h:1.5,t:'Sobni termostat (nad stikalom)'}));
+ IT.hv.push({x:686,z:889,h:1.2,t:'Rekuperacijska enota (zahodna stena utility)'},{x:886,z:915,h:'',t:'TČ hidromodul'},{x:1322,z:654,h:.3,t:'Razdelilnik talnega ogrevanja (podometna omarica)'},{x:1207,z:654,h:1.5,t:'Glavna stenska enota (TČ, klima, rekuperacija)'},{x:850,z:724,h:2.7,t:'Razdelilni škatli rekuperacije (nad stropom)'});
+ WATER.forEach(w=>IT.wa.push({x:w[0],z:w[1],h:w[2],t:w[3]+' – '+w[4]}));
+ const ord=ROOMS.map(q=>q[0]);Object.values(IT).forEach(a=>a.sort((p,q)=>{const d=ord.indexOf(roomOf(p.x,p.z))-ord.indexOf(roomOf(q.x,q.z));return d||p.z-q.z||p.x-q.x;}));
+ const NUM={};Object.entries(IT).forEach(([k,a])=>{const g=NUM[k]=el('g',{'data-n':k,style:'display:none'});a.forEach((it,i)=>{it.n=i+1;const bx=X(it.x)+7,by=Y(it.z)-7;el('circle',{cx:bx,cy:by,r:6,fill:'#1a1714',stroke:'#fff','stroke-width':1},g);const t=el('text',{x:bx,y:by+2.8,'font-size':7.5,'font-family':'Public Sans, Arial','font-weight':700,fill:'#fff','text-anchor':'middle'},g);t.textContent=it.n;});});
+ const LIST=document.getElementById('planList');
+ const TITLE={el:'Elektrika – vtičnice in fiksni priključki',lu:'Elektrika – luči in stikala',net:'Omrežje in pametna hiša',hv:'Ogrevanje, rekuperacija, klima',wa:'Voda in odtoki'};
  // legenda + sloji
- const leg=[['el','circle',C.el,'vtičnica 230 V'],['el','floor',C.fix,'fiksni izvod iz tal (pod sedežno)'],['el','rect',C.fix,'fiksni priključek'],['lu','x',C.lu,'vgradni spot (brez okvirja)'],['lu','circle',C.lu,'viseča luč'],['lu','line',C.lu,'LED trak'],['lu','rect',C.sw,'stikalo (število tipk)'],['net','tri',C.net,'UTP (RJ45)'],['net','ap',C.net,'dostopna točka Wi-Fi'],['net','dia',C.net,'senzor / javljalnik'],['hv','ring',C.sup,'D – dovod zraka'],['hv','ring',C.ext,'O – odvod zraka'],['hv','rect',C.ac,'rešetka klime'],['hv','rect',C.th,'termostat / enota'],['wa','circle',C.wa,'voda / odtok']];
+ const leg=[['el','circle',C.el,'vtičnica 230 V'],['el','floor',C.fix,'fiksni izvod iz tal (pod sedežno)'],['el','rect',C.fix,'fiksni priključek'],['lu','x',C.lu,'vgradni spot (brez okvirja)'],['lu','circle',C.lu,'viseča luč'],['lu','line',C.lu,'LED trak'],['lu','rect',C.sw,'stikalo (število tipk)'],['net','tri',C.net,'UTP (RJ45)'],['net','ap',C.net,'dostopna točka Wi-Fi'],['net','dia',C.net,'senzor / javljalnik'],['hv','ring',C.sup,'D – dovod zraka'],['hv','ring',C.ext,'O – odvod zraka'],['hv','rect',C.ac,'rešetka klime'],['hv','rect',C.th,'termostat / enota'],['wa','circle','#2f7fd0','hladna voda'],['wa','circle','#d0402f','topla voda'],['wa','rect','#6b4a33','odtok']];
  const lg=document.getElementById('planLegend'),btns=[...document.querySelectorAll('#planTabs button')];
  const sym=(t,c)=>({circle:`<circle cx="7" cy="7" r="5" fill="${c}"/>`,rect:`<rect x="2" y="2" width="10" height="10" fill="${c}"/>`,x:`<circle cx="7" cy="7" r="4.5" fill="#fff" stroke="${c}" stroke-width="1.6"/><circle cx="7" cy="7" r="1.8" fill="${c}"/>`,line:`<line x1="0" y1="7" x2="14" y2="7" stroke="${c}" stroke-width="2" stroke-dasharray="4 2"/>`,tri:`<path d="M7 2L12 11L2 11Z" fill="${c}"/>`,ap:`<circle cx="7" cy="7" r="5.5" fill="#fff" stroke="${c}" stroke-width="2"/>`,dia:`<path d="M7 2L12 7L7 12L2 7Z" fill="#fff" stroke="${c}" stroke-width="1.5"/>`,ring:`<circle cx="7" cy="7" r="5" fill="#fff" stroke="${c}" stroke-width="2"/>`,floor:`<rect x="2" y="2" width="10" height="10" fill="#fff" stroke="${c}" stroke-width="1.6"/><circle cx="7" cy="7" r="2.6" fill="${c}"/>`})[t];
  const cnt={el:sockets.filter(q=>q[2]>=0&&inS(q[0],q[1])).length,lu:PL.light.filter(q=>inS(...q)).length+PL.pend.filter(q=>inS(...q)).length,sw:PL.sw.length,net:lan.length};
  function upd(){const on=new Set(btns.filter(b=>b.getAttribute('aria-pressed')==='true').map(b=>b.dataset.l));const all=on.has('all');
   Object.entries(layers).forEach(([k,g])=>g.style.display=(all||on.has(k))?'':'none');
+  const one=!all&&on.size===1?[...on][0]:null; svg.classList.toggle('numbered',!!one); Object.entries(NUM).forEach(([k,g])=>g.style.display=one===k?'':'none');
+  if(LIST){if(one&&IT[one]){LIST.innerHTML=`<h3 style="font:700 18px var(--display);margin:4px 0 8px">${TITLE[one]} – ${IT[one].length} točk</h3><div class="tbl"><table><thead><tr><th>Št.</th><th>Prostor</th><th>Kaj</th><th>Višina od tal</th></tr></thead><tbody>${IT[one].map(it=>`<tr><td class="n">${it.n}</td><td class="small">${roomOf(it.x,it.z)}</td><td>${it.t}</td><td class="n">${cm(it.h)}</td></tr>`).join('')}</tbody></table></div>`;}
+   else LIST.innerHTML='<p class="small">Izberi eno stroko zgoraj, da se točke oštevilčijo in se pokaže seznam za izvajalca.</p>';}
   lg.innerHTML=leg.filter(q=>all||on.has(q[0])).map(q=>`<span><svg width="14" height="14" viewBox="0 0 14 14">${sym(q[1],q[2])}</svg>${q[3]}</span>`).join('')+
    `<span style="margin-left:auto">${(all||on.has('el'))?cnt.el+' vtičnic in priključkov v mansardi · ':''}${(all||on.has('lu'))?cnt.lu+' luči, '+cnt.sw+' mest stikal · ':''}${(all||on.has('net'))?cnt.net+' UTP na tem listu (+ vhod, podstrešje) · ':''}</span>`;}
- btns.forEach(b=>b.addEventListener('click',()=>{const on=b.getAttribute('aria-pressed')!=='true';if(b.dataset.l==='all')btns.forEach(x=>x.setAttribute('aria-pressed',String(x===b&&on)));else{b.setAttribute('aria-pressed',String(on));btns.find(x=>x.dataset.l==='all').setAttribute('aria-pressed','false');}upd();}));
+ btns.forEach(b=>b.addEventListener('click',()=>{btns.forEach(x=>x.setAttribute('aria-pressed',String(x===b)));upd();}));   // ena stroka naenkrat (pregledno), »Vse« za pregled
  upd();
  // povečava čez cel zaslon (+/−, vlečenje)
  const wrap=document.getElementById('planWrap');let z=1.6;
