@@ -80,6 +80,14 @@ const nextConfig: NextConfig = {
       : [{ protocol: "https" as const, hostname: "*.r2.dev" }],
   },
 
+  // Kratek naslov za zasebni 3D model hiše (lažje vtipkati na tablici).
+  // Preusmeri na skriti naslov pod /h/, kjer proxy.ts zahteva geslo.
+  async redirects() {
+    return [
+      { source: "/hisa", destination: "/h/jpd9g1n3omp2w88elt4toc/index.html", permanent: false },
+    ];
+  },
+
   async headers() {
     return [
       { source: "/:path*", headers: glave },
