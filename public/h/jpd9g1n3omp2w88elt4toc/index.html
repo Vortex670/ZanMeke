@@ -161,7 +161,7 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
       <div><b id="stLan">–</b><span>mrežnih priključkov</span></div>
       <div><b>17</b><span>mest stikal</span></div>
     </div>
-    <p class="small" style="margin-top:14px;color:var(--faint)">različica 125 – vtičnice, priključki, UTP in stikala v svojih barvah</p>
+    <p class="small" style="margin-top:14px;color:var(--faint)">različica 126 – nakupovalni seznam: kaj, kje, kdaj</p>
   </header>
 
   <section class="viewer" id="model" aria-label="3D pogled">
@@ -259,6 +259,41 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
     <div class="planwrap" id="planWrap"><div class="ptools"><button class="t" id="pzOut" type="button" aria-label="Pomanjšaj">−</button><button class="t" id="pzIn" type="button" aria-label="Povečaj">+</button><button class="t" id="pzClose" type="button">✕ Zapri</button></div><div class="pin" id="planPin"><img id="planBase" alt="Tloris mansarde S2, list 3"><svg id="planSvg" viewBox="0 0 1120 820" role="img" aria-label="Načrt inštalacij"></svg></div></div>
     <div class="plegend" id="planLegend"></div>
   </section>
+  <section class="plans" id="nakup">
+    <div class="phead"><div>
+      <p class="eyebrow">Nakupovalni seznam</p>
+      <h2 id="s-nakup">Kje kupiti in kdaj</h2>
+      <p class="small" style="max-width:72ch">Vse, kar je v modelu, po vrstnem redu odločanja. Stvari pod »Pred gradnjo« morajo biti izbrane pred PZI in pred estrihom, ker vplivajo na napeljave. Trgovine so primeri večjih prodajaln v Sloveniji. Cene in zaloge preveri sam, pri vgradni tehniki pa vedno vzemi ponudbo z montažo.</p>
+    </div></div>
+    <div class="tbl"><table>
+      <thead><tr><th>Kdaj</th><th>Kaj</th><th>Znamke</th><th>Kje / prek koga</th></tr></thead>
+      <tbody>
+            <tr><td class="small">Pred gradnjo / PZI</td><td>Toplotna črpalka, talno ogrevanje</td><td class="small">Daikin, Mitsubishi, Panasonic, Viessmann, Vaillant</td><td class="small">Prek monterja strojnih inštalacij (ponudba z montažo). Pred nakupom preveri razpis Eko sklada.</td></tr>
+            <tr><td class="small">Pred gradnjo / PZI</td><td>Rekuperacija (centralna, ~300–350 m³/h)</td><td class="small">Zehnder ComfoAir Q350, Brink Flair 325, Vallox</td><td class="small">Prek monterja prezračevanja, z izračunom pretokov in zvezdastim razvodom.</td></tr>
+            <tr><td class="small">Pred gradnjo / PZI</td><td>Kanalska klima</td><td class="small">Daikin, Mitsubishi Electric</td><td class="small">Prek monterja klime, usklajeno s TČ.</td></tr>
+            <tr><td class="small">Pred gradnjo / PZI</td><td>Pametna hiša KNX (tipke, aktorji, termostati)</td><td class="small">Gira, Jung, ABB, MDT, Schneider</td><td class="small">Prek KNX integratorja (seznam partnerjev na knx.org) – projektira in programira.</td></tr>
+            <tr><td class="small">Pred gradnjo / PZI</td><td>Zunanje alu žaluzije z motorjem</td><td class="small">Warema, Schenker, Somfy motorji</td><td class="small">Prek lokalnega izdelovalca/monterja senčil – kasete se vgradijo v fasado med gradnjo.</td></tr>
+            <tr><td class="small">Pred gradnjo / PZI</td><td>Kamin (vložek na drva, akumulacijski)</td><td class="small">Spartherm, Attika, Brunner, Schmid</td><td class="small">Prek prodajalca kaminov / pečarja, z dovodom zunanjega zraka in dimnikom.</td></tr>
+            <tr><td class="small">Pred gradnjo / PZI</td><td>Podometni nosilci, tuš-WC, kanaleta, armature</td><td class="small">Geberit (AquaClean, CleanLine), TECE, Hansgrohe, Grohe</td><td class="small">Kopalniški saloni (npr. Kolpa), Bauhaus, Merkur – vodovodar mora imeti mere pred ometom.</td></tr>
+            <tr><td class="small">Pred gradnjo / PZI</td><td>Notranja vrata (vlagoodporna za kopalnico), PSK terasna vrata</td><td class="small">Proizvajalci oken in vrat</td><td class="small">Okna/PSK pri izvajalcu stavbnega pohištva, notranja vrata v salonih vrat.</td></tr>
+            <tr><td class="small">Med gradnjo</td><td>Ploščice (keramika v videzu hrasta, travertin)</td><td class="small">Marazzi, Atlas Concorde, Florim, Porcelanosa</td><td class="small">Saloni keramike, Bauhaus, Merkur – vzemi vzorec domov.</td></tr>
+            <tr><td class="small">Med gradnjo</td><td>Omrežje (omarica 15U, PoE stikalo, dostopne točke, Cat6A)</td><td class="small">Ubiquiti UniFi, TP-Link Omada</td><td class="small">Mimovrste, Big Bang, spletne trgovine z mrežno opremo; kable in omarico montira električar.</td></tr>
+            <tr><td class="small">Kuhinja</td><td>Kuhinja po meri (oreh / Silbermond, mat, črn pult)</td><td class="small">DanKüchen</td><td class="small">DanKüchen Trebnje, Lesnina – pokaži razporeditev otoka z modela.</td></tr>
+            <tr><td class="small">Kuhinja</td><td>BORA X Pure Max, Oven Steam, Dish</td><td class="small">BORA</td><td class="small">Samo prek pooblaščenih prodajalcev kuhinj (seznam na bora.com → Prodajalci); pogosto v paketu s kuhinjo.</td></tr>
+            <tr><td class="small">Kuhinja</td><td>Hladilnik LG GSXV90MCDE, Philips Airfryer 5000, kavni aparat</td><td class="small">LG, Philips</td><td class="small">Big Bang, Harvey Norman, Mimovrste – primerjaj cene in akcije.</td></tr>
+            <tr><td class="small">Kuhinja</td><td>Dvoconska vinska vitrina</td><td class="small">Klarstein</td><td class="small">Spletna trgovina Klarstein ali Mimovrste – preveri mere za otok.</td></tr>
+            <tr><td class="small">Utility</td><td>Pralni in sušilni stroj</td><td class="small">Miele</td><td class="small">Big Bang, Harvey Norman, Miele prodajni center.</td></tr>
+            <tr><td class="small">Dnevni</td><td>Kotna sedežna z vgrajenim modulom, na nogah 12 cm</td><td class="small">Wersal, Koinor, Himolla, Bretz</td><td class="small">Harvey Norman, Rutar, Lesnina – vprašaj za noge in USB/230 V modul.</td></tr>
+            <tr><td class="small">Dnevni</td><td>TV Philips 65OLED910, JBL soundbar + sub, Xbox</td><td class="small">Philips, JBL, Microsoft</td><td class="small">Big Bang, Harvey Norman, Mimovrste.</td></tr>
+            <tr><td class="small">Dnevni</td><td>Morski akvarij (bazen, sump, LED z UV, krmilnik)</td><td class="small">Red Sea, Waterbox, Neptune Apex / GHL</td><td class="small">Specializirana trgovina z morsko akvaristiko (SI ali DE/AT spletno) – svetovanje je tu ključno.</td></tr>
+            <tr><td class="small">Luči</td><td>Philips Hue (spoti, LED trakovi, Bridge Pro), stoječe in viseče luči</td><td class="small">Philips Hue</td><td class="small">Big Bang, Mimovrste, spletna trgovina Hue; dekorativne luči v Lesnini, Rutarju, IKEA.</td></tr>
+            <tr><td class="small">Pohištvo</td><td>Omare z drsnimi vrati po meri, postelje, komode, otroške mize</td><td class="small">Mizar po meri, Lesnina, Rutar, IKEA</td><td class="small">Omare po meri pri mizarju (mat furnir), ostalo v pohištvenih trgovinah.</td></tr>
+            <tr><td class="small">Ostalo</td><td>Robotski sesalnik s postajo, video zvonec, kamere</td><td class="small">iRobot (Roomba Combo), Ubiquiti / Ring</td><td class="small">Big Bang, Mimovrste, Harvey Norman.</td></tr>
+            <tr><td class="small">Ostalo</td><td>Home Assistant (aplikacija in avtomatizacije)</td><td class="small">Home Assistant Green ali mini PC</td><td class="small">Uradna spletna trgovina / mrežni prodajalci; nastavi integrator ali sam.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
 
   <section class="grid">
     <div>
@@ -2245,7 +2280,7 @@ try{{const NS='http://www.w3.org/2000/svg',svg=document.getElementById('planSvg'
    g.fillText('Stanovanje S2 – načrt inštalacij ('+on+')',30,1640+50);g.font='22px Arial';g.fillStyle='#555';g.fillText(lg.innerText.replace(/\s+/g,' ').slice(0,180),30,1640+90);
    const blob=await new Promise(ok=>c.toBlob(ok,'image/png'));
    await dl.save({filename:'nacrt-instalacij-S2.png',data:blob});}catch(e){if(e&&e.code==='unavailable')b.hidden=true;}finally{b.disabled=false;b.textContent='Prenesi PNG';}});})();
- const a=document.createElement('a');a.href='#s-plans';a.textContent='Načrti';document.getElementById('toc').insertBefore(a,document.getElementById('toc').children[1]||null);}
+ const a=document.createElement('a');a.href='#s-plans';a.textContent='Načrti';document.getElementById('toc').insertBefore(a,document.getElementById('toc').children[1]||null);{const b=document.createElement('a');b.href='#s-nakup';b.textContent='Nakup';document.getElementById('toc').appendChild(b);}}
 // ---------- KERAMIKA ZA TLA: imitacija travertina, lesa (deske, ribja kost) in betona – vse porcelanske ploščice ----------
 {const N=1024,mk=draw=>{const c=document.createElement('canvas');c.width=c.height=N;const g=c.getContext('2d');draw(g);const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.encoding=THREE.sRGBEncoding;t.anisotropy=8;t.repeat.set(1/2.4,1/2.4);return t;};
  let sd=7;const rn=()=>(sd=(sd*16807)%2147483647)/2147483647, px=N/240;   // 1 cm = px pikslov (tekstura = 2,4 m)
