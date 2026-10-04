@@ -182,8 +182,13 @@ export function StatCard({
           // `flex-col-reverse` obrne le prikaz: v HTML ostane oznaka pred
           // ikono, kar bralnik zaslona prebere v pravem vrstnem redu.
           "flex items-start justify-between gap-3",
-          "max-sm:flex-col-reverse max-sm:items-start max-sm:gap-2",
-          showIcon && "h-10 items-center max-sm:h-auto",
+          // ZLOŽENO DO `lg` IN NE DO `sm`. Mreža ima dva stolpca vse do
+          // 1024 px; pri 800 px je kartica široka 230 px, od tega vzame krog
+          // z ikono 40 in razmik 12 — oznaki ostane 125 px, »OGLEDI STRANI«
+          // pa jih potrebuje okoli 150 in se je odrezala v »OGLE STRA«.
+          // Odrezan napis je hujša napaka od ikone nad njim.
+          "max-lg:flex-col-reverse max-lg:items-start max-lg:gap-2",
+          showIcon && "h-10 items-center max-lg:h-auto",
         )}
       >
         <p
@@ -192,7 +197,7 @@ export function StatCard({
           // 390 px to pomeni, da »REZERVACIJE« zavzame 122 px od 119
           // razpoložljivih. Pri 0,10em meri 97 px in se izide. Odrezana
           // beseda je hujša napaka od tesnejšega razmika.
-          className="type-eyebrow text-subtle line-clamp-2 text-pretty [--tracking-eyebrow:0.1em] sm:[--tracking-eyebrow:0.28em]"
+          className="type-eyebrow text-subtle line-clamp-2 text-pretty [--tracking-eyebrow:0.1em] lg:[--tracking-eyebrow:0.28em]"
         >
           {label}
         </p>
@@ -202,7 +207,7 @@ export function StatCard({
               aria-hidden
               className={cn(
                 "inline-flex h-10 w-10 items-center justify-center rounded-full [&>svg]:h-5 [&>svg]:w-5",
-                "max-sm:h-8 max-sm:w-8 max-sm:[&>svg]:h-4 max-sm:[&>svg]:w-4",
+                "max-lg:h-8 max-lg:w-8 max-lg:[&>svg]:h-4 max-lg:[&>svg]:w-4",
                 ICON_BG[variant],
               )}
             >
