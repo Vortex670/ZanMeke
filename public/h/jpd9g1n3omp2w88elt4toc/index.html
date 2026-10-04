@@ -163,7 +163,7 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
       <div><b id="stLan">–</b><span>mrežnih priključkov</span></div>
       <div><b>17</b><span>mest stikal</span></div>
     </div>
-    <p class="small" style="margin-top:14px;color:var(--faint)">različica 128 – načrti po strokah z oštevilčenimi seznami, voda in odtoki v 3D</p>
+    <p class="small" style="margin-top:14px;color:var(--faint)">različica 130 – vrstica Inštalacije, seznam pred začetkom inštalacij</p>
   </header>
 
   <section class="viewer" id="model" aria-label="3D pogled">
@@ -191,7 +191,6 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
     </div>
     <div class="bar chips">
       <span class="lbl">Prikaz</span>
-      <button class="t" id="tSock" aria-pressed="true">Vtičnice</button>
       <button class="t" id="tFurn" aria-pressed="true">Pohištvo</button>
       <button class="t" id="tReal" aria-pressed="true">Realistično</button>
       <button class="t" id="tNight" aria-pressed="false">Večer</button>
@@ -199,11 +198,18 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
       <button class="t" id="tXmas" aria-pressed="false">Božič</button>
       <button class="t" id="tRoof" aria-pressed="false">Streha</button>
       <button class="t" id="tLow" aria-pressed="false">Nizke stene</button>
-      <button class="t" id="tSmart" aria-pressed="true">Pametna hiša</button>
-      <button class="t" id="tDuct" aria-pressed="true">Kanali rekuperacije</button>
-      <button class="t" id="tWater" aria-pressed="false">Voda in odtoki</button>
-      <button class="t" id="tLan" aria-pressed="true">UTP</button>
-      <button class="t" id="tLab" aria-pressed="true">Oznake</button>
+      <button class="t" id="tLab" aria-pressed="true">Oznake prostorov</button>
+    </div>
+    <div class="bar chips">
+      <span class="lbl">Inštalacije</span>
+      <button class="t" id="tSock" aria-pressed="true" title="oranžno vtičnice, modro fiksni priključki, rumeno stikala">Elektrika 230 V + stikala</button>
+      <button class="t" id="tLan" aria-pressed="true" title="zeleno">UTP (omrežje)</button>
+      <button class="t" id="tWater" aria-pressed="false" title="modro hladna, rdeče topla, rjavo odtok">Voda in odtoki</button>
+      <button class="t" id="tDuct" aria-pressed="true" title="modro dovod, oranžno odvod">Rekuperacija (kanali)</button>
+      <button class="t" id="tSmart" aria-pressed="true" title="senzorji, dostopne točke, kasete senčil">Pametna hiša</button>
+      <span class="small" style="margin-left:8px">·</span>
+      <button class="t" id="iAll" aria-pressed="false">Vse</button>
+      <button class="t" id="iNone" aria-pressed="false">Nič</button>
     </div>
     <div class="stage" id="stage">
       <img id="planImg" alt="Tloris mansarde, list 3" hidden src="plan-3.jpg">
@@ -264,6 +270,46 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
     <div class="plegend" id="planLegend"></div>
     <div id="planList"></div>
   </section>
+  <section class="plans" id="predinst">
+    <div class="phead"><div>
+      <p class="eyebrow">Pred začetkom inštalacij</p>
+      <h2 id="s-pred">Kaj mora biti izbrano in kupljeno, preden začnejo električar, vodovodar in strojnik</h2>
+      <p class="small" style="max-width:72ch">Te stvari določajo, kje in kako gredo cevi in kabli. Če niso izbrane prej, se kasneje kleše, prestavlja ali kupuje drugo. Model ali vsaj natančne mere morajo biti znani pred PZI, kupljeno pa pred ometom in estrihom.</p>
+    </div></div>
+    <div class="grid" style="border:none;padding:0">
+      <div class="card"><h2>Odločitve in načrti</h2><ul>
+        <li><b>Kuhinjski načrt potrjen</b> (DanKüchen): položaj korita, BORA plošče 400 V, pečice, pomivalnega stroja v otoku, hladilnika z vodo, vtičnic nad pultom in v otoku.</li>
+        <li><b>KNX in integrator</b> izbran: projekt pametne hiše, seznam stikal, aktorjev in termostatov.</li>
+        <li><b>Debelina tal</b> (estrih + talno ogrevanje + ploščice) – za višino talne doze, kanalete in pragov.</li>
+        <li><b>Kopalnica in WC</b>: izbrani umivalniki in omarice (višina odtokov), tuš-WC model, kanaleta, armatura.</li>
+        <li><b>Akvarij</b>: velikost in teža (statika!), mesto tehnike v shrambi.</li>
+        <li><b>TV, soundbar, Xbox</b>: velikost TV-ja in višina – za vtičnice, UTP in prazno cev na TV steni.</li>
+      </ul></div>
+      <div class="card"><h2>Električar (pred ometom)</h2><ul>
+        <li>Globoke doze 60 mm za vsa stikala in vtičnice, doze za LED napajalnike (dostopne), zaprta doza z uvodnico pod sedežno.</li>
+        <li>Kabli: NYM 3×1,5 (luči), 3×2,5 (vtičnice, 16 A tokokrogi), 5×2,5 (BORA 400 V), KNX kabel (zelen, 2×2×0,8), Cat6A za vse UTP, kabli za motorje senčil in strešno okno.</li>
+        <li>Cevi (Ø 20/25) za vse kable in prazne cevi Ø 40 mm: TV stena, delovno mesto, otroški mizi, terasa, optika od vhoda S2-1 do omarice.</li>
+        <li>Razdelilnik (dovolj velik za KNX aktorje in FID), omrežna omarica 15U v utility (mesto + 2 vtičnici).</li>
+        <li>Dovodi: TČ, zunanja enota TČ in klime, rekuperacija, klima na podstrešju, kamin (regulacija), tuš-WC ×2, grelec brisač, LED ogledala, video zvonec, kamere.</li>
+      </ul></div>
+      <div class="card"><h2>Vodovodar (pred ometom in estrihom)</h2><ul>
+        <li><b>Podometna WC nosilca</b> ×2 (npr. Geberit Duofix) s priključkom 230 V za tuš-WC.</li>
+        <li><b>Podometno telo termostatske armature</b> z 2 izhodoma (dežna + ročna prha) in dovod za dežno prho v strop.</li>
+        <li><b>Linijska kanaleta</b> s sitom za lase + hidroizolacija (tuš do stropa, ostalo 15 cm).</li>
+        <li>Cevi za vodo (alupex/PEX), odtoki Ø 50 in Ø 110, podometni sifon za pralni stroj, odvodi kondenza (rekuperacija, klima, TČ).</li>
+        <li>Voda in odtok do <b>pomivalnega stroja v otoku skozi tla</b> (naklon 2 %), priključek za hladilnik, voda + odtok za akvarij, zunanje korito in pipa na terasi z zapornima ventiloma znotraj.</li>
+      </ul></div>
+      <div class="card"><h2>Strojnik in ostalo (pred stropom in estrihom)</h2><ul>
+        <li><b>Toplotna črpalka</b> (model – določa hidravliko), razdelilnik talnega ogrevanja s pogoni, cevi talnega ogrevanja.</li>
+        <li><b>Rekuperacija</b>: enota, 2 razdelilni škatli, kanali Ø 75 in Ø 160, 11 stropnih ventilov, 2 fasadni rešetki – kanali gredo nad strop pred montažo stropa.</li>
+        <li><b>Kanalska klima</b>: notranja enota, kanali in rešetke, cevi do zunanje enote (skozi zid, ne po fasadi).</li>
+        <li><b>Kamin</b>: vložek (model), dimnik, dovod zunanjega zraka v tleh ali steni.</li>
+        <li><b>Okna, PSK terasna vrata in kasete senčil</b> – kasete se vgradijo pred fasado, motorji potrebujejo kabel.</li>
+        <li><b>Notranja vrata</b>: mere podbojev (kopalnica vlagoodporna).</li>
+      </ul></div>
+    </div>
+  </section>
+
   <section class="plans" id="nakup">
     <div class="phead"><div>
       <p class="eyebrow">Nakupovalni seznam</p>
@@ -1885,7 +1931,7 @@ function go(k){const v=views[k];anim={from:cam.position.clone(),to:new THREE.Vec
  const room=!!v.room;setLayer('tSock',groups.sock,!room);setLayer('tSmart',groups.smart,!room);setLayer('tLab',groups.lab,!room);setLayer('tFurn',groups.furn,true);
  if(room&&wallH<H){wallH=H;buildWalls();setLayer('tLow',new THREE.Group(),false);}
  roomLights.visible=room&&!window.__night; window.__house=!!v.house; if(!window.__night){ if(v.house)scene.background=new THREE.Color(0xc9d8e4); else themeBg(); } window.__room=room; coveG.visible=room||!!window.__night; ceil.visible=wallH>=H; setRoof(!!v.house); if(v.house){setLayer('tSock',groups.sock,false);setLayer('tSmart',groups.smart,false);setLayer('tLab',groups.lab,false);}}
-{const _go=go;go=function(k){_go(k);const sk=!!views[k].sock;   // pogled »Vtičnice«: nizke stene, povečane oznake vtičnic, priključkov in stikal
+{const _go=go;go=function(k){_go(k);const sk=!!views[k].sock; if(views[k].room&&window.__instOff){['tLan','tWater','tDuct'].forEach(id=>{const b=document.getElementById(id);if(b.getAttribute('aria-pressed')==='true')b.click();});}   // pogled »Vtičnice«: nizke stene, povečane oznake vtičnic, priključkov in stikal
  groups.sock.children.forEach(c=>{const b=c.userData.baseScale||[1,1,1],k=sk?1.6:1;c.scale.set(b[0]*k,b[1]*k,b[2]*k);c.renderOrder=sk?20:0;}); lanG.children.forEach(c=>{c.scale.setScalar(sk?1.6:1);c.renderOrder=sk?20:0;}); lanG.visible=sk||document.getElementById('tLan').getAttribute('aria-pressed')==='true'; if(sk){waterG.visible=true;document.getElementById('tWater').setAttribute('aria-pressed','true');}
  [mat.sock,mat.fix,mat.lan,window.__swMk,...(window.__waterMats||[])].forEach(m_=>{if(!m_)return;m_.depthTest=!sk;m_.transparent=sk;m_.opacity=1;m_.emissiveIntensity=sk?.9:.4;m_.needsUpdate=true;});   // oznake vidne tudi skozi pohištvo
  if(sk){setLayer('tSock',groups.sock,true);setLayer('tSmart',groups.smart,false);setLayer('tLab',groups.lab,true);wallH=1.3;buildWalls();ceil.visible=false;document.getElementById('tLow').setAttribute('aria-pressed','true');hint.textContent='Pogled Vtičnice: oranžno = vtičnica 230 V · modro = fiksni priključek 230 V (aparat, luč, 400 V za BORA) · zeleno = UTP (RJ45) · rumeno = stikalo · miška nad oznako = kaj je in na kateri višini · vse je v steni ali za pohištvom, brez podaljškov';}
@@ -1906,6 +1952,10 @@ tog('tSmart',on=>{groups.smart.visible=on;lanG.visible=on;});
 tog('tDuct',on=>{if(window.__ductG)window.__ductG.visible=on;});
 tog('tWater',on=>{waterG.visible=on;});
 tog('tLan',on=>{lanG.visible=on;});
+{const ids=['tSock','tLan','tWater','tDuct','tSmart'],setI=(id,on)=>{const b=document.getElementById(id);if((b.getAttribute('aria-pressed')==='true')!==on)b.click();};
+ document.getElementById('iAll').addEventListener('click',()=>ids.forEach(id=>setI(id,true)));
+ document.getElementById('iNone').addEventListener('click',()=>ids.forEach(id=>setI(id,false)));
+ window.__instOff=()=>ids.forEach(id=>setI(id,false));}
 tog('tLab',on=>groups.lab.visible=on);
 document.getElementById('tRoof').addEventListener('click',()=>setRoof(!roofOn));
 tog('tLow',on=>{if(on&&roofOn)setRoof(false);wallH=on?1.1:H;buildWalls();ceil.visible=!on;});
@@ -2111,7 +2161,7 @@ document.getElementById('tXmas').addEventListener('click',()=>{xmas.visible=!xma
  const sup=dsup.map(p=>p[p.length-1]), ext=dext.map(p=>p[p.length-1]); PL.sup.push(...sup); PL.ext.push(...ext); PL.dsup=[tS,...dsup]; PL.dext=[tE,...dext]; PL.plen=[PS,PE]; PL.qs=[40,40,30,30,40,20]; PL.qe=[60,60,30,20,30];   // m³/h: dovod 200 = odvod 200 (uravnoteženo)
  sup.forEach(v=>valve(v[0],v[1],'Rekuperacija – dovod svežega zraka (stropni ventil)')); ext.forEach(v=>valve(v[0],v[1],'Rekuperacija – odvod izrabljenega zraka (stropni ventil)'));
  const dS=M(0x3f8fd8,{roughness:.5}),dE=M(0xd9822b,{roughness:.5}),y=H+.12;   // kanali v izolaciji nad stropom
- const ductG=new THREE.Group(); groups.smart.add(ductG); window.__ductG=ductG;
+ const ductG=new THREE.Group(); scene.add(ductG); window.__ductG=ductG;
  const seg=(a,b,c,d,mtl)=>box(Math.min(a,c)-3,Math.min(b,d)-3,Math.max(a,c)+3,Math.max(b,d)+3,y,y+.07,mtl,ductG);
  const path=(P,mtl)=>{for(let i=1;i<P.length;i++)seg(P[i-1][0],P[i-1][1],P[i][0],P[i][1],mtl);};
  dsup.forEach(P=>path(P,dS)); dext.forEach(P=>path(P,dE)); path(tS,dS); path(tE,dE);
@@ -2349,7 +2399,7 @@ try{{const NS='http://www.w3.org/2000/svg',svg=document.getElementById('planSvg'
    g.fillText('Stanovanje S2 – načrt inštalacij ('+on+')',30,1640+50);g.font='22px Arial';g.fillStyle='#555';g.fillText(lg.innerText.replace(/\s+/g,' ').slice(0,180),30,1640+90);
    const blob=await new Promise(ok=>c.toBlob(ok,'image/png'));
    await dl.save({filename:'nacrt-instalacij-S2.png',data:blob});}catch(e){if(e&&e.code==='unavailable')b.hidden=true;}finally{b.disabled=false;b.textContent='Prenesi PNG';}});})();
- const a=document.createElement('a');a.href='#s-plans';a.textContent='Načrti';document.getElementById('toc').insertBefore(a,document.getElementById('toc').children[1]||null);{const b=document.createElement('a');b.href='#s-nakup';b.textContent='Nakup';document.getElementById('toc').appendChild(b);}}
+ const a=document.createElement('a');a.href='#s-plans';a.textContent='Načrti';document.getElementById('toc').insertBefore(a,document.getElementById('toc').children[1]||null);{const c=document.createElement('a');c.href='#s-pred';c.textContent='Pred inštalacijami';document.getElementById('toc').appendChild(c);}{const b=document.createElement('a');b.href='#s-nakup';b.textContent='Nakup';document.getElementById('toc').appendChild(b);}}
 // ---------- KERAMIKA ZA TLA: imitacija travertina, lesa (deske, ribja kost) in betona – vse porcelanske ploščice ----------
 {const N=1024,mk=draw=>{const c=document.createElement('canvas');c.width=c.height=N;const g=c.getContext('2d');draw(g);const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.encoding=THREE.sRGBEncoding;t.anisotropy=8;t.repeat.set(1/2.4,1/2.4);return t;};
  let sd=7;const rn=()=>(sd=(sd*16807)%2147483647)/2147483647, px=N/240;   // 1 cm = px pikslov (tekstura = 2,4 m)
