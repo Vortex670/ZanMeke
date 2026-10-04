@@ -374,10 +374,20 @@ export async function getDashboardSnapshot(
   const dNaprave = delez(naprave, (r) => r._count._all);
   const dBrskalniki = delez(brskalniki, (r) => r._count._all);
 
-  const oblika =
-    zrno === "hour"
-      ? new Intl.DateTimeFormat("sl-SI", { hour: "2-digit" })
-      : new Intl.DateTimeFormat("sl-SI", { day: "numeric", month: "numeric" });
+  /**
+   * Os grafa dobi ISO in NE oblikovanega niza.
+   *
+   * Tu je bil `Intl.DateTimeFormat`, ki je vračal »3. 10.«; graf pa iz te
+   * vrednosti sestavi `new Date("3. 10.T00:00:00Z")` in dobi `Invalid Date`.
+   * Na osi je pisalo točno to. Oblikovanje je naloga grafa, ki edini ve,
+   * koliko prostora ima za napis — poizvedba vrne podatek.
+   *
+   * `date_trunc(... AT TIME ZONE 'Europe/Ljubljana')` vrne krajevni čas kot
+   * časovni žig brez cone, gonilnik pa ga poda kot `Date` v UTC. Zato je
+   * `toISOString()` tu PRAVI dan in ne dan prej.
+   */
+  const vIso = (d: Date) =>
+    zrno === "hour" ? d.toISOString().slice(0, 13) : d.toISOString().slice(0, 10);
 
   return {
     range,
@@ -397,7 +407,7 @@ export async function getDashboardSnapshot(
     callsTotal,
 
     daily: dailyRaw.map((v) => ({
-      date: oblika.format(new Date(v.kdaj)),
+      date: vIso(new Date(v.kdaj)),
       views: Number(v.views),
       visitors: Number(v.visitors),
     })),

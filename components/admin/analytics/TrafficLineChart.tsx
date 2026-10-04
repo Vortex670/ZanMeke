@@ -51,10 +51,18 @@ export function TrafficLineChart({
 
   const yScale = (v: number) => innerH - (v / maxY) * innerH;
 
+  // ENA SAMA TOČKA NI ČRTA. Pri enem dnevu podatkov je `buildPath` vrnil
+  // »M0,157.50« — ukaz, ki pero premakne in ne nariše ničesar, piko pa je
+  // prilepil na levo os. Graf je bil videti prazen, čeprav je podatek bil.
+  // Takrat postavimo točko na SREDINO: ena meritev ne pripada ne začetku ne
+  // koncu obdobja.
+  const enaTocka = data.length === 1;
+  const xAt = (i: number) => (enaTocka ? innerW / 2 : i * stepX);
+
   const buildPath = (key: "views" | "visitors") => {
     return data
       .map((d, i) => {
-        const x = i * stepX;
+        const x = xAt(i);
         const y = yScale(d[key]);
         return `${i === 0 ? "M" : "L"}${x.toFixed(2)},${y.toFixed(2)}`;
       })
@@ -64,7 +72,7 @@ export function TrafficLineChart({
   // Area path = line path + close at bottom
   const areaPath = (() => {
     const linePath = buildPath("views");
-    const lastX = (data.length - 1) * stepX;
+    const lastX = xAt(data.length - 1);
     return `${linePath} L${lastX.toFixed(2)},${innerH} L0,${innerH} Z`;
   })();
 
@@ -83,9 +91,20 @@ export function TrafficLineChart({
     (a, b) => a - b,
   );
 
+  /**
+   * Napis na osi iz ISO vrednosti.
+   *
+   * Zrno je razvidno iz dolžine: `2026-10-03` je dan, `2026-10-03T14` ura.
+   * Neveljavne vrednosti vrnemo nespremenjene — na osi je bolje videti
+   * surov podatek kot »Invalid Date«, ker prvo pove, kje iskati napako.
+   */
   const formatDate = (iso: string) => {
-    const d = new Date(`${iso}T00:00:00Z`);
-    return d.toLocaleDateString("sl-SI", { day: "numeric", month: "short" });
+    const jeUra = iso.length > 10;
+    const d = new Date(jeUra ? `${iso}:00:00Z` : `${iso}T00:00:00Z`);
+    if (Number.isNaN(d.getTime())) return iso;
+    return jeUra
+      ? d.toLocaleTimeString("sl-SI", { hour: "2-digit", timeZone: "Europe/Ljubljana" })
+      : d.toLocaleDateString("sl-SI", { day: "numeric", month: "short" });
   };
 
   return (
@@ -144,51 +163,62 @@ export function TrafficLineChart({
             );
           })}
 
-          {/* Area pod views črto */}
-          <path d={areaPath} fill="url(#trafficGradient)" />
+          {/* ČRTE IN PLOSKEV SAMO, KADAR JE KAJ POVEZOVATI. Pri eni točki je
+              ploskev »od točke do dna in do levega roba« narisala trikotnik,
+              ki je izgledal kot strma rast — podatka za rast pa ni bilo.
+              Izmišljena oblika je slabša od prazne: po njej se odloča. */}
+          {!enaTocka ? (
+            <>
+              {/* Area pod views črto */}
+              <path d={areaPath} fill="url(#trafficGradient)" />
 
-          {/* Visitors črta (success) — ozadenjska */}
-          <path
-            d={buildPath("visitors")}
-            fill="none"
-            stroke="var(--success)"
-            strokeWidth={2}
-            strokeLinejoin="round"
-            strokeLinecap="round"
-            strokeDasharray="4 3"
-          />
+              {/* Visitors črta (success) — ozadenjska */}
+              <path
+                d={buildPath("visitors")}
+                fill="none"
+                stroke="var(--success)"
+                strokeWidth={2}
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                strokeDasharray="4 3"
+              />
 
-          {/* Views črta (accent) — primarna */}
-          <path
-            d={buildPath("views")}
-            fill="none"
-            stroke="var(--accent)"
-            strokeWidth={2.5}
-            strokeLinejoin="round"
-            strokeLinecap="round"
-          />
+              {/* Views črta (accent) — primarna */}
+              <path
+                d={buildPath("views")}
+                fill="none"
+                stroke="var(--accent)"
+                strokeWidth={2.5}
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              />
+            </>
+          ) : null}
 
           {/* Data points (dot na vsakem) */}
           {data.map((d, i) => {
-            const x = i * stepX;
+            const x = xAt(i);
             return (
               <g key={i}>
-                <circle cx={x} cy={yScale(d.views)} r={3} fill="var(--accent)" />
+                <circle
+                  cx={x}
+                  cy={yScale(d.views)}
+                  r={enaTocka ? 5 : 3}
+                  fill="var(--accent)"
+                />
               </g>
             );
           })}
 
           {/* X axis labels */}
           {xLabels.map(({ i, label }) => {
-            const x = i * stepX;
+            const x = xAt(i);
             return (
               <text
                 key={i}
                 x={x}
                 y={innerH + 20}
-                textAnchor={
-                  i === 0 ? "start" : i === data.length - 1 ? "end" : "middle"
-                }
+                textAnchor={i === 0 ? "start" : i === data.length - 1 ? "end" : "middle"}
                 fontSize={10}
                 fill="var(--text-muted)"
                 fontFamily="ui-monospace, monospace"
