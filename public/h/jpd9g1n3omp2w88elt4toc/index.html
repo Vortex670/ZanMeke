@@ -191,7 +191,7 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
       <div><b id="stLan">–</b><span>mrežnih priključkov</span></div>
       <div><b>17</b><span>mest stikal</span></div>
     </div>
-    <p class="small" style="margin-top:14px;color:var(--faint)">različica 135 – Apple Home / Alexa</p>
+    <p class="small" style="margin-top:14px;color:var(--faint)">različica 136 – hitrejši prikaz (večer, realistično, celoten pregled)</p>
   </header>
 
   <section class="viewer" id="model" aria-label="3D pogled">
@@ -1155,8 +1155,8 @@ if(THREE.ColorManagement)THREE.ColorManagement.legacyMode=false;   // barve v sR
 // --- Scena
 const stage=document.getElementById('stage');
 const renderer=new THREE.WebGLRenderer({antialias:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap; renderer.shadowMap.autoUpdate=false; renderer.shadowMap.needsUpdate=true;   // sence se preračunajo samo ob spremembi
 renderer.outputEncoding=THREE.sRGBEncoding; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=.8;
 stage.insertBefore(renderer.domElement,stage.firstChild);
 const scene=new THREE.Scene();
@@ -1170,7 +1170,7 @@ new MutationObserver(themeBg).observe(document.documentElement,{attributes:true,
 
 const hemi=new THREE.HemisphereLight(0xffffff,0x8a8378,0.75);scene.add(hemi);
 const sun=new THREE.DirectionalLight(0xffe6c4,0.8); sun.position.set(-8,16,10); sun.castShadow=true;
-sun.shadow.mapSize.set(4096,4096); sun.shadow.bias=-0.0004; sun.shadow.normalBias=0.02; sun.shadow.radius=3; Object.assign(sun.shadow.camera,{left:-20,right:20,top:20,bottom:-20,far:80}); scene.add(sun);
+sun.shadow.mapSize.set(2048,2048); sun.shadow.bias=-0.0004; sun.shadow.normalBias=0.02; sun.shadow.radius=3; Object.assign(sun.shadow.camera,{left:-20,right:20,top:20,bottom:-20,far:80}); scene.add(sun);
 
 const M=(c,o={})=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.85},o));
 const mat={wall:M(0xf3ece2),wallTop:M(0xc8643c),ext:M(0xeceae3),parquet:M(0xb98a5c),tile:M(0xb9bcbe),out:M(0xa9a59c),
@@ -2144,7 +2144,7 @@ const coneMat=new THREE.MeshBasicMaterial({color:0xffd7a0,transparent:true,opaci
  const amb=new THREE.Mesh(new THREE.PlaneGeometry(m(150),1.25),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),color:0xffb070,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));
  amb.rotation.y=Math.PI/2; amb.position.set(mx(918.8),1.42,mz(900.5)); nightG.add(amb); window.__amb=amb;
  const al2=new THREE.PointLight(0xffb070,.5,3,2); al2.position.set(mx(925),1.42,mz(900)); nightG.add(al2); window.__ambL=al2;}
-coneReq.forEach(q=>{const h=q[4];const c=new THREE.Mesh(new THREE.ConeGeometry(q[3],h,32,1,true),coneMat);c.position.set(mx(q[0]),q[2]-h/2,mz(q[1]));nightG.add(c);});
+coneReq.forEach(q=>{const h=q[4];const c=new THREE.Mesh(new THREE.ConeGeometry(q[3],h,12,1,true),coneMat);c.position.set(mx(q[0]),q[2]-h/2,mz(q[1]));nightG.add(c);});
 function setNight(on){window.__night=on;
  if(window.__aqL){window.__aqL.color.setHex(on?0x6a5cff:0x7cc8ff);window.__aqL.intensity=on?1.1:.8;window.__aqLed.emissive.setHex(on?0x5a3cff:0x9fd0ff);(window.__corals||[]).forEach(c=>c.emissiveIntensity=on?1.3:.35);} scene.environment=on?null:envTex;nightG.visible=on;coveG.visible=on||!!window.__room;
  hemi.intensity=on?.05:.35; hemi.color.setHex(on?0x6d7da6:0xffffff); sun.intensity=on?.04:1.1; sun.color.setHex(on?0x9fb4ff:0xffe6c4);
@@ -2242,7 +2242,7 @@ const blindsG=new THREE.Group();scene.add(blindsG);const blinds=[];let blindsDow
 })();
 function toggleBlinds(list){const ids=list==='all'?blinds.map((_,i)=>i):list;const down=ids.some(i=>!blinds[i].down);ids.forEach(i=>blinds[i].down=down);swHits.forEach(h=>{const a=h.userData.act,ii=a==='all'?blinds.map((_,i)=>i):a;h.userData.led.material.emissive.setHex(ii.every(i=>blinds[i].down)?0xffa640:0x6ab8ff);});}
 window.__dbg.blinds=()=>blinds; window.__dbg.cam=()=>cam;
-function updBlinds(){blinds.forEach(b=>{const target=b.down?(b.top-b.sill):.02;b.h+=(target-b.h)*.08;b.me.scale.y=Math.max(.02,b.h);b.me.position.y=b.top-b.h/2;});}
+function updBlinds(){let mv=false;blinds.forEach(b=>{const target=b.down?(b.top-b.sill):.02;if(Math.abs(target-b.h)<.002)return;mv=true;b.h+=(target-b.h)*.08;b.me.scale.y=Math.max(.02,b.h);b.me.position.y=b.top-b.h/2;});return mv;}
 document.getElementById('tBlinds').addEventListener('click',()=>{blindsDown=!blindsDown;blinds.forEach(b=>b.down=blindsDown);toggleBlinds([]);document.getElementById('tBlinds').setAttribute('aria-pressed',String(blindsDown));});
 
 // ---------- BOŽIČNA JELKA: pred velikim oknom O6 med sedežno in jedilnico (vidna tudi od zunaj) ----------
@@ -2408,11 +2408,11 @@ if(THREE.EffectComposer&&THREE.SAOPass){
  composer.addPass(new THREE.RenderPass(scene,cam));
  const sao=new THREE.SAOPass(scene,cam,false,true);
  Object.assign(sao.params,{saoBias:.5,saoIntensity:.0035,saoScale:3,saoKernelRadius:28,saoMinResolution:0,saoBlur:true,saoBlurRadius:6,saoBlurStdDev:4,saoBlurDepthCutoff:.01});
- composer.addPass(sao);
+ composer.addPass(sao); window.__sao=sao;
  composer.addPass(new THREE.ShaderPass({uniforms:{tDiffuse:{value:null},exposure:{value:.8}},
   vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
   fragmentShader:'uniform sampler2D tDiffuse;uniform float exposure;varying vec2 vUv;vec3 aces(vec3 x){x*=exposure*.6;return clamp((x*(2.51*x+.03))/(x*(2.43*x+.59)+.14),0.,1.);}void main(){vec4 c=texture2D(tDiffuse,vUv);vec3 m=aces(c.rgb);gl_FragColor=vec4(pow(m,vec3(1./2.2)),1.);}'}));
- const rs=()=>{const r=stage.getBoundingClientRect();composer.setSize(r.width,r.height);composer.setPixelRatio(Math.min(devicePixelRatio,2));};
+ const rs=()=>{const r=stage.getBoundingClientRect();composer.setSize(r.width,r.height);composer.setPixelRatio(1);};
  new ResizeObserver(rs).observe(stage); rs();
 }
 document.getElementById('tReal').addEventListener('click',()=>{realOn=!realOn;document.getElementById('tReal').setAttribute('aria-pressed',String(realOn));});
@@ -2565,14 +2565,26 @@ document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest
  const cnt=()=>document.querySelectorAll('.shopc').forEach(c=>{const g=c.dataset.g,bs=boxes.filter(b=>b.dataset.k.split('-')[0]===g);c.textContent=bs.filter(b=>b.checked).length+' / '+bs.length;});
  boxes.forEach(b=>{b.checked=!!st[b.dataset.k];b.addEventListener('change',()=>{st[b.dataset.k]=b.checked;try{localStorage.setItem(K,JSON.stringify(st));}catch(e){}cnt();});});cnt();}
 
-function frame(){ updBlinds();
- doorAnim.forEach(a=>{if(a.cycle){const k=reduce?1:.12;a.tc+=(a.tt-a.tc)*k;a.sc+=(a.sl-a.sc)*k;a.g.rotation.z=.045*a.tc;a.g.position.z=a.slideZ*a.sc+(a.sc>.001?-m(1.5)*Math.min(1,a.sc*8)*0:0);return;}
-  if(Math.abs(a.t-a.cur)<.002)return;a.cur+=(a.t-a.cur)*(reduce?1:.14);if(a.slideZ!==undefined)a.g.position.z=a.slideZ*a.cur;else if(a.slide!==undefined)a.g.position.x=a.slide*a.cur;else a.g.rotation.y=a.aO+(a.aC-a.aO)*a.cur;});
+// ---------- HITROST: izris samo ob spremembi, največ 8 dinamičnih luči (najbližje pogledu), SAO samo v sobah podnevi ----------
+window.__dirty=5;const dirty=(n=3)=>{window.__dirty=Math.max(window.__dirty,n);};
+['click','keydown','input','wheel'].forEach(t=>document.addEventListener(t,()=>{dirty(4);renderer.shadowMap.needsUpdate=true;},true));
+new ResizeObserver(()=>dirty(3)).observe(stage);
+const MAXL=8;let lightTick=0;const _lv=new THREE.Vector3();
+function limitLights(){const c=[];scene.traverse(o=>{if(!o.isPointLight)return;let on=true;for(let q=o.parent;q;q=q.parent)if(q.visible===false){on=false;break;}if(on)c.push(o);});
+ c.forEach(l=>{l.getWorldPosition(_lv);l.userData.d=_lv.distanceTo(ctl.target)+.3*_lv.distanceTo(cam.position)-l.intensity;});
+ c.sort((a,b)=>a.userData.d-b.userData.d);c.forEach((l,i)=>{const v=i<MAXL;if(l.visible!==v){l.visible=v;}});}
+function frame(){ let mv=updBlinds(),mo=mv;
+ doorAnim.forEach(a=>{if(a.cycle){if(Math.abs(a.tt-a.tc)+Math.abs(a.sl-a.sc)>.002)mv=mo=true;const k=reduce?1:.12;a.tc+=(a.tt-a.tc)*k;a.sc+=(a.sl-a.sc)*k;a.g.rotation.z=.045*a.tc;a.g.position.z=a.slideZ*a.sc+(a.sc>.001?-m(1.5)*Math.min(1,a.sc*8)*0:0);return;}
+  if(Math.abs(a.t-a.cur)<.002)return;mv=mo=true;a.cur+=(a.t-a.cur)*(reduce?1:.14);if(a.slideZ!==undefined)a.g.position.z=a.slideZ*a.cur;else if(a.slide!==undefined)a.g.position.x=a.slide*a.cur;else a.g.rotation.y=a.aO+(a.aC-a.aO)*a.cur;});
  if(anim){anim.t=Math.min(1,anim.t+(reduce?1:0.04));const e=anim.t<.5?2*anim.t*anim.t:1-Math.pow(-2*anim.t+2,2)/2;
   cam.position.lerpVectors(anim.from,anim.to,e);cam.fov=anim.f0+(anim.f1-anim.f0)*e;cam.updateProjectionMatrix();ctl.target.lerpVectors(anim.tf,anim.tt,e);if(anim.t>=1)anim=null;}
- ctl.update(); if(composer&&realOn)composer.render(); else renderer.render(scene,cam);}
+ if(anim)mv=true; if(ctl.update())mv=true; if(mo)renderer.shadowMap.needsUpdate=true;
+ if(!mv&&window.__dirty<=0)return; window.__dirty--;
+ if(++lightTick%20===0||window.__dirty>0)limitLights();
+ if(window.__sao)window.__sao.enabled=!!window.__room&&!window.__night;
+ if(composer&&realOn)composer.render(); else renderer.render(scene,cam);}
 (function loop(){requestAnimationFrame(loop); frame();})();
-window.__frames=n=>{for(let i=0;i<n;i++)frame();};   // za preverjanje v skritem zavihku
+window.__frames=n=>{for(let i=0;i<n;i++){window.__dirty=Math.max(window.__dirty,1);frame();}};   // za preverjanje v skritem zavihku
 })();
 </script>
 </body></html>
