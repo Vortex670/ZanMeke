@@ -115,6 +115,12 @@ tr:hover td{background:var(--accent-soft)}
 .big{font-family:var(--display);letter-spacing:-.03em}
 footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint);font-size:13px}
 @media (max-width:640px){.topnav .brand{display:none}}
+.roles{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:28px}
+.role{all:unset;cursor:pointer;display:grid;gap:4px;padding:14px 16px;border:1px solid var(--line);border-radius:2px;background:var(--sheet);transition:border-color .15s,transform .15s}
+.role:hover,.role:focus-visible{border-color:var(--accent);transform:translateY(-1px)}
+.role b{font:700 16px var(--display);color:var(--ink)}
+.role span{font-size:13.5px;color:var(--muted);line-height:1.35}
+
 .plans{border-top:1px solid var(--line);padding-top:clamp(32px,5vw,56px);display:grid;gap:14px}
 .phead{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
 .planwrap{position:relative;background:#fff;border:1px solid var(--line);border-radius:2px;overflow:hidden}
@@ -151,10 +157,22 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
   <header class="hero">
     <p class="eyebrow">Dvostanovanjska hiša · DGD 306/2025 · mansarda</p>
     <h1>Stanovanje S2, sobo za sobo.</h1>
-    <p class="lead">Model je zgrajen iz mer na tlorisu (1683 × 1063 cm, neto 151,83 m²). Gumb »Hiša« pokaže celotno hišo s pritličjem in streho, ostali pogledi so brez strehe, da se vidi notranjost. Oranžne točke so predlagane vtičnice, modre so fiksni priključki. Oprema je okvirna, kuhinja ima otok z BORA ploščo z vgrajeno napo, tla so iz ploščic velikega formata.</p>
+    <p class="lead">Vse za stanovanje S2 na enem mestu: 3D model za ogled in izbiro barv, načrti po strokah z oštevilčenimi seznami za izvajalce, kaj mora biti izbrano pred inštalacijami, kje kupiti in koliko stane. Model je narejen po merah iz tlorisa (DGD 306/2025, list 3).</p>
     <div class="actions">
       <button class="btn" type="button" id="heroFull">Odpri 3D na celem zaslonu</button>
       <a class="btn ghost" href="#s-cost">Ocena opreme <b id="heroCost"></b></a>
+    </div>
+    <div class="roles" aria-label="Kdo si?">
+      <p class="eyebrow" style="grid-column:1/-1;margin:0">Kdo si? Klikni in odpre se tvoj del</p>
+      <button class="role" data-v="v3d"><b>Lastnika</b><span>3D model, sprehod po sobah, barve in materiali</span></button>
+      <button class="role" data-l="el"><b>Električar – vtičnice</b><span>oštevilčen načrt vtičnic in fiksnih priključkov z višinami</span></button>
+      <button class="role" data-l="lu"><b>Električar – luči in stikala</b><span>spoti, LED trakovi, stikala in senčila</span></button>
+      <button class="role" data-l="net"><b>Omrežje in pametna hiša</b><span>UTP, dostopne točke, senzorji, omarica</span></button>
+      <button class="role" data-l="wa"><b>Vodovodar</b><span>voda in odtoki z višinami priključkov</span></button>
+      <button class="role" data-l="hv"><b>Strojnik</b><span>TČ, talno ogrevanje, rekuperacija, klima</span></button>
+      <button class="role" data-v="vkit"><b>Kuhinjski studio</b><span>kuhinja in otok v 3D, nato seznam »Nakup«</span></button>
+      <button class="role" data-h="s-pred"><b>Pred inštalacijami</b><span>kaj mora biti izbrano in kupljeno prej</span></button>
+      <button class="role" data-h="s-smart"><b>Pametna hiša – nakup</b><span>vse komponente s količinami in cela hiša na tablici</span></button>
     </div>
     <div class="stats">
       <div><b>131,6 m²</b><span>notranja površina</span></div>
@@ -163,7 +181,7 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
       <div><b id="stLan">–</b><span>mrežnih priključkov</span></div>
       <div><b>17</b><span>mest stikal</span></div>
     </div>
-    <p class="small" style="margin-top:14px;color:var(--faint)">različica 130 – vrstica Inštalacije, seznam pred začetkom inštalacij</p>
+    <p class="small" style="margin-top:14px;color:var(--faint)">različica 132 – kartice »Kdo si«, seznam za pametno hišo, cela hiša na stenski tablici</p>
   </header>
 
   <section class="viewer" id="model" aria-label="3D pogled">
@@ -345,6 +363,45 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
     </table></div>
   </section>
 
+
+  <section class="plans" id="smartbom">
+    <div class="phead"><div>
+      <p class="eyebrow">Pametna hiša – nakupovalni seznam</p>
+      <h2 id="s-smart">Kaj vse nabaviti, da pametna hiša deluje</h2>
+      <p class="small" style="max-width:72ch">Količine so iz modela (17 mest stikal, 11 senčil, 9 zank talnega ogrevanja …). Vse v steni in razdelilniku (KNX) dobavi in sprogramira <b>KNX integrator</b>. Hue, Home Assistant in omrežje lahko kupiš sam. Pomembno: kabli in doze morajo biti v steni že med gradnjo, naprave pa se lahko kupijo pozneje.</p>
+    </div></div>
+    <div class="tbl"><table>
+      <thead><tr><th>Skupina</th><th>Kaj</th><th>Količina</th><th>Za kaj</th><th>Znamke</th></tr></thead>
+      <tbody>
+            <tr><td class="small">Srce sistema</td><td>KNX napajalnik 640 mA + IP vmesnik / router</td><td class="n">1 + 1</td><td class="small">napaja vodilo, poveže KNX z omrežjem in Home Assistantom</td><td class="small">Gira, MDT, ABB</td></tr>
+            <tr><td class="small">Srce sistema</td><td>Home Assistant strežnik (Home Assistant Green ali mini PC) + UPS</td><td class="n">1</td><td class="small">ena aplikacija za vse: KNX, Hue, TČ, klima, kamere, robot, BORA, LG</td><td class="small">Home Assistant</td></tr>
+            <tr><td class="small">Srce sistema</td><td>Philips Hue Bridge Pro</td><td class="n">1</td><td class="small">vse luči Hue (~70 točk), scene, Ambilight sync</td><td class="small">Philips Hue</td></tr>
+            <tr><td class="small">Tipke in senzorji</td><td>KNX tipke (stikala) s 1–4 tipkami</td><td class="n">17 mest, ~47 tipk</td><td class="small">luči, scene, senčila; vsaka tipka je programabilna</td><td class="small">Gira, Jung, MDT</td></tr>
+            <tr><td class="small">Tipke in senzorji</td><td>Sobni termostati / temperaturni senzorji KNX</td><td class="n">3 + glavna enota</td><td class="small">temperatura po sobah, krmili talno ogrevanje in klimo</td><td class="small">Gira, MDT, Theben</td></tr>
+            <tr><td class="small">Tipke in senzorji</td><td>Senzorji gibanja / prisotnosti</td><td class="n">6</td><td class="small">hodnik, predprostor, stopnice, shramba, WC, spalnica (nočna luč)</td><td class="small">Theben, Steinel, MDT</td></tr>
+            <tr><td class="small">Tipke in senzorji</td><td>Senzor CO₂ (otroški sobi) in vlage (kopalnica)</td><td class="n">2 + 1</td><td class="small">povečajo pretok rekuperacije</td><td class="small">MDT, Theben</td></tr>
+            <tr><td class="small">Tipke in senzorji</td><td>Vremenska postaja (veter, dež, sonce, temperatura)</td><td class="n">1</td><td class="small">senčila ob vetru gor, poleti ob soncu dol, strešno okno ob dežju zapre</td><td class="small">Elsner, MDT</td></tr>
+            <tr><td class="small">Tipke in senzorji</td><td>Kontakt na terasnih vratih in strešnem oknu</td><td class="n">2</td><td class="small">senčilo se ne spusti pri odprtih vratih, opozorilo »okno odprto«</td><td class="small">—</td></tr>
+            <tr><td class="small">Tipke in senzorji</td><td>Senzorji puščanja vode</td><td class="n">5</td><td class="small">pod koritom, pomivalnim strojem, pralnim strojem, akvarijem, hladilnikom</td><td class="small">Zigbee (prek Hue/HA) ali KNX</td></tr>
+            <tr><td class="small">Tipke in senzorji</td><td>Povezani javljalniki dima + CO</td><td class="n">2 + 1</td><td class="small">hodnik, dnevni, CO pri kaminu – alarm na telefon</td><td class="small">Ei Electronics, Hekatron</td></tr>
+            <tr><td class="small">Aktorji (v razdelilniku)</td><td>Aktor za senčila</td><td class="n">12 kanalov</td><td class="small">11 zunanjih žaluzij + rolo strešnega okna</td><td class="small">MDT, Gira, ABB</td></tr>
+            <tr><td class="small">Aktorji (v razdelilniku)</td><td>Aktor za talno ogrevanje (ventilski pogoni 230 V)</td><td class="n">8–10 kanalov</td><td class="small">vsaka soba svoja zanka in temperatura</td><td class="small">MDT, Theben</td></tr>
+            <tr><td class="small">Aktorji (v razdelilniku)</td><td>Stikalni aktor</td><td class="n">8–12 kanalov</td><td class="small">vtičnice za božično jelko, grelec brisač, LED napajalniki, terasa, akvarij v sili</td><td class="small">MDT, Gira</td></tr>
+            <tr><td class="small">Povezave z napravami</td><td>Vmesnik TČ in rekuperacije (Modbus ali KNX modul proizvajalca)</td><td class="n">1–2</td><td class="small">temperatura, režimi, filtri, poraba v isti aplikaciji</td><td class="small">po proizvajalcu TČ/REK</td></tr>
+            <tr><td class="small">Povezave z napravami</td><td>Vmesnik klime (KNX/Modbus, npr. Intesis)</td><td class="n">1</td><td class="small">klima po conah v isti aplikaciji in termostatih</td><td class="small">Intesis, Daikin, Mitsubishi</td></tr>
+            <tr><td class="small">Povezave z napravami</td><td>Wi-Fi naprave brez dodatne opreme</td><td class="n">—</td><td class="small">LG ThinQ, BORA One, Miele@home, Roomba, Philips TV, Xbox – povežejo se v Home Assistant</td><td class="small">—</td></tr>
+            <tr><td class="small">Omrežje</td><td>Router s požarnim zidom in VLAN-i, PoE stikalo 24×, 4 dostopne točke, patch panel 48, omarica 15U, UPS</td><td class="n">1 kpl</td><td class="small">stabilno omrežje, IoT naprave ločene od računalnikov</td><td class="small">Ubiquiti UniFi, TP-Link Omada</td></tr>
+            <tr><td class="small">Varnost</td><td>Video zvonec + 2 kameri (PoE)</td><td class="n">1 + 2</td><td class="small">vhod, terasa, nadstrešek; posnetki ostanejo doma</td><td class="small">Ubiquiti, Reolink</td></tr>
+            <tr><td class="small">Cela hiša na tablici</td><td>Stenska tablica 10" v hodniku namesto glavne enote (napajanje PoE ali USB-C v steni)</td><td class="n">1</td><td class="small">tloris stanovanja: luči, senčila, temperature, kamere, kdo je doma – vse z enim dotikom</td><td class="small">iPad / Android tablica + nosilec v steni</td></tr>
+            <tr><td class="small">Cela hiša na tablici</td><td>Aplikacija Home Assistant na telefonih in tablicah</td><td class="n">—</td><td class="small">ista nadzorna plošča doma in na poti (varen dostop prek Home Assistant Cloud ali VPN)</td><td class="small">Home Assistant</td></tr>
+      </tbody>
+    </table></div>
+    <div class="card" style="margin-top:12px"><h2>Cela hiša na tablici</h2><ul>
+      <li><b>Stenska tablica v hodniku</b> (namesto majhne glavne enote) kaže tloris stanovanja: tapneš sobo in prižgeš luči, spustiš rolete, nastaviš temperaturo, vidiš kamero pri vhodu, ali je kje odprto okno in ali pušča voda. Napajanje je iz stene (PoE ali USB-C), zato ni kabla.</li>
+      <li><b>Isto na telefonu in tvoji tablici</b> v aplikaciji Home Assistant – doma in na poti. Glasovno pa prek Google, Alexa ali Siri.</li>
+      <li><b>3D model in načrti</b> (ta stran) so na <b>zanmeke.com/hisa</b> z geslom – na tablici dodaj ikono na začetni zaslon.</li>
+    </ul></div>
+  </section>
 
   <section class="grid">
     <div>
@@ -2195,7 +2252,7 @@ document.getElementById('tXmas').addEventListener('click',()=>{xmas.visible=!xma
 }
 // ---------- UPRAVLJANJE TEMPERATURE: glavna stenska enota v hodniku + sobni termostati ----------
 {const scr=M(0x15181b,{roughness:.15,emissive:0x1d3a52,emissiveIntensity:.5}),wh=M(0xf4f2ee,{roughness:.4});
- LBL="glavna enota (TČ, klima, rekuperacija, pametna hiša) – hodnik";box(1192,652.7,1222,654,1.3,1.62,wh); box(1194,652.5,1220,652.7,1.33,1.59,scr);                 // glavna enota (TČ, klima, rekuperacija, pametna hiša) – hodnik
+ LBL="glavna enota (TČ, klima, rekuperacija, pametna hiša) – hodnik";LBL='Stenska tablica 10" – cela hiša na enem zaslonu (Home Assistant): luči, senčila, temperatura, kamere';box(1192,652.7,1226,654,1.28,1.52,M(0x1a1a1a,{roughness:.3})); box(1193.5,652.5,1224.5,652.7,1.295,1.505,scr);LBL=null;                 // glavna enota (TČ, klima, rekuperacija, pametna hiša) – hodnik
  [[1038,585,'x',-1],[1395,578,'x',1],[1106,583,'z',-1]].forEach(t=>{ if(t[2]==='x')box(t[0],t[1]-4,t[0]+t[3]*1,t[1]+4,1.45,1.55,wh); else box(t[0]-4,t[1],t[0]+4,t[1]+t[3]*1,1.45,1.55,wh);});   // sobni termostati: otroška 1, spalnica, otroška 2
  LBL="UPRAVLJANJE TEMPERATURE: glavna stenska enota v hodniku + sobni termostati";box(1060,612,1068,613,1.45,1.55,wh,undefined);
  LBL="podometna omarica razdelilnika talnega ogrevanja (hodnik)";box(1300,653.2,1345,654,.3,1.05,M(0xf1eee8,{roughness:.5})); box(1343,653,1344,653.2,.6,.75,mt.black);   // podometna omarica razdelilnika talnega ogrevanja (hodnik)
@@ -2399,7 +2456,13 @@ try{{const NS='http://www.w3.org/2000/svg',svg=document.getElementById('planSvg'
    g.fillText('Stanovanje S2 – načrt inštalacij ('+on+')',30,1640+50);g.font='22px Arial';g.fillStyle='#555';g.fillText(lg.innerText.replace(/\s+/g,' ').slice(0,180),30,1640+90);
    const blob=await new Promise(ok=>c.toBlob(ok,'image/png'));
    await dl.save({filename:'nacrt-instalacij-S2.png',data:blob});}catch(e){if(e&&e.code==='unavailable')b.hidden=true;}finally{b.disabled=false;b.textContent='Prenesi PNG';}});})();
- const a=document.createElement('a');a.href='#s-plans';a.textContent='Načrti';document.getElementById('toc').insertBefore(a,document.getElementById('toc').children[1]||null);{const c=document.createElement('a');c.href='#s-pred';c.textContent='Pred inštalacijami';document.getElementById('toc').appendChild(c);}{const b=document.createElement('a');b.href='#s-nakup';b.textContent='Nakup';document.getElementById('toc').appendChild(b);}}
+ {const toc=document.getElementById('toc');const det=[...toc.querySelectorAll('a')].filter(a=>!['#model','#s-cost'].includes(a.getAttribute('href')));toc.innerHTML='';
+  [['#model','3D model'],['#s-plans','Načrti za izvajalce'],['#s-pred','Pred inštalacijami'],['#s-nakup','Nakup'],['#s-smart','Pametna hiša – nakup'],['#s-cost','Stroški']].forEach(([h,t])=>{const a=document.createElement('a');a.href=h;a.textContent=t;a.style.fontWeight='600';a.style.color='var(--ink)';toc.appendChild(a);});
+  const sep=document.createElement('span');sep.textContent='·';sep.style.cssText='color:var(--faint);padding:6px 2px';toc.appendChild(sep);det.forEach(a=>toc.appendChild(a));}
+ document.querySelectorAll('.role').forEach(b=>b.addEventListener('click',()=>{
+  if(b.dataset.l){const t=document.querySelector(`#planTabs [data-l="${b.dataset.l}"]`);if(t)t.click();document.getElementById('s-plans').scrollIntoView({behavior:'smooth'});}
+  else if(b.dataset.v){const v=document.getElementById(b.dataset.v);if(v)v.click();document.getElementById('model').scrollIntoView({behavior:'smooth'});}
+  else if(b.dataset.h){document.getElementById(b.dataset.h).scrollIntoView({behavior:'smooth'});}}));}
 // ---------- KERAMIKA ZA TLA: imitacija travertina, lesa (deske, ribja kost) in betona – vse porcelanske ploščice ----------
 {const N=1024,mk=draw=>{const c=document.createElement('canvas');c.width=c.height=N;const g=c.getContext('2d');draw(g);const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.encoding=THREE.sRGBEncoding;t.anisotropy=8;t.repeat.set(1/2.4,1/2.4);return t;};
  let sd=7;const rn=()=>(sd=(sd*16807)%2147483647)/2147483647, px=N/240;   // 1 cm = px pikslov (tekstura = 2,4 m)
