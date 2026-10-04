@@ -115,6 +115,15 @@ tr:hover td{background:var(--accent-soft)}
 .big{font-family:var(--display);letter-spacing:-.03em}
 footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint);font-size:13px}
 @media (max-width:640px){.topnav .brand{display:none}}
+.shop{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+.shopg summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:8px;font:700 17px var(--display)}
+.shopg summary::-webkit-details-marker{display:none}
+.shopl{list-style:none;padding:0;margin:0;display:grid;gap:7px}
+.shopl label{cursor:pointer}
+.shopl input{accent-color:var(--accent);margin-right:6px}
+.shopl li:has(input:checked) label{text-decoration:line-through;color:var(--faint)}
+.shopl a{color:var(--accent)}
+
 .roles{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:28px}
 .role{all:unset;cursor:pointer;display:grid;gap:4px;padding:14px 16px;border:1px solid var(--line);border-radius:2px;background:var(--sheet);transition:border-color .15s,transform .15s}
 .role:hover,.role:focus-visible{border-color:var(--accent);transform:translateY(-1px)}
@@ -172,7 +181,8 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
       <button class="role" data-l="hv"><b>Strojnik</b><span>TČ, talno ogrevanje, rekuperacija, klima</span></button>
       <button class="role" data-v="vkit"><b>Kuhinjski studio</b><span>kuhinja in otok v 3D, nato seznam »Nakup«</span></button>
       <button class="role" data-h="s-pred"><b>Pred inštalacijami</b><span>kaj mora biti izbrano in kupljeno prej</span></button>
-      <button class="role" data-h="s-smart"><b>Pametna hiša – nakup</b><span>vse komponente s količinami in cela hiša na tablici</span></button>
+      <button class="role" data-h="s-kupi"><b>Nakupovalni seznami</b><span>kaj kupiti in kje, s kljukicami in povezavami</span></button>
+      <button class="role" data-h="s-smart"><b>Pametna hiša</b><span>vse komponente in cela hiša na tablici</span></button>
     </div>
     <div class="stats">
       <div><b>131,6 m²</b><span>notranja površina</span></div>
@@ -181,7 +191,7 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
       <div><b id="stLan">–</b><span>mrežnih priključkov</span></div>
       <div><b>17</b><span>mest stikal</span></div>
     </div>
-    <p class="small" style="margin-top:14px;color:var(--faint)">različica 132 – kartice »Kdo si«, seznam za pametno hišo, cela hiša na stenski tablici</p>
+    <p class="small" style="margin-top:14px;color:var(--faint)">različica 134 – nakupovalni seznami po trgovinah, Home Assistant na Synologyju</p>
   </header>
 
   <section class="viewer" id="model" aria-label="3D pogled">
@@ -328,13 +338,76 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
     </div>
   </section>
 
+  <section class="plans" id="kupi">
+    <div class="phead"><div>
+      <p class="eyebrow">Nakupovalni seznami</p>
+      <h2 id="s-kupi">Kaj kupiti in kje – po trgovinah</h2>
+      <p class="small" style="max-width:72ch">Kratki seznami po tem, kam greš. »Poišči« odpre iskanje izdelka, imena trgovin vodijo na njihovo spletno stran. Kljukice si stran zapomni na tej napravi. Cene in zaloge preveri pri trgovini.</p>
+    </div></div>
+    <div class="shop">
+      <details class="card shopg" open><summary><b>Izvajalci – ponudba z montažo (ne kupuješ sam)</b> <span class="small shopc" data-g="0"></span></summary><p class="small" style="margin:6px 0 8px">Pokliči in zahtevaj ponudbo. Pokaži jim načrt njihove stroke s te strani.</p><ul class="shopl">
+        <li><label><input type="checkbox" data-k="0-0"> Električar + KNX integrator: kabli, doze, razdelilnik, KNX stikala, aktorji, senzorji, termostati</label><span class="small"> — <a href="https://www.google.com/search?q=KNX%20integrator%20Slovenija" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.knx.org" target="_blank" rel="noopener noreferrer">KNX partnerji</a></span></li>
+        <li><label><input type="checkbox" data-k="0-1"> Vodovodar: 2 podometna WC nosilca, armatura za tuš, kanaleta, cevi in odtoki</label><span class="small"> — <a href="https://www.google.com/search?q=Geberit%20Duofix%20AquaClean%20podometni%20nosilec" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.geberit.si" target="_blank" rel="noopener noreferrer">Geberit</a></span></li>
+        <li><label><input type="checkbox" data-k="0-2"> Strojnik: toplotna črpalka + talno ogrevanje (preveri subvencijo)</label><span class="small"> — <a href="https://www.google.com/search?q=toplotna%20%C4%8Drpalka%20zrak%20voda%20monta%C5%BEa%20Slovenija" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.ekosklad.si" target="_blank" rel="noopener noreferrer">Eko sklad</a></span></li>
+        <li><label><input type="checkbox" data-k="0-3"> Strojnik: rekuperacija ~300–350 m³/h z razvodom</label><span class="small"> — <a href="https://www.google.com/search?q=Zehnder%20ComfoAir%20Q350%20Slovenija" target="_blank" rel="noopener noreferrer">Poišči</a></span></li>
+        <li><label><input type="checkbox" data-k="0-4"> Strojnik: kanalska klima</label><span class="small"> — <a href="https://www.google.com/search?q=kanalska%20klima%20Daikin%20Slovenija%20monta%C5%BEa" target="_blank" rel="noopener noreferrer">Poišči</a></span></li>
+        <li><label><input type="checkbox" data-k="0-5"> Okna, PSK terasna vrata, zunanje alu žaluzije z motorjem</label><span class="small"> — <a href="https://www.google.com/search?q=zunanje%20%C5%BEaluzije%20z%20motorjem%20Slovenija" target="_blank" rel="noopener noreferrer">Poišči</a></span></li>
+        <li><label><input type="checkbox" data-k="0-6"> Kamin: vložek na drva z akumulacijsko oblogo + dimnik</label><span class="small"> — <a href="https://www.google.com/search?q=Spartherm%20vlo%C5%BEek%20kamin%20Slovenija" target="_blank" rel="noopener noreferrer">Poišči</a></span></li>
+        <li><label><input type="checkbox" data-k="0-7"> Mizar: omare z drsnimi vrati po meri, TV stena</label><span class="small"> — <a href="https://www.google.com/search?q=mizar%20omare%20po%20meri%20drsna%20vrata" target="_blank" rel="noopener noreferrer">Poišči</a></span></li>
+      </ul></details>
+      <details class="card shopg" open><summary><b>Kuhinjski studio</b> <span class="small shopc" data-g="1"></span></summary><p class="small" style="margin:6px 0 8px">Vse za kuhinjo naenkrat, BORA pogosto ceneje v paketu s kuhinjo.</p><ul class="shopl">
+        <li><label><input type="checkbox" data-k="1-0"> Kuhinja po meri (oreh ali hrast, krem zgornji, črn mat pult, otok)</label><span class="small"> — <a href="https://www.google.com/search?q=DanK%C3%BCchen%20Trebnje%20kuhinje" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.lesnina.si" target="_blank" rel="noopener noreferrer">Lesnina</a></span></li>
+        <li><label><input type="checkbox" data-k="1-1"> BORA X Pure Max (plošča z napo)</label><span class="small"> — <a href="https://www.google.com/search?q=BORA%20X%20Pure%20Max" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.bora.com/sl-si" target="_blank" rel="noopener noreferrer">BORA</a></span></li>
+        <li><label><input type="checkbox" data-k="1-2"> BORA Oven Steam</label><span class="small"> — <a href="https://www.google.com/search?q=BORA%20Oven%20Steam" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.bora.com/sl-si" target="_blank" rel="noopener noreferrer">BORA</a></span></li>
+        <li><label><input type="checkbox" data-k="1-3"> BORA Dish (pomivalni stroj)</label><span class="small"> — <a href="https://www.google.com/search?q=BORA%20Dish" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.bora.com/sl-si" target="_blank" rel="noopener noreferrer">BORA</a></span></li>
+        <li><label><input type="checkbox" data-k="1-4"> Korito iz granita + pipa + Quooker / filter</label><span class="small"> — <a href="https://www.google.com/search?q=podpultno%20korito%20granit%20%C4%8Drno%20Quooker" target="_blank" rel="noopener noreferrer">Poišči</a></span></li>
+      </ul></details>
+      <details class="card shopg" open><summary><b>Trgovina z elektroniko in belo tehniko</b> <span class="small shopc" data-g="2"></span></summary><p class="small" style="margin:6px 0 8px">Primerjaj cene, pogosto so akcije.</p><ul class="shopl">
+        <li><label><input type="checkbox" data-k="2-0"> Hladilnik LG GSXV90MCDE InstaView</label><span class="small"> — <a href="https://www.google.com/search?q=LG%20GSXV90MCDE" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.bigbang.si" target="_blank" rel="noopener noreferrer">Big Bang</a> · <a href="https://www.harveynorman.si" target="_blank" rel="noopener noreferrer">Harvey Norman</a> · <a href="https://www.mimovrste.com" target="_blank" rel="noopener noreferrer">Mimovrste</a></span></li>
+        <li><label><input type="checkbox" data-k="2-1"> Pralni in sušilni stroj Miele</label><span class="small"> — <a href="https://www.google.com/search?q=Miele%20pralni%20stroj%20su%C5%A1ilni%20stroj" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.bigbang.si" target="_blank" rel="noopener noreferrer">Big Bang</a> · <a href="https://www.harveynorman.si" target="_blank" rel="noopener noreferrer">Harvey Norman</a></span></li>
+        <li><label><input type="checkbox" data-k="2-2"> TV Philips 65OLED910</label><span class="small"> — <a href="https://www.google.com/search?q=Philips%2065OLED910" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.bigbang.si" target="_blank" rel="noopener noreferrer">Big Bang</a> · <a href="https://www.harveynorman.si" target="_blank" rel="noopener noreferrer">Harvey Norman</a> · <a href="https://www.mimovrste.com" target="_blank" rel="noopener noreferrer">Mimovrste</a></span></li>
+        <li><label><input type="checkbox" data-k="2-3"> JBL soundbar + subwoofer</label><span class="small"> — <a href="https://www.google.com/search?q=JBL%20Bar%20soundbar%20subwoofer" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.bigbang.si" target="_blank" rel="noopener noreferrer">Big Bang</a> · <a href="https://www.harveynorman.si" target="_blank" rel="noopener noreferrer">Harvey Norman</a> · <a href="https://www.mimovrste.com" target="_blank" rel="noopener noreferrer">Mimovrste</a></span></li>
+        <li><label><input type="checkbox" data-k="2-4"> Xbox</label><span class="small"> — <a href="https://www.google.com/search?q=Xbox%20konzola" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.bigbang.si" target="_blank" rel="noopener noreferrer">Big Bang</a> · <a href="https://www.mimovrste.com" target="_blank" rel="noopener noreferrer">Mimovrste</a></span></li>
+        <li><label><input type="checkbox" data-k="2-5"> Philips Airfryer serije 5000 s paro</label><span class="small"> — <a href="https://www.google.com/search?q=Philips%20Airfryer%205000%20steam" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.bigbang.si" target="_blank" rel="noopener noreferrer">Big Bang</a> · <a href="https://www.harveynorman.si" target="_blank" rel="noopener noreferrer">Harvey Norman</a> · <a href="https://www.mimovrste.com" target="_blank" rel="noopener noreferrer">Mimovrste</a></span></li>
+        <li><label><input type="checkbox" data-k="2-6"> Avtomatski kavni aparat</label><span class="small"> — <a href="https://www.google.com/search?q=avtomatski%20kavni%20aparat" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.bigbang.si" target="_blank" rel="noopener noreferrer">Big Bang</a> · <a href="https://www.harveynorman.si" target="_blank" rel="noopener noreferrer">Harvey Norman</a> · <a href="https://www.mimovrste.com" target="_blank" rel="noopener noreferrer">Mimovrste</a></span></li>
+        <li><label><input type="checkbox" data-k="2-7"> Robotski sesalnik iRobot Roomba Combo s postajo</label><span class="small"> — <a href="https://www.google.com/search?q=iRobot%20Roomba%20Combo" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.bigbang.si" target="_blank" rel="noopener noreferrer">Big Bang</a> · <a href="https://www.mimovrste.com" target="_blank" rel="noopener noreferrer">Mimovrste</a></span></li>
+        <li><label><input type="checkbox" data-k="2-8"> Dvoconska podpultna vinska vitrina Klarstein</label><span class="small"> — <a href="https://www.google.com/search?q=Klarstein%20dvoconska%20vinska%20vitrina%20podpultna" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.mimovrste.com" target="_blank" rel="noopener noreferrer">Mimovrste</a></span></li>
+      </ul></details>
+      <details class="card shopg" open><summary><b>Pohištvo</b> <span class="small shopc" data-g="3"></span></summary><p class="small" style="margin:6px 0 8px">Pri sedežni in postelji vprašaj za noge 12 cm (robotski sesalnik).</p><ul class="shopl">
+        <li><label><input type="checkbox" data-k="3-0"> Kotna sedežna ~270 × 220 cm z vgrajenim modulom (230 V + USB-C)</label><span class="small"> — <a href="https://www.google.com/search?q=kotna%20sede%C5%BEna%20garnitura%20USB%20modul" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.harveynorman.si" target="_blank" rel="noopener noreferrer">Harvey Norman</a> · <a href="https://rutar.com" target="_blank" rel="noopener noreferrer">Rutar</a> · <a href="https://www.lesnina.si" target="_blank" rel="noopener noreferrer">Lesnina</a></span></li>
+        <li><label><input type="checkbox" data-k="3-1"> Postelja 180 × 200 z oblazinjenim vzglavjem + vzmetnica</label><span class="small"> — <a href="https://www.google.com/search?q=postelja%20180x200%20oblazinjeno%20vzglavje" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://rutar.com" target="_blank" rel="noopener noreferrer">Rutar</a> · <a href="https://www.lesnina.si" target="_blank" rel="noopener noreferrer">Lesnina</a> · <a href="https://www.ikea.com/si/sl/" target="_blank" rel="noopener noreferrer">IKEA</a></span></li>
+        <li><label><input type="checkbox" data-k="3-2"> Okrogla jedilna miza Ø 110 + 4 stoli, 4 barski stoli</label><span class="small"> — <a href="https://www.google.com/search?q=okrogla%20jedilna%20miza%20110%20oreh" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.lesnina.si" target="_blank" rel="noopener noreferrer">Lesnina</a> · <a href="https://rutar.com" target="_blank" rel="noopener noreferrer">Rutar</a> · <a href="https://www.ikea.com/si/sl/" target="_blank" rel="noopener noreferrer">IKEA</a></span></li>
+        <li><label><input type="checkbox" data-k="3-3"> Otroški postelji, pisalni mizi, pisarniška stola</label><span class="small"> — <a href="https://www.google.com/search?q=otro%C5%A1ka%20pisalna%20miza" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.ikea.com/si/sl/" target="_blank" rel="noopener noreferrer">IKEA</a> · <a href="https://www.lesnina.si" target="_blank" rel="noopener noreferrer">Lesnina</a></span></li>
+        <li><label><input type="checkbox" data-k="3-4"> Preproge, zavese, tekstil</label><span class="small"> — <a href="https://www.google.com/search?q=volnena%20preproga" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.ikea.com/si/sl/" target="_blank" rel="noopener noreferrer">IKEA</a> · <a href="https://www.lesnina.si" target="_blank" rel="noopener noreferrer">Lesnina</a></span></li>
+      </ul></details>
+      <details class="card shopg" open><summary><b>Keramika in kopalnica</b> <span class="small shopc" data-g="4"></span></summary><p class="small" style="margin:6px 0 8px">Vzemi vzorce domov in jih poglej zvečer.</p><ul class="shopl">
+        <li><label><input type="checkbox" data-k="4-0"> Ploščice v videzu svetlega hrasta (tla povsod, ~135 m²)</label><span class="small"> — <a href="https://www.google.com/search?q=keramika%20videz%20hrasta%2020x120%20mat" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.bauhaus.si" target="_blank" rel="noopener noreferrer">Bauhaus</a> · <a href="https://www.merkur.si" target="_blank" rel="noopener noreferrer">Merkur</a> · <a href="https://www.kolpa.si" target="_blank" rel="noopener noreferrer">Kolpa</a></span></li>
+        <li><label><input type="checkbox" data-k="4-1"> Stenske ploščice in kamen za kopalnico in WC (~50 m²)</label><span class="small"> — <a href="https://www.google.com/search?q=plo%C5%A1%C4%8Dice%20kopalnica%20velik%20format%20kamen" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.bauhaus.si" target="_blank" rel="noopener noreferrer">Bauhaus</a> · <a href="https://www.merkur.si" target="_blank" rel="noopener noreferrer">Merkur</a> · <a href="https://www.kolpa.si" target="_blank" rel="noopener noreferrer">Kolpa</a></span></li>
+        <li><label><input type="checkbox" data-k="4-2"> 2 tuš-WC (Geberit AquaClean ali podobno)</label><span class="small"> — <a href="https://www.google.com/search?q=Geberit%20AquaClean" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.geberit.si" target="_blank" rel="noopener noreferrer">Geberit</a> · <a href="https://www.kolpa.si" target="_blank" rel="noopener noreferrer">Kolpa</a></span></li>
+        <li><label><input type="checkbox" data-k="4-3"> Umivalniki, lebdeči omarici, ogledali z LED</label><span class="small"> — <a href="https://www.google.com/search?q=lebde%C4%8Da%20kopalni%C5%A1ka%20omarica%20oreh" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.kolpa.si" target="_blank" rel="noopener noreferrer">Kolpa</a> · <a href="https://www.bauhaus.si" target="_blank" rel="noopener noreferrer">Bauhaus</a></span></li>
+        <li><label><input type="checkbox" data-k="4-4"> Steklena stena tuša, dežna + ročna prha, termostatska armatura</label><span class="small"> — <a href="https://www.google.com/search?q=walk-in%20steklena%20stena%20tu%C5%A1" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.kolpa.si" target="_blank" rel="noopener noreferrer">Kolpa</a> · <a href="https://www.bauhaus.si" target="_blank" rel="noopener noreferrer">Bauhaus</a></span></li>
+      </ul></details>
+      <details class="card shopg" open><summary><b>Pametna hiša in omrežje (lahko kupiš sam)</b> <span class="small shopc" data-g="5"></span></summary><p class="small" style="margin:6px 0 8px">Kable in doze mora električar položiti že med gradnjo.</p><ul class="shopl">
+        <li><label><input type="checkbox" data-k="5-0"> Philips Hue Bridge Pro + spoti, LED trakovi, žarnice (~70 točk)</label><span class="small"> — <a href="https://www.google.com/search?q=Philips%20Hue%20Bridge%20Pro" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.philips-hue.com" target="_blank" rel="noopener noreferrer">Philips Hue</a> · <a href="https://www.bigbang.si" target="_blank" rel="noopener noreferrer">Big Bang</a> · <a href="https://www.mimovrste.com" target="_blank" rel="noopener noreferrer">Mimovrste</a></span></li>
+        <li><label><input type="checkbox" data-k="5-1"> Strežnik za Home Assistant: <b>tvoj Synology</b> (Home Assistant OS v Virtual Machine Manager) ali samostojen Home Assistant Green</label><span class="small"> — <a href="https://www.google.com/search?q=Home%20Assistant%20OS%20Synology%20Virtual%20Machine%20Manager" target="_blank" rel="noopener noreferrer">Navodila za Synology</a> · <a href="https://www.home-assistant.io" target="_blank" rel="noopener noreferrer">Home Assistant</a></span></li>
+        <li><label><input type="checkbox" data-k="5-2"> Router, PoE stikalo, 4 dostopne točke, omarica 15U, UPS</label><span class="small"> — <a href="https://www.google.com/search?q=UniFi%20Dream%20Machine%20PoE%20switch%20access%20point" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://eu.store.ui.com" target="_blank" rel="noopener noreferrer">Ubiquiti</a> · <a href="https://www.mimovrste.com" target="_blank" rel="noopener noreferrer">Mimovrste</a></span></li>
+        <li><label><input type="checkbox" data-k="5-3"> Stenska tablica 10" + nosilec v steni (cela hiša na zaslonu)</label><span class="small"> — <a href="https://www.google.com/search?q=stenski%20nosilec%20tablica%2010%20PoE" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.bigbang.si" target="_blank" rel="noopener noreferrer">Big Bang</a> · <a href="https://www.mimovrste.com" target="_blank" rel="noopener noreferrer">Mimovrste</a></span></li>
+        <li><label><input type="checkbox" data-k="5-4"> Video zvonec + 2 kameri (PoE)</label><span class="small"> — <a href="https://www.google.com/search?q=video%20zvonec%20PoE%20kamera" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://eu.store.ui.com" target="_blank" rel="noopener noreferrer">Ubiquiti</a> · <a href="https://www.mimovrste.com" target="_blank" rel="noopener noreferrer">Mimovrste</a></span></li>
+        <li><label><input type="checkbox" data-k="5-5"> 5 senzorjev puščanja vode (Zigbee)</label><span class="small"> — <a href="https://www.google.com/search?q=Zigbee%20senzor%20pu%C5%A1%C4%8Danja%20vode" target="_blank" rel="noopener noreferrer">Poišči</a> · <a href="https://www.mimovrste.com" target="_blank" rel="noopener noreferrer">Mimovrste</a></span></li>
+      </ul></details>
+      <details class="card shopg" open><summary><b>Morski akvarij</b> <span class="small shopc" data-g="6"></span></summary><p class="small" style="margin:6px 0 8px">Pri specializirani trgovini, kjer ti svetujejo in pomagajo pri zagonu.</p><ul class="shopl">
+        <li><label><input type="checkbox" data-k="6-0"> Bazen s sumpom, LED z UV, črpalke, krmilnik z letvijo, RO filter</label><span class="small"> — <a href="https://www.google.com/search?q=Red%20Sea%20Reefer%20akvarij" target="_blank" rel="noopener noreferrer">Poišči</a></span></li>
+      </ul></details>
+    </div>
+  </section>
+
   <section class="plans" id="nakup">
     <div class="phead"><div>
       <p class="eyebrow">Nakupovalni seznam</p>
       <h2 id="s-nakup">Kje kupiti in kdaj</h2>
       <p class="small" style="max-width:72ch">Vse, kar je v modelu, po vrstnem redu odločanja. Stvari pod »Pred gradnjo« morajo biti izbrane pred PZI in pred estrihom, ker vplivajo na napeljave. Trgovine so primeri večjih prodajaln v Sloveniji. Cene in zaloge preveri sam, pri vgradni tehniki pa vedno vzemi ponudbo z montažo.</p>
     </div></div>
-    <div class="tbl"><table>
+    <details><summary class="small" style="cursor:pointer;font-weight:600">Podrobno: tabela po vrstnem redu gradnje</summary><div class="tbl"><table>
       <thead><tr><th>Kdaj</th><th>Kaj</th><th>Znamke</th><th>Kje / prek koga</th></tr></thead>
       <tbody>
             <tr><td class="small">Pred gradnjo / PZI</td><td>Toplotna črpalka, talno ogrevanje</td><td class="small">Daikin, Mitsubishi, Panasonic, Viessmann, Vaillant</td><td class="small">Prek monterja strojnih inštalacij (ponudba z montažo). Pred nakupom preveri razpis Eko sklada.</td></tr>
@@ -360,7 +433,7 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
             <tr><td class="small">Ostalo</td><td>Robotski sesalnik s postajo, video zvonec, kamere</td><td class="small">iRobot (Roomba Combo), Ubiquiti / Ring</td><td class="small">Big Bang, Mimovrste, Harvey Norman.</td></tr>
             <tr><td class="small">Ostalo</td><td>Home Assistant (aplikacija in avtomatizacije)</td><td class="small">Home Assistant Green ali mini PC</td><td class="small">Uradna spletna trgovina / mrežni prodajalci; nastavi integrator ali sam.</td></tr>
       </tbody>
-    </table></div>
+    </table></div></details>
   </section>
 
 
@@ -370,11 +443,11 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
       <h2 id="s-smart">Kaj vse nabaviti, da pametna hiša deluje</h2>
       <p class="small" style="max-width:72ch">Količine so iz modela (17 mest stikal, 11 senčil, 9 zank talnega ogrevanja …). Vse v steni in razdelilniku (KNX) dobavi in sprogramira <b>KNX integrator</b>. Hue, Home Assistant in omrežje lahko kupiš sam. Pomembno: kabli in doze morajo biti v steni že med gradnjo, naprave pa se lahko kupijo pozneje.</p>
     </div></div>
-    <div class="tbl"><table>
+    <details><summary class="small" style="cursor:pointer;font-weight:600">Podrobno: vse komponente s količinami</summary><div class="tbl"><table>
       <thead><tr><th>Skupina</th><th>Kaj</th><th>Količina</th><th>Za kaj</th><th>Znamke</th></tr></thead>
       <tbody>
             <tr><td class="small">Srce sistema</td><td>KNX napajalnik 640 mA + IP vmesnik / router</td><td class="n">1 + 1</td><td class="small">napaja vodilo, poveže KNX z omrežjem in Home Assistantom</td><td class="small">Gira, MDT, ABB</td></tr>
-            <tr><td class="small">Srce sistema</td><td>Home Assistant strežnik (Home Assistant Green ali mini PC) + UPS</td><td class="n">1</td><td class="small">ena aplikacija za vse: KNX, Hue, TČ, klima, kamere, robot, BORA, LG</td><td class="small">Home Assistant</td></tr>
+            <tr><td class="small">Srce sistema</td><td>Home Assistant strežnik: tvoj Synology (Home Assistant OS v virtualki) ali Home Assistant Green; UPS</td><td class="n">1</td><td class="small">ena aplikacija za vse: KNX, Hue, TČ, klima, kamere, robot, BORA, LG</td><td class="small">Home Assistant</td></tr>
             <tr><td class="small">Srce sistema</td><td>Philips Hue Bridge Pro</td><td class="n">1</td><td class="small">vse luči Hue (~70 točk), scene, Ambilight sync</td><td class="small">Philips Hue</td></tr>
             <tr><td class="small">Tipke in senzorji</td><td>KNX tipke (stikala) s 1–4 tipkami</td><td class="n">17 mest, ~47 tipk</td><td class="small">luči, scene, senčila; vsaka tipka je programabilna</td><td class="small">Gira, Jung, MDT</td></tr>
             <tr><td class="small">Tipke in senzorji</td><td>Sobni termostati / temperaturni senzorji KNX</td><td class="n">3 + glavna enota</td><td class="small">temperatura po sobah, krmili talno ogrevanje in klimo</td><td class="small">Gira, MDT, Theben</td></tr>
@@ -395,8 +468,9 @@ footer.foot{border-top:1px solid var(--line);padding-top:24px;color:var(--faint)
             <tr><td class="small">Cela hiša na tablici</td><td>Stenska tablica 10" v hodniku namesto glavne enote (napajanje PoE ali USB-C v steni)</td><td class="n">1</td><td class="small">tloris stanovanja: luči, senčila, temperature, kamere, kdo je doma – vse z enim dotikom</td><td class="small">iPad / Android tablica + nosilec v steni</td></tr>
             <tr><td class="small">Cela hiša na tablici</td><td>Aplikacija Home Assistant na telefonih in tablicah</td><td class="n">—</td><td class="small">ista nadzorna plošča doma in na poti (varen dostop prek Home Assistant Cloud ali VPN)</td><td class="small">Home Assistant</td></tr>
       </tbody>
-    </table></div>
+    </table></div></details>
     <div class="card" style="margin-top:12px"><h2>Cela hiša na tablici</h2><ul>
+<li><b>Strežnik na tvojem Synologyju:</b> Home Assistant lahko teče na Synology NAS v <b>Virtual Machine Manager</b> kot Home Assistant OS (priporočeno, ker ima tako vse dodatke in varnostne kopije) – potrebuješ model, ki podpira virtualizacijo (serija Plus / x86 procesor) in vsaj 2–4 GB prostega RAM-a. Synology gre v omrežno omarico 15U v utility, na UPS. Če je NAS star ali ga pogosto ponovno zaganjaš, je boljši samostojen <b>Home Assistant Green</b> (~100 €), da pametna hiša ni odvisna od NAS-a. Na Synology pa lahko gredo posnetki kamer in varnostne kopije Home Assistanta.</li>
       <li><b>Stenska tablica v hodniku</b> (namesto majhne glavne enote) kaže tloris stanovanja: tapneš sobo in prižgeš luči, spustiš rolete, nastaviš temperaturo, vidiš kamero pri vhodu, ali je kje odprto okno in ali pušča voda. Napajanje je iz stene (PoE ali USB-C), zato ni kabla.</li>
       <li><b>Isto na telefonu in tvoji tablici</b> v aplikaciji Home Assistant – doma in na poti. Glasovno pa prek Google, Alexa ali Siri.</li>
       <li><b>3D model in načrti</b> (ta stran) so na <b>zanmeke.com/hisa</b> z geslom – na tablici dodaj ikono na začetni zaslon.</li>
@@ -2457,7 +2531,7 @@ try{{const NS='http://www.w3.org/2000/svg',svg=document.getElementById('planSvg'
    const blob=await new Promise(ok=>c.toBlob(ok,'image/png'));
    await dl.save({filename:'nacrt-instalacij-S2.png',data:blob});}catch(e){if(e&&e.code==='unavailable')b.hidden=true;}finally{b.disabled=false;b.textContent='Prenesi PNG';}});})();
  {const toc=document.getElementById('toc');const det=[...toc.querySelectorAll('a')].filter(a=>!['#model','#s-cost'].includes(a.getAttribute('href')));toc.innerHTML='';
-  [['#model','3D model'],['#s-plans','Načrti za izvajalce'],['#s-pred','Pred inštalacijami'],['#s-nakup','Nakup'],['#s-smart','Pametna hiša – nakup'],['#s-cost','Stroški']].forEach(([h,t])=>{const a=document.createElement('a');a.href=h;a.textContent=t;a.style.fontWeight='600';a.style.color='var(--ink)';toc.appendChild(a);});
+  [['#model','3D model'],['#s-plans','Načrti za izvajalce'],['#s-pred','Pred inštalacijami'],['#s-kupi','Nakupovalni seznami'],['#s-smart','Pametna hiša'],['#s-cost','Stroški']].forEach(([h,t])=>{const a=document.createElement('a');a.href=h;a.textContent=t;a.style.fontWeight='600';a.style.color='var(--ink)';toc.appendChild(a);});
   const sep=document.createElement('span');sep.textContent='·';sep.style.cssText='color:var(--faint);padding:6px 2px';toc.appendChild(sep);det.forEach(a=>toc.appendChild(a));}
  document.querySelectorAll('.role').forEach(b=>b.addEventListener('click',()=>{
   if(b.dataset.l){const t=document.querySelector(`#planTabs [data-l="${b.dataset.l}"]`);if(t)t.click();document.getElementById('s-plans').scrollIntoView({behavior:'smooth'});}
@@ -2484,6 +2558,12 @@ try{{const NS='http://www.w3.org/2000/svg',svg=document.getElementById('planSvg'
 
 }catch(err){const lg=document.getElementById('planLegend');if(lg)lg.textContent='Načrta ni bilo mogoče izrisati: '+(err&&err.message||err);console.error(err);}
 document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href^="#"]');if(!a)return;const id=a.getAttribute('href').slice(1);const t=id==='top'?document.body:document.getElementById(id);if(t){e.preventDefault();(id==='top'?window:t).scrollIntoView?t.scrollIntoView({behavior:'smooth',block:'start'}):scrollTo(0,0);}});
+// nakupovalni seznami: kljukice (zapomni si ta naprava) in štetje po skupinah
+{const K='hisaS2-kupi';let st={};try{st=JSON.parse(localStorage.getItem(K)||'{}');}catch(e){}
+ const boxes=[...document.querySelectorAll('.shopl input')];
+ const cnt=()=>document.querySelectorAll('.shopc').forEach(c=>{const g=c.dataset.g,bs=boxes.filter(b=>b.dataset.k.split('-')[0]===g);c.textContent=bs.filter(b=>b.checked).length+' / '+bs.length;});
+ boxes.forEach(b=>{b.checked=!!st[b.dataset.k];b.addEventListener('change',()=>{st[b.dataset.k]=b.checked;try{localStorage.setItem(K,JSON.stringify(st));}catch(e){}cnt();});});cnt();}
+
 function frame(){ updBlinds();
  doorAnim.forEach(a=>{if(a.cycle){const k=reduce?1:.12;a.tc+=(a.tt-a.tc)*k;a.sc+=(a.sl-a.sc)*k;a.g.rotation.z=.045*a.tc;a.g.position.z=a.slideZ*a.sc+(a.sc>.001?-m(1.5)*Math.min(1,a.sc*8)*0:0);return;}
   if(Math.abs(a.t-a.cur)<.002)return;a.cur+=(a.t-a.cur)*(reduce?1:.14);if(a.slideZ!==undefined)a.g.position.z=a.slideZ*a.cur;else if(a.slide!==undefined)a.g.position.x=a.slide*a.cur;else a.g.rotation.y=a.aO+(a.aC-a.aO)*a.cur;});
